@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-<!-- display control -->
-<node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
-<!-- display depth prediction -->
-<node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
-
-</launch>

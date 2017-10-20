@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<!--Read data parameters from yaml file-->
-	<arg name="global_param" default="debug_param.yaml"/>
-  	<rosparam command="load" file="$(find simulation_supervised)/config/$(arg global_param)" />
-  	<!-- Load the topics for control and camera input -->
-  	<arg name="drone_config" default="sim_drone.yaml"/>
-  	<rosparam command="load" file="$(find simulation_supervised)/config/$(arg drone_config)" />  
-</launch>
