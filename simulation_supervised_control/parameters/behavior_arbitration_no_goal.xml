@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!---->
+<opencv_storage>
+<!--define goal direction-->
+<lambdaGoalHorz>
+0.
+</lambdaGoalHorz>
+<!--increase to anticipate earlier horizontal-->
+<lambdaObstacleHorzNormal>
+3
+</lambdaObstacleHorzNormal>	
+<!--if you detect a corner react more aggressive: 50-->
+<lambdaObstacleHorzAggressive>
+50
+</lambdaObstacleHorzAggressive>
+<weightGoalHorz>
+0.
+</weightGoalHorz>
+<weightObstacleHorz>
+1.0
+</weightObstacleHorz>
+<!--decrease exponentially the strength of reaction-->
+<obstacleDistanceGainHorzNormal>
+0.1
+</obstacleDistanceGainHorzNormal>
+<obstacleDistanceGainHorzAggressive>
+0.005
+</obstacleDistanceGainHorzAggressive>
+<!--the maximum range it plans to fly through-->
+<angularRangeHorz>
+58
+</angularRangeHorz>
+<lambdaObstacleVert>
+5
+</lambdaObstacleVert>
+<angularRangeVert>
+27.5
+</angularRangeVert>
+<obstacleDistanceGainVert>
+0.15
+</obstacleDistanceGainVert>
+<noiseVariance>
+0.2
+</noiseVariance>
+<matchedFilterExpectedResult>
+3304
+</matchedFilterExpectedResult>
+<matchedFilterMargin>
+800
+</matchedFilterMargin>
+<depthImageScaling>
+1
+<!-- 1 -->
+</depthImageScaling>
+
+</opencv_storage>

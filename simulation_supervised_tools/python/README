@@ -1,0 +1,23 @@
+# Python scripts
+This folder contains python scripts used at different locations:
+
+### Generate training environments
+
+* canyon_generator.py
+* forest_generator.py
+* sandbox_generator.py
+
+### Vizualize during online performance
+
+* console_display: listens to the controller
+* control_mapping: maps the control from the tensorflow /pilot_vel to the drones /cmd_vel when flying in the real world. 
+* show_control: displays the predicted / supervised control
+* show_depth_predictions: vizualize predicted depth
+* show_odom_predictions: vizualize predicted odometry
+
+### Extra topics
+
+* evaluate: checks continuously during flying the closest point in the depth map. If this is smaller than the minimum allowed distance, the run ends in a failure.
+* ground_truth_listener: writes the current position away and draws the trajectory on the top down view in the logfolder/runs directory.
+
+

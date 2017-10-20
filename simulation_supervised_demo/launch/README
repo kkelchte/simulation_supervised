@@ -1,0 +1,7 @@
+Launch files for different enviroments.
+
+The *_joy files include starting a joy-node that listens to a joystick so the user can fly the drone with a controller.
+
+The full demo esat1 and esat2 assumes a running neural network running in the background.
+
+The other launch files are best invoked from scripts in simulation_supervised/simulation_supervised/scripts.

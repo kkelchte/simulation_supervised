@@ -1,0 +1,6 @@
+Esat_corridor_v1 and v2 correspond to the ESAT corridor for flying in the two directions.
+Tree is used for generating new forests.
+Forest is a more realistic model of a forest [Not used in doshico].
+
+Most models used for generating new sandboxes.
+If you want to include more models, you should place them here and add them to the models.txt list in simulation_supervised_tools/etc.

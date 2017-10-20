@@ -1,0 +1,33 @@
+<package>
+  <name>simulation_supervised_demo</name>
+  <version>0.0.0</version>
+  <description>simulation_supervised contains packages related to the setup of training a neural network control with behavior arbitration supervision in the gazebo simulated environment</description>
+  <maintainer email="kkelchte@esat.kuleuven.be">Klaas Kelchtermans</maintainer>
+
+  <license>BSD</license>
+
+  <author email="kkelchte@esat.kuleuven.be">Klaas Kelchtermans</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>hector_quadrotor</run_depend>
+  <run_depend>hector_sensors_description</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>image_transport</run_depend>
+
+
+  <!-- Dependencies needed only for running tests. -->
+  <export>
+  <gazebo_ros gazebo_model_path="$(find simulation_supervised)/models"/>
+  </export>
+
+</package>

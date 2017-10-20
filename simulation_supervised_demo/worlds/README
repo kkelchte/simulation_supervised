@@ -1,0 +1,9 @@
+This folder contains simulated gazebo environments.
+
+The empty_world and template are used by random-world-generators as a starting point.
+
+forest, canyon and sandbox are example worlds. During online training/evaluation, they are created on the fly and saved to a the log folder. 
+
+Note that the .png file contain a top down view of the environment. This image is used to project the trajectory.
+
+
