@@ -1,0 +1,13 @@
+cafe_table
+cabinet
+bookshelf
+construction_cone
+first_2015_trash_can
+nist_elevated_floor_120
+nist_maze_wall_240
+person_standing
+robocup_3Dsim_goal
+table
+textured_shapes_sphere
+textured_shapes_cylinder
+textured_shapes_box

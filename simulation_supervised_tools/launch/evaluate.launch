@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="starting_height" default="0.5"/>
+  <param name="starting_height" value="$(arg starting_height)"/>
+  <arg name="log_folder" default="$(find simulation_supervised_tools)/log"/>
+  <param name="log_folder" value="$(arg log_folder)"/>
+  <arg name="eva_dis" default="-1"/>
+  <param name="eva_dis" value="$(arg eva_dis)"/>
+  <node name="evaluate" pkg="simulation_supervised_tools" type="evaluate.py" output="screen"/>
+</launch>

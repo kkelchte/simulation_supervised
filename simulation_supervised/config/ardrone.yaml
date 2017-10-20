@@ -1,0 +1,7 @@
+control: /cmd_vel
+takeoff: /takeoff
+land: /land
+ready: /ready
+finished: /finished
+rgb_image: /kinect/rgb/image_raw
+depth_image: /kinect/depth/image_raw

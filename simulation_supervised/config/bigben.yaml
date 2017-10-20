@@ -1,0 +1,132 @@
+# PS3 wireless controller
+
+#define PS3_BUTTON_SELECT            0
+#define PS3_BUTTON_STICK_LEFT        1
+#define PS3_BUTTON_STICK_RIGHT       2
+#define PS3_BUTTON_START             3
+#define PS3_BUTTON_CROSS_UP          4
+#define PS3_BUTTON_CROSS_RIGHT       5
+#define PS3_BUTTON_CROSS_DOWN        6
+#define PS3_BUTTON_CROSS_LEFT        7
+#define PS3_BUTTON_REAR_LEFT_2       8
+#define PS3_BUTTON_REAR_RIGHT_2      9
+#define PS3_BUTTON_REAR_LEFT_1       10
+#define PS3_BUTTON_REAR_RIGHT_1      11
+#define PS3_BUTTON_ACTION_TRIANGLE   12
+#define PS3_BUTTON_ACTION_CIRCLE     13
+#define PS3_BUTTON_ACTION_CROSS      14
+#define PS3_BUTTON_ACTION_SQUARE     15
+#define PS3_BUTTON_PAIRING           16
+
+#define PS3_AXIS_STICK_LEFT_LEFTWARDS    0
+#define PS3_AXIS_STICK_LEFT_UPWARDS      1
+#define PS3_AXIS_STICK_RIGHT_LEFTWARDS   2
+#define PS3_AXIS_STICK_RIGHT_UPWARDS     3
+#define PS3_AXIS_BUTTON_CROSS_UP         4
+#define PS3_AXIS_BUTTON_CROSS_RIGHT      5
+#define PS3_AXIS_BUTTON_CROSS_DOWN       6
+#define PS3_AXIS_BUTTON_CROSS_LEFT       7
+#define PS3_AXIS_BUTTON_REAR_LEFT_2      8
+#define PS3_AXIS_BUTTON_REAR_RIGHT_2     9
+#define PS3_AXIS_BUTTON_REAR_LEFT_1      10
+#define PS3_AXIS_BUTTON_REAR_RIGHT_1     11
+#define PS3_AXIS_BUTTON_ACTION_TRIANGLE  12
+#define PS3_AXIS_BUTTON_ACTION_CIRCLE    13
+#define PS3_AXIS_BUTTON_ACTION_CROSS     14
+#define PS3_AXIS_BUTTON_ACTION_SQUARE    15
+#define PS3_AXIS_ACCELEROMETER_LEFT      16
+#define PS3_AXIS_ACCELEROMETER_FORWARD   17
+#define PS3_AXIS_ACCELEROMETER_UP        18
+#define PS3_AXIS_GYRO_YAW                19
+
+teleop:
+  piloting:
+    type: topic
+    message_type: "geometry_msgs/Twist"
+    topic_name: ps3_vel
+    axis_mappings:
+      -
+        axis: 3  # Right thumb stick (up/down)
+        target: linear.x
+        scale: 0.2
+        offset: 0.0
+      -
+        axis: 2  # Right thumb stick (left/right)
+        target: linear.y
+        scale: 0.0
+        offset: 0.0
+      -
+        axis: 1  # Left thumb stick (up/down)
+        target: linear.z
+        scale: 0.2
+        offset: 0.0
+      -
+        axis: 0  # Left thumb stick (left/right)
+        target: angular.z
+        scale: 0.5
+        offset: 0.0
+  camera:
+    type: topic
+    message_type: "geometry_msgs/Twist"
+    topic_name: camera_control
+    deadman_buttons: [7]
+    axis_mappings:
+      -
+        axis: 5  # Left D-Pad (up/down)
+        target: angular.y
+        scale: 35.0
+        offset: 0.0
+      -
+        axis: 4  # Left D-Pad (left/right)
+        target: angular.z
+        scale: -35.0
+        offset: 0.0
+  takeoff:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: takeoff
+    deadman_buttons: [11]  #  right joy button
+    axis_mappings: []
+  land:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: land
+    deadman_buttons: [10]  #  left joy button
+    axis_mappings: []
+  emergency:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: emergency
+    deadman_buttons: [4,5] # L1+R1
+    axis_mappings: []
+  flattrim:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: flattrim
+    deadman_buttons: [0] # Square
+    axis_mappings: []
+  overtake:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: overtake
+    deadman_buttons: [1] #cross
+    axis_mappings: []
+  ready:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: ready
+    deadman_buttons: [3] #Triangle
+    axis_mappings: []
+  tweak_roll_on:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: tweak_roll_on
+    deadman_buttons: [6] #L2
+    axis_mappings: []
+  tweak_roll_off:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: tweak_roll_off
+    deadman_buttons: [7] #R2
+    axis_mappings: []
+

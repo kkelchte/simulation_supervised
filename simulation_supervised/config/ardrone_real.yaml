@@ -1,0 +1,6 @@
+control: /cmd_vel
+takeoff: /ardrone/takeoff
+land: /ardrone/land
+ready: /ready
+overtake: /overtake
+rgb_image: /ardrone/front/image_raw

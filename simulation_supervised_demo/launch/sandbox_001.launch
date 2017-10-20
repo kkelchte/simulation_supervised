@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- <include file="$(find simulation_supervised)/launch/load_params.launch"/> -->
+  <include file="$(find simulation_supervised_demo)/launch/sandbox.launch">
+	<arg name="world_name" value="sandbox_001.world"/>  
+  </include>
+</launch>
