@@ -38,8 +38,5 @@ catkin_install_python(PROGRAMS
     python/console_display.py
     python/control_mapping.py
     python/show_depth_prediction.py
-    python/viz_trajectories.py
-    python/world_generator.py
-    python/test_ounoise.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
