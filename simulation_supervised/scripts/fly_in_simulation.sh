@@ -1,30 +1,44 @@
 #!/bin/bash
 ######################################################
 # Settings:
-# $1=TAG
-# $2=MODELDIR
-# $3=WORLD (esat_v1, esat_v2, sandbox, canyon or forest)
+# -t TAG
+# -m MODELDIR
+# -w WORLD
+# -p PARAMS
 ######################################################
-if [ -z $1 ] ; then
-  TAG="testing"
-else
-  TAG="$1"
-fi
-if [ -z $2 ] ; then
-  MODELDIR="offl_mobsm"
-else
-  MODELDIR="$2"
-fi
-if [ -z $3 ] ; then
-  WORLD=esat_v1
-else
-  WORLD=$3
-fi
+
+usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
+    [-m MODEL: checkpoint to initialize weights with in logfolder]
+    [-w WORLD: the environment you want to fly in]
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+
+while getopts ":t:m:n:p:w:" o; do
+    case "${o}" in
+        t)
+            TAG=${OPTARG}
+            ;;
+        m)
+            MODEL=${OPTARG}
+            ;;
+        w)
+            WORLD=${OPTARG}
+            ;;
+        p)
+            PARAMS="${OPTARG}"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 echo "+++++++++++++++++++++++FLY IN SIMULATION+++++++++++++++++++++"
 echo "TAG $TAG"
 echo "MODELDIR $MODELDIR"
-echo "WORLDS ${WORLDS[@]}"
+echo "WORLD ${WORLD[@]}"
+echo "PARAMS=${PARAMS[@]}"
+
 
 RANDOM=125 #seed the random sequence
 
@@ -79,13 +93,9 @@ mkdir $LLOC/xterm_log
 finished=false
 while [ $finished != true ] ; do
   EXTRA_ARGUMENTS=""
-  if [[ ${WORLD} == forest || ${WORLD} == canyon ]] ; then
+  if [[ ${WORLD} == forest || ${WORLD} == canyon || ${WORLD} == sandbox]] ; then
     python $(rospack find simulation_supervised_tools)/python/${WORLD}_generator.py $LLOC
     EXTRA_ARGUMENTS=" background:=$LLOC/${WORLD}.png world_name:=$LLOC/${WORLD}.world"
-  fi
-  if [ ${WORLDS[NUM]} == sandbox ] ; then
-    SANDLOC=$(rospack find simulation_supervised_demo)/worlds/sandboxes_train
-    EXTRA_ARGUMENTS=" background:=$SANDLOC/${WORLDS[NUM]}_00000.png world_name:=$SANDLOC/${WORLDS[NUM]}_00000.world"
   fi
     
   # x=$(awk "BEGIN {print -1+2*$((RANDOM%=100))/100}")

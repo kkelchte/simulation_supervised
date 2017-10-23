@@ -1,13 +1,26 @@
 #!/bin/bash
 
 ######################################################
-# $1=NAME
+# create dataset with real bebop drone
+# -n NAME
 ######################################################
 
 NAME="location"
-if [ ! -z $1 ] ; then
-  NAME="$1"
-fi
+usage() { 
+  echo "Create dataset with real bebop drone."
+  echo "Usage: $0 [-n NAME_OF_DATASET]" 1>&2; exit 1; }
+
+while getopts ":n:" o; do
+    case "${o}" in
+        n)
+            NAME=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 RANDOM=125 #seed the random sequence
 
