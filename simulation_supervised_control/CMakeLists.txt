@@ -46,9 +46,3 @@ target_link_libraries(teleop_autopilot_behaviour_arbitration
    ouNoise
 )
 
-add_executable(test_ou src/test_ounoise.cpp)
-target_link_libraries(test_ou
-   ${catkin_LIBRARIES}
-   ${OpenCV_LIBRARIES}
-   ouNoise
-)
