@@ -1,14 +1,12 @@
 #!/bin/bash
-
 ######################################################
 # create dataset with real bebop drone
 # -n NAME
 ######################################################
 
+usage() { echo "Usage: $0 [-n NAME: tag used to name data folder]" 1>&2; exit 1; }
+
 NAME="location"
-usage() { 
-  echo "Create dataset with real bebop drone."
-  echo "Usage: $0 [-n NAME_OF_DATASET]" 1>&2; exit 1; }
 
 while getopts ":n:" o; do
     case "${o}" in
@@ -21,6 +19,9 @@ while getopts ":n:" o; do
     esac
 done
 shift $((OPTIND-1))
+
+echo "+++++++++++++++++++++++CREATE DATA+++++++++++++++++++++"
+echo "NAME=$NAME"
 
 RANDOM=125 #seed the random sequence
 
@@ -52,7 +53,6 @@ kill_combo(){
 }
 
 crash_number=0
-start_time=$(date +%s)
 #location for logging
 LLOC="$HOME/pilot_data/$NAME"
 finished=false

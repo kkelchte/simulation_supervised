@@ -66,10 +66,10 @@
   </include>
 
   <!-- start create_data node -->
-  <arg name="saving_location" default="$(find create_dataset)/tmp"/>
+  <!-- <arg name="saving_location" default="$(find create_dataset)/tmp"/>
   <include file="$(find create_dataset)/create_data.launch">
     <arg name="saving_location" value="$(arg saving_location)"/>
-  </include>
+  </include> -->
 
   <!-- display control -->
   <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>

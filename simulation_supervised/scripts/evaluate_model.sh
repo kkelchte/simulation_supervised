@@ -3,19 +3,20 @@
 # Settings:
 # -t TAG
 # -m MODELDIR
-# -n NUMBER_OF_FLIGTHS
+# -n NUMBER_OF_FLIGHTS
 # -w WORLDS
 # -p PARAMS
 ######################################################
 
 usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-m MODELDIR: checkpoint to initialize weights with in logfolder]
-    [-n NUMBER_OF_FLIGTHS]
+    [-n NUMBER_OF_FLIGHTS]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
 
 python_script="start_python_docker.sh"
+NUMBER_OF_FLIGHTS=2
 
 while getopts ":t:m:n:p:w:s:" o; do
     case "${o}" in
@@ -26,7 +27,7 @@ while getopts ":t:m:n:p:w:s:" o; do
             MODELDIR=${OPTARG}
             ;;
         n)
-            NUMBER_OF_FLIGTHS=${OPTARG}
+            NUMBER_OF_FLIGHTS=${OPTARG}
             ;;
         w)
             WORLDS=(${OPTARG})
@@ -47,7 +48,7 @@ shift $((OPTIND-1))
 echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
-echo "NUMBER_OF_FLIGTHS=$NUMBER_OF_FLIGTHS"
+echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
 echo "WORLDS=${WORLDS[@]}"
 echo "PARAMS=${PARAMS[@]}"
 
@@ -109,6 +110,7 @@ mkdir -p $LLOC/xterm_log
 i=0
 while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
 do
+  echo "run: $i"
   NUM=$((i%${#WORLDS[@]}))
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
@@ -124,11 +126,7 @@ do
   speed=1.3
   x=0
   y=0
-  if [ ${WORLDS[NUM]} == sandbox ] ; then
-    z=0.5
-  else 
-    z=$(awk "BEGIN {print 0.5+1.*$((RANDOM%=100))/100}")
-  fi
+  z=1
   Y=1.57  
   LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
@@ -146,6 +144,7 @@ do
     DIFF=$(( $END - $START ))
     if [ $DIFF -gt 300 ] ; 
     then
+      echo "TIME TO KILL: $DIFF"
       if [ $crash_number -ge 3 ] ; then
         message="$(date +%H:%M) ########################### KILLED ROSCORE" 
         echo $message >> $LLOC/crash      
@@ -178,12 +177,7 @@ do
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
     sleep 5
   fi
-  
 done
 kill_combo
-echo 'done'
 date +%F_%H%M%S
-
-
-
-
+echo 'done'

@@ -18,7 +18,7 @@
   <!-- display console -->
   <node name="console_display" pkg="simulation_supervised_tools" type="console_display.py" output="log"/>
   
-  <arg name="saving_location" default="$(find create_dataset)/tmp"/>
+  <arg name="saving_location" default="/tmp"/>
   <param name="saving_location" value="$(arg saving_location)"/>
   <param name="save_images" value="true"/>
   
