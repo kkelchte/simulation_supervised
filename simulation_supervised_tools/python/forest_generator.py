@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import os,sys
 
 result_world='forest.world'
-worlds_location=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 
 if len(sys.argv) >= 2:
   location=sys.argv[1]+'/'
 else:
-  location=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+  location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 # print('[generator] World and image is saved in: {}'.format(location))
 
 # Size of total field

@@ -22,14 +22,11 @@
   </include>
     
   <!-- Spawn simulated quadrotor uav -->
-  <arg name="recovery" default="false"/>
-  <param name="recovery" value="$(arg recovery)"/>
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
   <arg name="Yspawned" default="1.57"/>
   <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
-    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam_and_kinect.gazebo.xacro" unless="$(arg recovery)"/>
-    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_multiple_kinects.gazebo.xacro" if="$(arg recovery)"/>
+    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam_and_kinect.gazebo.xacro" /> 
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
     <arg name="Y" default="$(arg Yspawned)"/>
@@ -68,8 +65,8 @@
   <param name="background" value="$(arg background)"/>
   <node name="gt_listener" pkg="simulation_supervised_tools" type="ground_truth_listener.py" output="screen"/>
   
-  <!-- display odom prediction -->
-  <node name="show_odom_prediction" pkg="simulation_supervised_tools" type="show_odom_prediction.py" output="screen"/>
+  
+  
   
 
 </launch>

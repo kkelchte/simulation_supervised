@@ -12,9 +12,9 @@ show_plan=False
 if len(sys.argv) >= 2:
   location=sys.argv[1]+'/'
 else:
-  location=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+  location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 # print('[generator] World and image is saved in: {}'.format(location))
-worlds_location=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 
 walls=[]
 fig = plt.figure(figsize=(10, 10))

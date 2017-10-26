@@ -1,67 +1,69 @@
 #!/bin/bash
 ######################################################
 # Settings:
-# $1=TAG
-# $2=MODELDIR
-# $3=NUMBER_OF_FLIGTHS
-# $4=PARAMS
+# -t TAG
+# -m MODELDIR
+# -n NUMBER_OF_FLIGHTS
+# -w WORLDS
+# -p PARAMS
 ######################################################
+echo $@
+usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
+    [-m MODELDIR: checkpoint to initialize weights with in logfolder]
+    [-n NUMBER_OF_EPISODES]
+    [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
+    [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+python_script="start_python_docker.sh"
+NUMBER_OF_FLIGHTS=2
+while getopts ":t:m:n:p:w:s:" o; do
+    case "${o}" in
+        t)
+            TAG=${OPTARG} ;;
+        m)
+            MODELDIR=${OPTARG} ;;
+        n)
+            NUMBER_OF_EPISODES=${OPTARG} ;;
+        w)
+            WORLDS+=(${OPTARG}) ;;
+        s)
+            python_script=${OPTARG} ;;
+        p)
+            PARAMS+=(${OPTARG}) ;;
+        *)
+            usage ;;
+    esac
+done
+shift $((OPTIND-1))
 
-if [ -z $1 ] ; then
-  TAG="testing"
+if [ -z $WORLDS ] ; then
+	TRAIN_WORLDS=(canyon forest sandbox)
+	EVA_WORLDS=(esat_v1 esat_v2)
 else
-  TAG="$1"
+	TRAIN_WORLDS=${WORLDS[@]}
+	EVA_WORLDS=${WORLDS[@]}
 fi
-if [ -z $2 ] ; then
-  MODELDIR="None"
-else
-  MODELDIR="$2"
-fi
-if [ -z $3 ] ; then
+if [ $NUMBER_OF_EPISODES = 0 ] ; then 
+  echo "debugging so only small set of runs."
+  TRAIN_NUMBER_OF_FLIGHTS=4
+  EVA_NUMBER_OF_FLIGHTS=1
   NUMBER_OF_EPISODES=3
 else
-  NUMBER_OF_EPISODES="$3"
+  TRAIN_NUMBER_OF_FLIGHTS=40
+  EVA_NUMBER_OF_FLIGHTS=10
 fi
-
-PARAMS="${@:4}"
-if [ $MODELDIR != "None" ] ; then
-  # ensure continue training is true
-  PARAMS="$(echo $PARAMS | sed 's/--continue_training False//' | sed 's/--continue_training True//') --continue_training True"
-fi
-
-
-TRAIN_NUMBER_OF_FLIGHTS=30
-EVA_NUMBER_OF_FLIGHTS=10
-
-TRAIN_WORLDS=(sandbox sandbox canyon forest)
-# TRAIN_WORLDS=(sandbox esat_v2 canyon forest)
-TRAIN_COUNTSUC=(0 0 0 0) 
-TRAIN_COUNTTOT=(0 0 0 0)
-
-EVA_WORLDS=(esat_v1 esat_v2)
-# EVA_WORLDS=(esat_v1 forest)
-EVA_COUNTSUC=(0 0) 
-EVA_COUNTTOT=(0 0) 
-
-echo "TAG $TAG"
-echo "MODELDIR $MODELDIR"
-echo "NUMBER_OF_EPISODES $NUMBER_OF_EPISODES"
+echo "+++++++++++++++++++++++TRAIN AND EVALUATE+++++++++++++++++++++"
+echo "TAG=$TAG"
+echo "MODELDIR=$MODELDIR"
+echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
+echo "TRAIN_WORLDS=${TRAIN_WORLDS[@]}"
+echo "EVA_WORLDS=${EVA_WORLDS[@]}"
+echo "PARAMS=${PARAMS[@]}"
+echo "NUMBER_OF_EPISODES=$NUMBER_OF_EPISODES"
 echo "TRAIN NUMBER OF FLIGHTS ${TRAIN_NUMBER_OF_FLIGHTS}"
-echo "TRAIN WORLDS ${TRAIN_WORLDS[@]}"
 echo "EVA NUMBER OF FLIGHTS ${EVA_NUMBER_OF_FLIGHTS}"
-echo "EVA WORLDS ${EVA_WORLDS[@]}"
 
 RANDOM=125 #seed the random sequence
-
-#check if you re running condor
-docker=true
-echo "condor slot: $_CONDOR_SLOT"
-if [ -z $_CONDOR_SLOT ] ; then
-  docker=false
-fi
-echo "Docker: $docker"
-
-RECOVERY=false
 
 ######################################################
 # Start roscore and load general parameters
@@ -73,9 +75,9 @@ start_ros(){
   sleep 10  
 }
 start_ros
-echo; echo;echo;
+
 ######################################################
-# if folder already exists, continue training from there rather than restarting...
+# if log folder already exists, continue training from there rather than restarting...
 if [[ -e $HOME/tensorflow/log/$TAG && -e $HOME/tensorflow/log/$TAG/$(ls -t $HOME/tensorflow/log/$TAG | head -2 | grep -v xterm)/checkpoint ]] ; then
   echo "ADJUSTED MODELDIR: continue training from $TAG instead of $MODELDIR"
   MODELDIR=$TAG
@@ -84,23 +86,16 @@ if [[ -e $HOME/tensorflow/log/$TAG && -e $HOME/tensorflow/log/$TAG/$(ls -t $HOME
 fi   
 mkdir -p $HOME/tensorflow/log/$TAG
 cd $HOME/tensorflow/log/$TAG
-if [ $docker = true ] ; then
-  echo "RUNNING IN DOCKER"
-  python_script="start_python_docker.sh"
-else 
-  echo "RUNNING LOCALLY"
-  python_script="start_python.sh"
-fi
 start_python(){
   LOGDIR="$TAG/$(date +%F_%H%M)"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
+  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
-  sleep 35 #wait some seconds for model to load otherwise you miss the start message  
+  sleep 20 #wait some seconds for model to load otherwise you miss the start message  
 }
 start_python
 # Start ros with launch file
@@ -119,8 +114,10 @@ kill_combo(){
   done
   sleep 10
 }
+
+crash_number=0
 #location for logging
-mkdir $LLOC/xterm_log
+mkdir -p $LLOC/xterm_log
 
 RUN_ROS(){
   crash_number=0
@@ -132,76 +129,65 @@ RUN_ROS(){
     NUM=$((i%${#WORLDS[@]}))
     # If it is not esat/sandbox simulated, you can create a new world
     EXTRA_ARGUMENTS=""
-    if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest ]] ; then
+    if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
       python $(rospack find simulation_supervised_tools)/python/${WORLDS[NUM]}_generator.py $LLOC
       EXTRA_ARGUMENTS=" background:=$LLOC/${WORLDS[NUM]}.png world_name:=$LLOC/${WORLDS[NUM]}.world"
-    fi
-    if [ ${WORLDS[NUM]} == sandbox ] ; then
-      SANDLOC=$(rospack find simulation_supervised_demo)/worlds/sandboxes_train
-      EXTRA_ARGUMENTS=" background:=$SANDLOC/${WORLDS[NUM]}_$(printf %05d $i).png world_name:=$SANDLOC/${WORLDS[NUM]}_$(printf %05d $i).world"
     fi
     crashed=false
     # Clear gazebo log folder to overcome the impressive amount of log data
     if [[ $((i%50)) = 0 && i!=0 ]] ; then rm -r $HOME/.gazebo/log/* ; fi
-    if [ ! -d $LLOC ] ; then echo "Cant locate $LLOC : esat is unmounted so stop." ; exit ; fi
+    if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
     echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number and world ${WORLDS[NUM]}"
-    
-    # x=$(awk "BEGIN {print -1+2*$((RANDOM%=100))/100}")
-    # y=$(awk "BEGIN {print $((RANDOM%=100))/100}")   
-    # z=$(awk "BEGIN {print 0.5+1.*$((RANDOM%=100))/100}")
-    # Y=$(awk "BEGIN {print 1.57-0.25+0.5*$((RANDOM%=100))/100}")
-    speed=1.3
     x=0
-    y=0
-    if [ ${WORLDS[NUM]} == sandbox ] ; then
-      z=0.5
-    else 
-      z=$(awk "BEGIN {print 0.5+1.*$((RANDOM%=100))/100}")
-    fi
     Y=1.57  
+    if [ $evaluate = true ] ; then
+      y=$(awk "BEGIN {print -0.25+0.5*$((RANDOM%=100))/100}")   
+      if [ ${WORLDS[NUM]} == sandbox ] ; then
+        z=$(awk "BEGIN {print 0.4+0.2*$((RANDOM%=100))/100}")
+      else 
+        z=$(awk "BEGIN {print 0.5+1.*$((RANDOM%=100))/100}")
+      fi
+    else
+      y=0 
+      if [ ${WORLDS[NUM]} == sandbox ] ; then
+        z=0.5
+      else 
+        z=1
+      fi
+    fi
     LAUNCHFILE="${WORLDS[NUM]}.launch"
     COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-     Yspawned:=$Y x:=$x y:=$y starting_height:=$z speed:=$speed log_folder:=$LLOC\
+     Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC\
      recovery:=$RECOVERY evaluate:=$evaluate $EXTRA_ARGUMENTS"
     echo $COMMANDR
-    START_RUN=$(date +%s)     
+    START=$(date +%s)     
     xterm -l -lf $LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S)_$RUN_TYPE -hold -e $COMMANDR &
     pidlaunch=$!
     echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
     echo "Run started in xterm: $pidlaunch"
     while kill -0 $pidlaunch; 
     do 
-      if [ docker = true ] ; then 
-        # if the last check was too long ago you probably got suspended
-        if [[ $(( $(date +%s) - START_RUN - DIFF)) -gt 30 ]] ; then
-          sleep 30 #wait for big tick to update
-          TOTAL_SUS="$(condor_q -glob -l $cluser_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
-          echo "I was suspended for the $TOTAL_SUS 'th time."
-          START_RUN=$(( $(date +%s) - $DIFF ))
-        fi
-      fi
       END=$(date +%s)
-      DIFF=$(( $END - $START_RUN ))
+      DIFF=$(( $END - $START ))
       if [ $DIFF -gt 300 ] ; 
       then
+        echo "$(tput setaf 1) ---CRASH (delay time: $DIFF) $(tput sgr 0)"
         if [ $crash_number -ge 3 ] ; then 
-          echo "$(date +%H:%M) ########################### KILLED ROSCORE" >> $LLOC/crash      
-          echo "$(date +%H:%M) ########################### KILLED ROSCORE"     
+          message="$(date +%H:%M) ########################### KILLED ROSCORE" 
+          echo $message >> $LLOC/crash      
+          echo $message     
           sleep 0.5
           kill_combo
           crash_number=0
           echo "restart python:"
-          # if [ "$(ls $LLOC | wc -l)" -ge 6 ] ; then
           MODELDIR="$LLOC"
           PARAMS="$(echo $PARAMS | sed 's/--continue_training False//' | sed 's/--continue_training True//') --continue_training True"
-          # else 
-          #   rm -r $LLOC
-          # fi
           start_ros
           start_python
         else
-          echo "$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number" >> $LLOC/crash
-          echo "$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
+          message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
+          echo $message >> $LLOC/crash
+          echo $message
           sleep 0.5
           kill -9 $pidlaunch >/dev/null 2>&1
           sleep 2
@@ -247,12 +233,9 @@ while [ $episode -lt $NUMBER_OF_EPISODES ] ; do
   EVA_COUNTSUC=(${COUNTSUC[@]})
   EVA_COUNTTOT=(${COUNTTOT[@]})
 
-  
-
   episode=$((episode+1))
 
 done
-
 kill_combo
-echo 'done'
 date +%F_%H%M%S
+echo 'done'

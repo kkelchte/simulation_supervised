@@ -113,12 +113,7 @@ while [ $finished != true ] ; do
       i=0
     fi
   fi
-done  
-
+done
 kill_combo
-echo 'done'
 date +%F_%H%M%S
-
-
-
-
+echo 'done'

@@ -14,11 +14,11 @@ result_world='sandbox.world'
  
 # example file that is adapted:
 template_world='template.world'
-worlds_location=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 if len(sys.argv) >= 2:
   location=sys.argv[1]+'/'
 else:
-  location=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+  location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 # print('[generator] World and image is saved in: {}'.format(location))
 
 tree = ET.parse(worlds_location+template_world)
@@ -69,7 +69,7 @@ for link in surrounding.findall('link'):
 
 # place objects from list
 # add models from file to list if the model exists in .gazebo/models
-model_file=os.environ['HOME']+'/catkin_ws/src/simulation_supervised/simulation_supervised_tools/etc/models.txt'
+model_file=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_tools/etc/models.txt'
 model_list=[ m[:-1] for m in open(model_file).readlines() if os.path.exists(worlds_location+'../models/'+m[:-1])]
 # print "model_list "+str(model_list)
 

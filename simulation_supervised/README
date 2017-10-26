@@ -27,5 +27,4 @@ The scripts start python with the following two scripts:
 * start_python_docker
 
 The other two scripts are extra:
-* fly_in_simulation: used to manually fly the drone in simulation interacting with the DNN policy
 * create_data_real: used for creating a new almost_collision_dataset

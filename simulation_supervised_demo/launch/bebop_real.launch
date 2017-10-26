@@ -28,9 +28,6 @@
   <!-- display depth prediction -->
   <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
 
-  <!-- display odom prediction -->
-  <node name="show_odom_prediction" pkg="simulation_supervised_tools" type="show_odom_prediction.py" output="screen"/>
-  
   <!-- visualize the image raw topic
   <node name="image_view" pkg="image_view" type="image_view" output="screen" args="image:=/kinect/rgb/image_raw"/>-->
 

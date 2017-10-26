@@ -14,38 +14,33 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
-
 python_script="start_python_docker.sh"
 NUMBER_OF_FLIGHTS=2
-
 while getopts ":t:m:n:p:w:s:" o; do
     case "${o}" in
         t)
-            TAG=${OPTARG}
-            ;;
+            TAG=${OPTARG} ;;
         m)
-            MODELDIR=${OPTARG}
-            ;;
+            MODELDIR=${OPTARG} ;;
         n)
-            NUMBER_OF_FLIGHTS=${OPTARG}
-            ;;
+            NUMBER_OF_FLIGHTS=${OPTARG} ;;
         w)
-            WORLDS=(${OPTARG})
-            ;;
+            WORLDS+=(${OPTARG}) ;;
         s)
-            python_script=${OPTARG}
-            ;;
+            python_script=${OPTARG} ;;
         p)
-            PARAMS="${OPTARG}"
-            ;;
+            PARAMS+=(${OPTARG}) ;;
         *)
-            usage
-            ;;
+            usage ;;
     esac
 done
 shift $((OPTIND-1))
 
-echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
+if [ -z $WORLDS ] ; then
+  WORLDS=(canyon forest sandbox)
+fi
+
+echo "+++++++++++++++++++++++TRAIN+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
 echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
@@ -53,8 +48,6 @@ echo "WORLDS=${WORLDS[@]}"
 echo "PARAMS=${PARAMS[@]}"
 
 RANDOM=125 #seed the random sequence
-
-RECOVERY=false
 
 ######################################################
 # Start roscore and load general parameters
@@ -74,10 +67,7 @@ cd $HOME/tensorflow/log/$TAG
 start_python(){
   LOGDIR="$TAG/$(date +%F_%H%M)_val"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  ARGUMENTS="--continue_training True --evaluate True --log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
-  if [ $RECOVERY = true ] ; then
-    ARGUMENTS="$ARGUMENTS --recovery_cameras True"
-  fi
+  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
@@ -112,6 +102,7 @@ while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
 do
   echo "run: $i"
   NUM=$((i%${#WORLDS[@]}))
+  # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
     python $(rospack find simulation_supervised_tools)/python/${WORLDS[NUM]}_generator.py $LLOC
@@ -123,15 +114,18 @@ do
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
   echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
 
-  speed=1.3
   x=0
   y=0
-  z=1
+  if [ ${WORLDS[NUM]} == sandbox ] ; then
+    z=0.5
+  else 
+    z=1
+  fi
   Y=1.57  
   LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-   Yspawned:=$Y x:=$x y:=$y starting_height:=$z speed:=$speed log_folder:=$LLOC\
-   docker:=$docker evaluate:=true recovery:=$RECOVERY $EXTRA_ARGUMENTS"
+   Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC \
+   evaluate:=true $EXTRA_ARGUMENTS"
   echo $COMMANDR
   START=$(date +%s)     
   xterm -l -lf $LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &
@@ -144,7 +138,7 @@ do
     DIFF=$(( $END - $START ))
     if [ $DIFF -gt 300 ] ; 
     then
-      echo "TIME TO KILL: $DIFF"
+      echo "$(tput setaf 1) ---CRASH (delay time: $DIFF) $(tput sgr 0)"
       if [ $crash_number -ge 3 ] ; then
         message="$(date +%H:%M) ########################### KILLED ROSCORE" 
         echo $message >> $LLOC/crash      
@@ -166,7 +160,6 @@ do
         crashed=true
       fi
     fi
-    sleep 0.1
   done
   if [[ crashed != true ]] ; then
     i=$((i+1))
