@@ -67,7 +67,10 @@ cd $HOME/tensorflow/log/$TAG
 start_python(){
   LOGDIR="$TAG/$(date +%F_%H%M)_train"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
+  ARGUMENTS="--log_tag $LOGDIR ${PARAMS[@]}"
+  if [ ! -z $MODELDIR ] ; then
+    ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
+  fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &

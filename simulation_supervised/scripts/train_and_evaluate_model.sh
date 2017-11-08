@@ -1,5 +1,7 @@
 #!/bin/bash
 ######################################################
+# Train model online in the doshico training environments
+# and evaluate the same model online in the ESAT environment
 # Settings:
 # -t TAG
 # -m MODELDIR
@@ -13,7 +15,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-n NUMBER_OF_EPISODES]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
-    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True\" ]" 1>&2; exit 1; }
 python_script="start_python_docker.sh"
 NUMBER_OF_FLIGHTS=2
 while getopts ":t:m:n:p:w:s:" o; do
@@ -52,6 +54,7 @@ else
   TRAIN_NUMBER_OF_FLIGHTS=40
   EVA_NUMBER_OF_FLIGHTS=10
 fi
+
 echo "+++++++++++++++++++++++TRAIN AND EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
@@ -89,7 +92,10 @@ cd $HOME/tensorflow/log/$TAG
 start_python(){
   LOGDIR="$TAG/$(date +%F_%H%M)"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
+  ARGUMENTS="--log_tag $LOGDIR ${PARAMS[@]}"
+  if [ ! -z $MODELDIR ] ; then
+    ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
+  fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &

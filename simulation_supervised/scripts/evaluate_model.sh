@@ -40,6 +40,12 @@ if [ -z $WORLDS ] ; then
   WORLDS=(canyon forest sandbox)
 fi
 
+if [ -z $MODELDIR ] ; then
+  echo "$(tput setaf 1) (evaluate_model.sh): NO MODEL PROVIDED TO EVLUATE."
+  tput sgr 0 
+  exit
+fi
+
 echo "+++++++++++++++++++++++TRAIN+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
