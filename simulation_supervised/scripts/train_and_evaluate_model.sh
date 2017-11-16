@@ -217,7 +217,8 @@ RUN_ROS(){
       new_stat="$(stat -c %Y $LLOC/tf_log)"
       while [ $old = $new ] ; do new="$(stat -c %Y log)"; sleep 1; done
     else 
-      while [ ! -e $LLOC/tf_log ] ; do sleep 1; done
+      cnt=0
+      while [ ! -e $LLOC/tf_log ] ; do sleep 1; cnt=$((cnt+1)); if [ $cnt -gt 300 ] ; then echo "Waited for 5minutes on tf_log..."; exit; fi; done
     fi
     sleep 3
   done
