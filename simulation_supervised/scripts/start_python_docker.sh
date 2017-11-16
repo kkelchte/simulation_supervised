@@ -1,5 +1,5 @@
 #!/bin/bash
-export PYTHONPATH=$HOME/tensorflow/pilot/pilot:\
+export PYTHONPATH=$HOME/tensorflow/pilot:\
 $HOME/drone_ws/devel/lib/python2.7/dist-packages:\
 /opt/ros/kinetic/lib/python2.7/dist-packages:\
 $HOME/simsup_ws/devel/lib/python2.7/dist-packages:\

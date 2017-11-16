@@ -9,7 +9,7 @@
 # -w WORLDS
 # -p PARAMS
 ######################################################
-echo $@
+
 usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-m MODELDIR: checkpoint to initialize weights with in logfolder]
     [-n NUMBER_OF_EPISODES]
@@ -185,6 +185,8 @@ RUN_ROS(){
           sleep 0.5
           kill_combo
           crash_number=0
+          #location for logging
+          mkdir -p $LLOC/xterm_log
           echo "restart python:"
           MODELDIR="$LLOC"
           PARAMS="$(echo $PARAMS | sed 's/--continue_training False//' | sed 's/--continue_training True//') --continue_training True"
@@ -209,7 +211,13 @@ RUN_ROS(){
       fi
       COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
       echo "$(date +%F_%H-%M) finished ${RUN_TYPE}_run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-      sleep 5
+      # wait for tensorflow
+    if [ -e $LLOC/tf_log ] ; then 
+      old_stat="$(stat -c %Y $LLOC/tf_log)"
+      new_stat="$(stat -c %Y $LLOC/tf_log)"
+      while [ $old = $new ] ; do new="$(stat -c %Y log)"; sleep 1; done
+    else 
+      while [ ! -e $LLOC/tf_log ] ; do sleep 1; done
     fi
     sleep 3
   done

@@ -15,6 +15,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
 python_script="start_python_docker.sh"
+TAG=test_evaluate_online
 NUMBER_OF_FLIGHTS=2
 while getopts ":t:m:n:p:w:s:" o; do
     case "${o}" in
@@ -36,17 +37,17 @@ while getopts ":t:m:n:p:w:s:" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z $WORLDS ] ; then
+if [ -z "$WORLDS" ] ; then
   WORLDS=(canyon forest sandbox)
 fi
 
-if [ -z $MODELDIR ] ; then
-  echo "$(tput setaf 1) (evaluate_model.sh): NO MODEL PROVIDED TO EVLUATE."
+if [ -z "$MODELDIR" ] ; then
+  echo "$(tput setaf 1) (evaluate_model.sh): NO MODEL PROVIDED TO EVALUATE."
   tput sgr 0 
   exit
 fi
 
-echo "+++++++++++++++++++++++TRAIN+++++++++++++++++++++"
+echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
 echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
@@ -152,6 +153,8 @@ do
         sleep 0.5
         kill_combo
         crash_number=0
+        #location for logging
+        mkdir -p $LLOC/xterm_log
         echo "restart python:"
         start_ros
         start_python
@@ -174,7 +177,14 @@ do
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-    sleep 5
+    # wait for tensorflow
+    if [ -e $LLOC/tf_log ] ; then 
+      old_stat="$(stat -c %Y $LLOC/tf_log)"
+      new_stat="$(stat -c %Y $LLOC/tf_log)"
+      while [ $old = $new ] ; do new="$(stat -c %Y log)"; sleep 1; done
+    else 
+      while [ ! -e $LLOC/tf_log ] ; do sleep 1; done
+    fi
   fi
 done
 kill_combo

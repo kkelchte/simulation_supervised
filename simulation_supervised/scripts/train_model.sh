@@ -16,6 +16,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
 python_script="start_python_docker.sh"
 NUMBER_OF_FLIGHTS=2
+TAG=test_train_online
 while getopts ":t:m:n:p:w:s:" o; do
     case "${o}" in
         t)
@@ -149,12 +150,15 @@ do
         sleep 0.5
         kill_combo
         crash_number=0
+        #location for logging
+        mkdir -p $LLOC/xterm_log
         echo "restart python:"
         if [ "$(ls $LLOC | wc -l)" -ge 6 ] ; then
-	  echo "Continue training from $LLOC"
+	        echo "Continue training from $LLOC"
           MODELDIR="$LLOC"
+          PARAMS="$(echo $PARAMS | sed 's/--scratch True/--scratch False/')"
         else 
-	  echo "Clean up $LLOC"
+	        echo "Clean up $LLOC"
           rm -r $LLOC
         fi
         start_ros
@@ -180,7 +184,14 @@ do
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-    sleep 5
+    # wait for tensorflow
+    if [ -e $LLOC/tf_log ] ; then 
+      old_stat="$(stat -c %Y $LLOC/tf_log)"
+      new_stat="$(stat -c %Y $LLOC/tf_log)"
+      while [ $old = $new ] ; do new="$(stat -c %Y log)"; sleep 1; done
+    else 
+      while [ ! -e $LLOC/tf_log ] ; do sleep 1; done
+    fi
   fi
 done
 kill_combo
