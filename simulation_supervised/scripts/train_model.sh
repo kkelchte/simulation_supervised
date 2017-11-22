@@ -178,21 +178,28 @@ do
     sleep 0.1
   done
   if [[ crashed != true ]] ; then
+    # wait for tensorflow
+    if [ -e $LLOC/tf_log ] ; then 
+      old_stat="$(stat -c %Y $LLOC/tf_log)"
+      new_stat="$(stat -c %Y $LLOC/tf_log)"
+      while [ $old_stat = $new_stat ] ; do new_stat="$(stat -c %Y $LLOC/tf_log)"; sleep 1; done
+    else 
+      cnt=0
+      while [ ! -e $LLOC/tf_log ] ; do 
+        sleep 1 
+        cnt=$((cnt+1)) 
+        if [ $cnt -gt 300 ] ; then 
+          echo "Waited for 5minutes on tf_log..." 
+          exit 
+        fi 
+      done
+    fi
     i=$((i+1))
     if [ $(tail -1 $LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-    # wait for tensorflow
-    if [ -e $LLOC/tf_log ] ; then 
-      old_stat="$(stat -c %Y $LLOC/tf_log)"
-      new_stat="$(stat -c %Y $LLOC/tf_log)"
-      while [ $old = $new ] ; do new="$(stat -c %Y log)"; sleep 1; done
-    else 
-      cnt=0
-      while [ ! -e $LLOC/tf_log ] ; do sleep 1; cnt=$((cnt+1)); if [ $cnt -gt 300 ] ; then echo "Waited for 5minutes on tf_log..."; exit; fi; done
-    fi
   fi
 done
 kill_combo

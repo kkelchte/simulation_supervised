@@ -15,8 +15,8 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
 python_script="start_python_docker.sh"
-TAG=test_evaluate_online
 NUMBER_OF_FLIGHTS=2
+TAG=test_evaluate_online
 while getopts ":t:m:n:p:w:s:" o; do
     case "${o}" in
         t)
@@ -72,7 +72,7 @@ start_ros
 mkdir -p $HOME/tensorflow/log/$TAG
 cd $HOME/tensorflow/log/$TAG
 start_python(){
-  LOGDIR="$TAG/$(date +%F_%H%M)_val"
+  LOGDIR="$TAG/$(date +%F_%H%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
   ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
@@ -109,6 +109,12 @@ while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
 do
   echo "run: $i"
   NUM=$((i%${#WORLDS[@]}))
+
+  if [ -e $LLOC/tf_log ] ; then
+    old_stat="$(stat -c %Y $LLOC/tf_log)"
+  else
+    echo "Could not find $LLOC/tf_log"
+  fi
   # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
@@ -120,7 +126,6 @@ do
   if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
   echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
-
   x=0
   y=0
   if [ ${WORLDS[NUM]} == sandbox ] ; then
@@ -171,22 +176,31 @@ do
     fi
   done
   if [[ crashed != true ]] ; then
+    # wait for tensorflow
+    if [ -e $LLOC/tf_log ] ; then 
+      new_stat="$(stat -c %Y $LLOC/tf_log)"
+      while [ $old_stat = $new_stat ] ; do 
+        new_stat="$(stat -c %Y $LLOC/tf_log)"
+        sleep 1
+      done
+    else 
+      cnt=0
+      while [ ! -e $LLOC/tf_log ] ; do 
+        sleep 1 
+        cnt=$((cnt+1)) 
+        if [ $cnt -gt 300 ] ; then 
+          echo "Waited for 5minutes on tf_log..." 
+          exit 
+        fi 
+      done
+    fi
     i=$((i+1))
     if [ $(tail -1 $LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-    # wait for tensorflow
-    if [ -e $LLOC/tf_log ] ; then 
-      old_stat="$(stat -c %Y $LLOC/tf_log)"
-      new_stat="$(stat -c %Y $LLOC/tf_log)"
-      while [ $old = $new ] ; do new="$(stat -c %Y log)"; sleep 1; done
-    else 
-      cnt=0
-      while [ ! -e $LLOC/tf_log ] ; do sleep 1; cnt=$((cnt+1)); if [ $cnt -gt 300 ] ; then echo "Waited for 5minutes on tf_log..."; exit; fi; done
-    fi
-  fi
+  fi  
 done
 kill_combo
 date +%F_%H%M%S
