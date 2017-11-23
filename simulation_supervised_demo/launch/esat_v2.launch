@@ -55,10 +55,14 @@
     <arg name="saving_location" value="$(arg saving_location)"/>
   </include> -->
 
-  <!-- display control -->
-  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
-  <!-- display depth prediction -->
-  <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
+  <arg name="graphics" default="true"/>
+  <group if="$(arg graphics)">
+    <!-- display control -->
+    <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
+    <!-- display depth prediction -->
+    <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
+  </group>
+
   <!-- display ground_truth -->
   <param name="background" value="$(find simulation_supervised_demo)/worlds/esat_v2.png"/>
   <node name="gt_listener" pkg="simulation_supervised_tools" type="ground_truth_listener.py" output="screen"/>

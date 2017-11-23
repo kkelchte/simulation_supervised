@@ -33,7 +33,6 @@ catkin_package()
 catkin_install_python(PROGRAMS
     python/evaluate.py
     python/show_control.py
-    python/show_odom_prediction.py
     python/ground_truth_listener.py
     python/console_display.py
     python/control_mapping.py

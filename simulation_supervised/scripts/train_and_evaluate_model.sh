@@ -18,6 +18,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True\" ]" 1>&2; exit 1; }
 python_script="start_python_docker.sh"
 NUMBER_OF_FLIGHTS=2
+GRAPHICS=true
 while getopts ":t:m:n:p:w:s:" o; do
     case "${o}" in
         t)
@@ -32,13 +33,15 @@ while getopts ":t:m:n:p:w:s:" o; do
             python_script=${OPTARG} ;;
         p)
             PARAMS+=(${OPTARG}) ;;
+        g)
+            GRAPHICS=${OPTARG} ;; 
         *)
             usage ;;
     esac
 done
 shift $((OPTIND-1))
 
-if [ -z $WORLDS ] ; then
+if [ -z "$WORLDS" ] ; then
 	TRAIN_WORLDS=(canyon forest sandbox)
 	EVA_WORLDS=(esat_v1 esat_v2)
 else
@@ -65,6 +68,7 @@ echo "PARAMS=${PARAMS[@]}"
 echo "NUMBER_OF_EPISODES=$NUMBER_OF_EPISODES"
 echo "TRAIN NUMBER OF FLIGHTS ${TRAIN_NUMBER_OF_FLIGHTS}"
 echo "EVA NUMBER OF FLIGHTS ${EVA_NUMBER_OF_FLIGHTS}"
+echo "GRAPHICS=$GRAPHICS"
 
 RANDOM=125 #seed the random sequence
 
@@ -101,7 +105,15 @@ start_python(){
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
-  sleep 20 #wait some seconds for model to load otherwise you miss the start message  
+  while [ ! -e $LLOC/tf_log ] ; do 
+    sleep 1 
+    cnt=$((cnt+1)) 
+    if [ $cnt -gt 300 ] ; then 
+      echo "$(tput setaf 1) Waited for 5minutes on tf_log... $(tput sgr 0)" 
+      exit 
+    fi 
+  done
+  # sleep 20 #wait some seconds for model to load otherwise you miss the start message  
 }
 start_python
 # Start ros with launch file
@@ -133,6 +145,11 @@ RUN_ROS(){
   while [[ $i -lt $((START_INDEX+NUMBER_OF_FLIGHTS)) ]] ;
   do
     NUM=$((i%${#WORLDS[@]}))
+    if [ -e $LLOC/tf_log ] ; then
+      old_stat="$(stat -c %Y $LLOC/tf_log)"
+    else
+      echo "Could not find $LLOC/tf_log"
+    fi
     # If it is not esat/sandbox simulated, you can create a new world
     EXTRA_ARGUMENTS=""
     if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
@@ -213,9 +230,11 @@ RUN_ROS(){
       echo "$(date +%F_%H-%M) finished ${RUN_TYPE}_run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
       # wait for tensorflow
     if [ -e $LLOC/tf_log ] ; then 
-      old_stat="$(stat -c %Y $LLOC/tf_log)"
       new_stat="$(stat -c %Y $LLOC/tf_log)"
-      while [ $old_stat = $new_stat ] ; do new_stat="$(stat -c %Y $LLOC/tf_log)"; sleep 1; done
+      while [ $old_stat = $new_stat ] ; do 
+        new_stat="$(stat -c %Y $LLOC/tf_log)"
+        sleep 1
+      done
     else 
       cnt=0
       while [ ! -e $LLOC/tf_log ] ; do 
@@ -227,7 +246,6 @@ RUN_ROS(){
         fi 
       done
     fi
-    sleep 3
   done
 }
 

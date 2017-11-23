@@ -56,10 +56,14 @@
     <arg name="saving_location" value="$(arg saving_location)"/>
   </include> -->
 
-  <!-- display control -->
-  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
-  <!-- display depth prediction -->
-  <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
+  <arg name="graphics" default="true"/>
+  <group if="$(arg graphics)">
+    <!-- display control -->
+    <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
+    <!-- display depth prediction -->
+    <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
+  </group>
+
   <!-- display ground_truth -->
   <arg name="background" default="sandbox.png"/>
   <param name="background" value="$(arg background)"/>

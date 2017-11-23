@@ -17,27 +17,30 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
 python_script="start_python_docker.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
-while getopts ":t:m:n:p:w:s:" o; do
+GRAPHICS=true
+while getopts ":t:m:n:w:s:p:g:" o; do
     case "${o}" in
         t)
-            TAG=${OPTARG};;
+            TAG=${OPTARG} ;;
         m)
-            MODELDIR=${OPTARG};;
+            MODELDIR=${OPTARG} ;;
         n)
-            NUMBER_OF_FLIGHTS=${OPTARG};;
+            NUMBER_OF_FLIGHTS=${OPTARG} ;;
         w)
-            WORLDS+=(${OPTARG});;
+            WORLDS+=(${OPTARG}) ;;
         s)
-            python_script=${OPTARG};;
+            python_script=${OPTARG} ;;
         p)
-            PARAMS+=(${OPTARG});;
+            PARAMS+=(${OPTARG}) ;;
+        g)
+            GRAPHICS=${OPTARG} ;; 
         *)
-            usage;;
+            usage ;;
     esac
 done
 shift $((OPTIND-1))
 
-if [ -z WORLDS ] ; then
+if [ -z "$WORLDS" ] ; then
   WORLDS=(canyon forest sandbox)
 fi
 
@@ -46,7 +49,9 @@ echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
 echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
 echo "WORLDS=${WORLDS[@]}"
+echo "PYTHON SCRIPT=$python_script"
 echo "PARAMS=${PARAMS[@]}"
+echo "GRAPHICS=$GRAPHICS"
 
 RANDOM=125 #seed the random sequence
 
@@ -77,7 +82,15 @@ start_python(){
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
-  sleep 20 #wait some seconds for model to load otherwise you miss the start message  
+  while [ ! -e $LLOC/tf_log ] ; do 
+    sleep 1 
+    cnt=$((cnt+1)) 
+    if [ $cnt -gt 300 ] ; then 
+      echo "$(tput setaf 1) Waited for 5minutes on tf_log... $(tput sgr 0)" 
+      exit 
+    fi 
+  done
+  # sleep 20 #wait some seconds for model to load otherwise you miss the start message  
 }
 start_python
 # Start ros with launch file
@@ -106,6 +119,12 @@ while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
 do
   echo "run: $i"
   NUM=$((i%${#WORLDS[@]}))
+
+  if [ -e $LLOC/tf_log ] ; then
+    old_stat="$(stat -c %Y $LLOC/tf_log)"
+  else
+    echo "Could not find $LLOC/tf_log"
+  fi
   # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
@@ -117,7 +136,6 @@ do
   if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
   echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
-
   x=0
   y=$(awk "BEGIN {print -0.25+0.5*$((RANDOM%=100))/100}")   
   if [ ${WORLDS[NUM]} == sandbox ] ; then
@@ -129,7 +147,7 @@ do
   LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
    Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC\
-   $EXTRA_ARGUMENTS"
+   $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
   echo $COMMANDR
   START=$(date +%s)     
   xterm -l -lf $LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &
@@ -180,9 +198,11 @@ do
   if [[ crashed != true ]] ; then
     # wait for tensorflow
     if [ -e $LLOC/tf_log ] ; then 
-      old_stat="$(stat -c %Y $LLOC/tf_log)"
       new_stat="$(stat -c %Y $LLOC/tf_log)"
-      while [ $old_stat = $new_stat ] ; do new_stat="$(stat -c %Y $LLOC/tf_log)"; sleep 1; done
+      while [ $old_stat = $new_stat ] ; do 
+        new_stat="$(stat -c %Y $LLOC/tf_log)"
+        sleep 1
+      done
     else 
       cnt=0
       while [ ! -e $LLOC/tf_log ] ; do 
@@ -200,7 +220,7 @@ do
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-  fi
+  fi  
 done
 kill_combo
 date +%F_%H%M%S
