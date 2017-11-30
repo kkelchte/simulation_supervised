@@ -7,7 +7,6 @@
 # -w WORLDS
 # -p PARAMS
 ######################################################
-
 usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-m MODELDIR: checkpoint to initialize weights with in logfolder]
     [-n NUMBER_OF_FLIGHTS]
