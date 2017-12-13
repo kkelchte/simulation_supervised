@@ -14,7 +14,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
-python_script="start_python_docker.sh"
+python_script="start_python_sing.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_evaluate_online
 GRAPHICS=true
@@ -85,6 +85,7 @@ start_python(){
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
+  cnt=0
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
     cnt=$((cnt+1)) 
@@ -149,7 +150,7 @@ do
   Y=1.57  
   LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-   Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC \
+   Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC\
    evaluate:=true $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
   echo $COMMANDR
   START=$(date +%s)     
@@ -157,10 +158,20 @@ do
   pidlaunch=$!
   echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
+  DIFF=0
   while kill -0 $pidlaunch; 
   do 
+    # Check if job got suspended
+    if [[ $(( $(date +%s) - START - DIFF)) -gt 30 ]] ; then
+      sleep 30 #wait for big tick to update
+      TOTAL_SUS="$(condor_q -glob -l $cluser_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
+      echo "I was suspended for the $TOTAL_SUS 'th time."
+      START=$(( $(date +%s) - $DIFF ))
+      DIFF=$(( $END - $START ))
+    fi
     END=$(date +%s)
     DIFF=$(( $END - $START ))
+    
     if [ $DIFF -gt 300 ] ; 
     then
       echo "$(tput setaf 1) ---CRASH (delay time: $DIFF) $(tput sgr 0)"
@@ -176,6 +187,7 @@ do
         echo "restart python:"
         start_ros
         start_python
+        crashed=true
       else
         message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
         echo $message >> $LLOC/crash
@@ -189,31 +201,36 @@ do
     fi
     sleep 0.1
   done
-  if [[ crashed != true ]] ; then
+  if [ $crashed != true ] ; then
     # wait for tensorflow
     if [ -e $LLOC/tf_log ] ; then 
+      cnt=0
       new_stat="$(stat -c %Y $LLOC/tf_log)"
       while [ $old_stat = $new_stat ] ; do 
         new_stat="$(stat -c %Y $LLOC/tf_log)"
+        cnt=$((cnt+1)) 
+        if [ $cnt -gt 300 ] ; then 
+          echo "[evaluate_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
+          kill_combo
+          crash_number=0
+          #location for logging
+          mkdir -p $LLOC/xterm_log
+          start_ros
+          start_python
+        fi 
         sleep 1
       done
     else 
-      cnt=0
-      while [ ! -e $LLOC/tf_log ] ; do 
-        sleep 1 
-        cnt=$((cnt+1)) 
-        if [ $cnt -gt 300 ] ; then 
-          echo "Waited for 5minutes on tf_log..." 
-          exit 
-        fi 
-      done
+      echo "[evaluate_model.sh] Could not find $LLOC/tf_log"
+      exit 
     fi
     i=$((i+1))
     if [ $(tail -1 $LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
-    COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
+    COUNTTOT[NUM]="$(( COUNTTOT[NUM]+1 ))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
+
   fi  
 done
 kill_combo
