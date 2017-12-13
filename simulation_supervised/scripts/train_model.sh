@@ -13,7 +13,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
-python_script="start_python_docker.sh"
+python_script="start_python_sing.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
 GRAPHICS=true
