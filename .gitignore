@@ -9,3 +9,4 @@ compile_commands.json
 CTestTestfile.cmake
 *.pyc
 *~
+simulation_supervised_tools/data/*
