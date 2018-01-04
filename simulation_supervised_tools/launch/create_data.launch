@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- start creation of dataset-->
+  <arg name="saving_location" default="$(find create_dataset)/tmp"/>
+  <param name="saving_location" value="$(arg saving_location)"/>
+  <arg name="direction" default="none"/>
+  <param name="direction" value="$(arg direction)"/>
+  <node name="create_dataset" pkg="create_dataset" type="create_dataset.py" output="screen"/>
+  <!-- visualize the image raw topic
+  <node name="image_view" pkg="image_view" type="image_view" output="screen" args="image:=/ardrone/kinect/image_raw"/>-->
+</launch>

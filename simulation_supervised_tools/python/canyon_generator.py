@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os,sys
 
+np.random.seed(150)
+
 number_of_walls=150
 width = 3.0
 result_world='canyon.world'
@@ -13,6 +15,7 @@ if len(sys.argv) >= 2:
   location=sys.argv[1]+'/'
 else:
   location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+
 # print('[generator] World and image is saved in: {}'.format(location))
 worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 
@@ -88,5 +91,5 @@ for i,w in enumerate(walls):
         size = ET.SubElement(box, 'size')
         size.text='0.02 '+str(w[1])+' 4'
 
-print('make: {}'.format(result_world))
+print('saved {1}{0} '.format(result_world, location))
 tree.write(os.path.join(location,result_world), encoding="us-ascii", xml_declaration=True, method="xml")

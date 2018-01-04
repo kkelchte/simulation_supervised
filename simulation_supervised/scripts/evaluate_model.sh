@@ -50,6 +50,25 @@ if [ -z "$MODELDIR" ] ; then
   exit
 fi
 
+#### Ensure scratch is False and continue training is True
+next_val=''
+CLEAN_PARAMS=()
+for p in ${PARAMS[@]} ; do
+  if [  ! -z $next_val ] ; then
+    CLEAN_PARAMS=(${CLEAN_PARAMS[@]} $next_val)
+    next_val=''
+  else
+    CLEAN_PARAMS=(${CLEAN_PARAMS[@]} $p)
+  fi
+  if [[ "$p" = "--continue_training" ]] ; then
+    next_val='True'
+  fi
+  if [[ "$p" = "--scratch" ]] ; then
+    next_val='False'
+  fi
+done
+PARAMS=''
+PARAMS=(${CLEAN_PARAMS[@]} '--scratch' 'False' '--continue_training' 'True')
 echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
@@ -80,6 +99,9 @@ start_python(){
   LOGDIR="$TAG/$(date +%F_%H%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
   ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
+  if [ $GRAPHICS = false ] ; then
+    ARGUMENTS="$ARGUMENTS --show_depth False"
+  fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
