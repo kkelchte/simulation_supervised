@@ -51,11 +51,13 @@ def image_callback(msg):
     if user_ctr != 0:
       cv2.line(img, (xs, ys), (int(xs-200*user_ctr),ys),(240,200,0), 9)
       cv2.line(img, (xs, ys-5), (xs,ys+5),(0,0,0), 3)
+      cv2.putText(img,"supervised_vel",(img.shape[1]-250,img.shape[0]-50), font, 1,(240,200,0),2)  
 
     if pilot_ctr != 0:
       cv2.rectangle(img, (xs, ys-20), (int(xs-200*pilot_ctr),ys+20), (0,0,255),20) 
       # cv2.line(img, (xs, ys+10), (int(xs-200*pilot_ctr),ys+10),(255,0,0), 20)
       cv2.rectangle(img, (xs-5, ys-20), (xs+5,ys+20),(0,0,0), 10)
+      cv2.putText(img,"cmd_vel",(img.shape[1]-180,img.shape[0]-15), font, 1,(0,0,255),2)  
 
     if battery!='':
       cv2.putText(img,battery+'%',(img.shape[1]-75,40), font, 1,(240,200,200),2)
@@ -75,16 +77,15 @@ def image_callback(msg):
     #   cv2.putText(img,"Control off",(xs+137,40), font, 1,(0,0,255),2)
     
     # cv2.putText(img,"User",(img.shape[1]-105,img.shape[0]-55), font, 1,(240,200,0),2)
-    cv2.putText(img,"Autopilot",(img.shape[1]-180,img.shape[0]-15), font, 1,(240,0,200),2)  
     
     # if recording:
     #   cv2.circle(img,(30,40), 20, (0,0,255), -1)
     
     cv2.imshow('Control',img)
     cv2.waitKey(2)
-    if recording :
-      cv2.imwrite(saving_location+'/'+'{0:010d}.jpg'.format(count),img)
-      count+=1
+    # if recording :
+    #   cv2.imwrite(saving_location+'/'+'{0:010d}.jpg'.format(count),img)
+    #   count+=1
     
 def state_cb(data):
   global state
@@ -93,11 +94,15 @@ def state_cb(data):
 
 def recon_callback(msg):
   global recording
-  if not recording: recording=True
+  if not recording: 
+    print("[show_control]: recording on")
+    recording=True
     
 def recoff_callback(data):
   global recording
-  if recording: recording=False
+  if recording: 
+    print("[show_control]: recording off")
+    recording=False
      
 def user_cb(data):
   global user_ctr
@@ -131,7 +136,6 @@ if __name__=="__main__":
   if rospy.has_param('save_images'):
     save_images=rospy.get_param('save_images')
   if False:
-  # if save_images:
     print '----------------save images to: ',saving_location
     recording = True
     if not os.path.isdir(saving_location):
@@ -144,9 +148,7 @@ if __name__=="__main__":
   if rospy.has_param('supervision'):
     supervision=rospy.get_param('supervision')
     # supervision=bool(rospy.get_param('supervision')!='false')
-  
-  print('[show_control]--------------------------------save_images: ',save_images)
-  
+    
   rospy.init_node('show_control', anonymous=True)
   rospy.Subscriber('control_state', String, state_cb)
 
@@ -159,8 +161,10 @@ if __name__=="__main__":
     rospy.Subscriber(rospy.get_param('rec_off'), Empty, recoff_callback) 
   
 
-  rospy.Subscriber('ps3_vel', Twist, user_cb)
-  rospy.Subscriber('pilot_vel', Twist, pilot_cb)
+  rospy.Subscriber(rospy.get_param('ps3_top'), Twist, user_cb)
+  rospy.Subscriber('supervised_vel', Twist, user_cb)
+  rospy.Subscriber('tf_vel', Twist, pilot_cb)
+  rospy.Subscriber('cmd_vel', Twist, pilot_cb)
 
   rospy.Subscriber('/bebop/states/common/CommonState/BatteryStateChanged', CommonCommonStateBatteryStateChanged, battery_cb)
 

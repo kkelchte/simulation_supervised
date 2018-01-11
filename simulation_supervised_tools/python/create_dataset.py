@@ -27,6 +27,7 @@ index_left_60=0
 index_right_30=0
 index_right_60=0
 # index_depth=0
+last_supervised_control=[0,0,0,0,0,0]
 last_control=[0,0,0,0,0,0]
 last_imu=[0,0,0]
 last_position=[]
@@ -38,6 +39,8 @@ delay_evaluation = 3
 rgb_image = None #np.zeros((360,640,3))
 recovery = False
 T_pg = []
+
+skip_first=15
 # saving = False # token to avoid overwriting of rgb_image while saving
 
 def write_info(image_type, sloc, index):
@@ -54,11 +57,14 @@ def write_info(image_type, sloc, index):
   if sloc.find("30")!=-1:
     dg=30
   compensation=dr*dg/60.
+  supervised_control = last_supervised_control[:] # copy
   control=last_control[:] #copy
   control[5]=compensation+control[5] # compensate
   # print("sloc: {0}: dr: {1}, dg: {2}, control[5]: {3} = last_control[5] ({4}) + compensation ({5})".format(sloc, dr, dg, control[5], last_control[5], compensation))
   # with open(sloc+'/meta_info.txt','a') as metafile:
   #   metafile.write("{0:010d} {1}\n".format(index, str(last_imu)[1:-1]))
+  with open(sloc+'/supervised_info.txt','a') as supervised_controlfile:
+    supervised_controlfile.write("{0:010d} {1[0]} {1[1]} {1[2]} {1[3]} {1[4]} {1[5]}\n".format(index, supervised_control))
   with open(sloc+'/control_info.txt','a') as controlfile:
     controlfile.write("{0:010d} {1[0]} {1[1]} {1[2]} {1[3]} {1[4]} {1[5]}\n".format(index, control))
   with open(sloc+'/position_info.txt','a') as positionfile:
@@ -77,15 +83,16 @@ def process_rgb(msg, sloc, index):
     print(e)
   else:
     # Save your OpenCV2 image as a jpeg 
-    print('write RGB image {1} to {0}'.format(sloc, index))
-    cv2.imwrite(sloc+"/RGB/{:010d}.jpg".format(index), rgb_image)
+    if index > skip_first: 
+      print('write RGB image {1} to {0}'.format(sloc, index))
+      cv2.imwrite(sloc+"/RGB/{:010d}.jpg".format(index), rgb_image)
     return True  
 
 def image_callback(msg, sloc):
   global index  
   # print('received image for: {}'.format(sloc))
   if process_rgb(msg, sloc, index):
-    write_info('RGB', sloc, index)
+    if index > skip_first: write_info('RGB', sloc, index)
     index+=1
 def image_callback_left_30(msg, sloc):
   global index_left_30  
@@ -117,15 +124,16 @@ def process_depth(msg, sloc, index):
     print(e)
   else:
     im=im*1/5.*255
-    print('write Depth image {1} to {0}'.format(sloc, index))
-    cv2.imwrite(sloc+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))
+    if index > skip_first: 
+      print('write Depth image {1} to {0}'.format(sloc, index))
+      cv2.imwrite(sloc+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))
     return True
 
 def depth_callback(msg, sloc):
   global index  
   # print('received image for: {}'.format(sloc))
   if process_depth(msg, sloc, index):
-    write_info('Depth', sloc, index)
+    if index > skip_first: write_info('Depth', sloc, index)
     index+=1
 def depth_callback_left_30(msg, sloc):
   global index_left_30  
@@ -166,6 +174,16 @@ def control_callback(data):
         data.angular.x,
         data.angular.y,
         data.angular.z]
+
+def supervised_control_callback(data):
+  global last_supervised_control
+  last_supervised_control=[data.linear.x,
+      data.linear.y,
+      data.linear.z,
+      data.angular.x,
+      data.angular.y,
+      data.angular.z]
+
   
   #print('received control:', data.linear.x,', ',data.linear.y,', ',data.linear.z)
 
@@ -239,6 +257,7 @@ if __name__=="__main__":
   
   if rospy.has_param('control'):
     rospy.Subscriber(rospy.get_param('control'), Twist, control_callback)
+  rospy.Subscriber('/supervised_vel', Twist, supervised_control_callback)
   rospy.Subscriber('/ground_truth/state', Odometry, gt_callback)
   if rospy.has_param('ready'):
     rospy.Subscriber(rospy.get_param('ready'), Empty, ready_callback)

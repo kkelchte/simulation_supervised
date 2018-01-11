@@ -10,6 +10,7 @@ from std_msgs.msg import String
 
 #
 # Maps control from pilot_online and from PS3 on right cmd_vel values
+# Possible different states: 
 #
 cmd_pub = None # control publisher
 sup_pub = None # supervision publisher
@@ -77,7 +78,7 @@ if __name__=="__main__":
 	if rospy.has_param('ready'): 
 		ready_sub = rospy.Subscriber(rospy.get_param('ready'), Empty, ready_cb)
 	
-	pilot_sub = rospy.Subscriber('pilot_vel', Twist, pilot_cb)
+	pilot_sub = rospy.Subscriber('tf_vel', Twist, pilot_cb)
 	ps3_sub = rospy.Subscriber(rospy.get_param('ps3_top'), Twist, ps3_cb)
 	
 	tweak_roll_on_sub = rospy.Subscriber('/bebop/tweak_roll_on', Empty, tweak_roll_on_cb)

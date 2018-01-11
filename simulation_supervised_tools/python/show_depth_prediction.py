@@ -30,6 +30,7 @@ window_name_pred='Depth Prediction'
 window_name_gt='Depth Groundtruth'
 count=0
 saving_location='/tmp'
+save_images=False
   
 def ready_callback(msg):
   global ready, finished
@@ -106,8 +107,9 @@ def show():
     big_image[10:10+target_depth.shape[0], predicted_depth.shape[1]+10:predicted_depth.shape[1]+10+target_depth.shape[1]] = target_depth[:,:]
   cv2.imshow(window_name_pred, big_image)
   cv2.waitKey(1)
-  cv2.imwrite(saving_location+'/'+'{0:010d}.jpg'.format(count),big_image)
-  count+=1
+  # if save_images:
+  #   cv2.imwrite(saving_location+'/'+'{0:010d}.jpg'.format(count),big_image)
+  #   count+=1
     
   
   # cv2.imshow(window_name_pred, predicted_depth)
@@ -151,24 +153,24 @@ if __name__=="__main__":
   if rospy.has_param('depth_image'):
     rospy.Subscriber(rospy.get_param('depth_image'), Image, target_callback, queue_size = 1)
   
-  if rospy.has_param('saving_location'):
-    loc=rospy.get_param('saving_location')
-    if loc[0]=='/':
-      saving_location=loc
-    else:
-      saving_location='$HOME/pilot_data/flights/'+loc
-  print(saving_location)
-  if rospy.has_param('save_images'):
-    save_images=rospy.get_param('save_images')
+  # if rospy.has_param('saving_location'):
+  #   loc=rospy.get_param('saving_location')
+  #   if loc[0]=='/':
+  #     saving_location=loc
+  #   else:
+  #     saving_location='$HOME/pilot_data/flights/'+loc
+  # print(saving_location)
+  # if rospy.has_param('save_images'):
+  #   save_images=rospy.get_param('save_images')
   # if False:
-  if save_images:
-    print '----------------save images to: ',saving_location
-    recording = True
-    if not os.path.isdir(saving_location):
-      try:
-        os.mkdir(saving_location)
-      except:
-        pass 
+  # # if save_images:
+  #   print '----------------save images to: ',saving_location
+  #   recording = True
+  #   if not os.path.isdir(saving_location):
+  #     try:
+  #       os.mkdir(saving_location)
+  #     except:
+  #       pass 
   
   r = rospy.Rate(10) # 10hz
   while not rospy.is_shutdown():

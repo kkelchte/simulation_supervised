@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  
+
+
   <arg name="noise" default="none"/>
   <param name="noise" value="$(arg noise)"/>
   <param name="flight_duration" value="500"/>
@@ -10,6 +11,7 @@
 
   <arg name="world_name" default="esat_corridor_v2.world"/>
   <param name="world_name" value="$(arg world_name)"/><!-- used by rosinterface to label runs -->
+  
 
   <arg name="gui" default="false"/>
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched-->
@@ -21,11 +23,14 @@
   </include>
     
   <!-- Spawn simulated quadrotor uav -->
+  <arg name="recovery" default="false"/>
+  <param name="recovery" value="$(arg recovery)"/>
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
   <arg name="Yspawned" default="1.57"/>
-  <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
-    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam_and_kinect.gazebo.xacro" />
+  <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
+    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam_and_kinect.gazebo.xacro" unless="$(arg recovery)"/>
+    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_multiple_kinects.gazebo.xacro" if="$(arg recovery)"/>
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
     <arg name="Y" default="$(arg Yspawned)"/>
@@ -49,11 +54,11 @@
     <arg name="eva_dis" value="4200"/>
   </include>
 
-  <!-- start create_data node -->
-  <!-- <arg name="saving_location" default="$(find create_dataset)/tmp"/>
-  <include file="$(find create_dataset)/create_data.launch">
-    <arg name="saving_location" value="$(arg saving_location)"/>
-  </include> -->
+    <!-- start create_data node -->
+    <arg name="saving_location" default="$(find simulation_supervised_tools)/data"/>
+    <include file="$(find simulation_supervised_tools)/launch/create_data.launch">
+      <arg name="saving_location" value="$(arg saving_location)"/>
+    </include>
 
   <arg name="graphics" default="true"/>
   <group if="$(arg graphics)">

@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os,sys
 
-np.random.seed(150)
+# np.random.seed(150)
 
 number_of_walls=150
 width = 3.0

@@ -59,14 +59,14 @@
 
     <!-- start create_data node -->
     <arg name="saving_location" default="$(find simulation_supervised_tools)/data"/>
-    <include file="$(find create_dataset)/create_data.launch">
+    <include file="$(find simulation_supervised_tools)/launch/create_data.launch">
       <arg name="saving_location" value="$(arg saving_location)"/>
     </include>
 
     <arg name="graphics" default="true"/>
     <group if="$(arg graphics)">
       <!-- display control -->
-      <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
+      <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
       <!-- display depth prediction -->
       <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
     </group>

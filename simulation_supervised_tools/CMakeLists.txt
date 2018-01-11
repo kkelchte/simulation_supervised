@@ -32,6 +32,7 @@ catkin_package()
 
 catkin_install_python(PROGRAMS
     python/evaluate.py
+    python/create_dataset.py
     python/show_control.py
     python/ground_truth_listener.py
     python/console_display.py

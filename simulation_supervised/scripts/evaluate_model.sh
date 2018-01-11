@@ -9,16 +9,17 @@
 ######################################################
 
 usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
-    [-m MODELDIR: checkpoint to initialize weights with in logfolder]
+    [-m MODELDIR: checkpoint to initialize weights within logfolder]
     [-n NUMBER_OF_FLIGHTS]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
-    [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker]
-    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+    [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing]
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --continue_training False\" ]" 1>&2; exit 1; }
 python_script="start_python_sing.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_evaluate_online
 GRAPHICS=true
-while getopts ":t:m:n:w:s:p:g:" o; do
+RECOVERY=false
+while getopts ":t:m:n:w:s:p:g:r:" o; do
     case "${o}" in
         t)
             TAG=${OPTARG} ;;
@@ -34,6 +35,8 @@ while getopts ":t:m:n:w:s:p:g:" o; do
             PARAMS+=(${OPTARG}) ;;
         g)
             GRAPHICS=${OPTARG} ;; 
+        r)
+            RECOVERY=${OPTARG} ;; 
         *)
             usage ;;
     esac
@@ -77,6 +80,7 @@ echo "WORLDS=${WORLDS[@]}"
 echo "PYTHON SCRIPT=$python_script"
 echo "PARAMS=${PARAMS[@]}"
 echo "GRAPHICS=$GRAPHICS"
+echo "RECOVERY=$RECOVERY"
 
 RANDOM=125 #seed the random sequence
 
@@ -102,6 +106,9 @@ start_python(){
   if [ $GRAPHICS = false ] ; then
     ARGUMENTS="$ARGUMENTS --show_depth False"
   fi
+  if [ $RECOVERY = true ] ; then
+    ARGUMENTS="$ARGUMENTS --recovery True"
+  fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
   xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
@@ -116,10 +123,11 @@ start_python(){
       exit 
     fi 
   done
-  # sleep 20 #wait some seconds for model to load otherwise you miss the start message  
 }
 start_python
-# Start ros with launch file
+
+######################################################
+# Kill ros function
 kill_combo(){
   echo "kill ros:"
   kill -9 $pidlaunch >/dev/null 2>&1 
@@ -173,7 +181,7 @@ do
   LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
    Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC\
-   evaluate:=true $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
+   evaluate:=true $EXTRA_ARGUMENTS graphics:=$GRAPHICS recovery:=$RECOVERY"
   echo $COMMANDR
   START=$(date +%s)     
   xterm -l -lf $LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &

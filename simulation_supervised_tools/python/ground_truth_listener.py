@@ -11,7 +11,8 @@ from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 
 #
-# Listen to evaluate to plot positions
+# Listen to current ground truth positions 
+# in order to create evaluation plots
 #
 size = (200,200)
 img = np.zeros(size)
