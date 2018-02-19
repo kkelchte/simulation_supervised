@@ -1,0 +1,647 @@
++++++++++++++++++++++++CREATE DATA+++++++++++++++++++++
+TAG=canyon_fully_random
+MODELDIR=mobilenet_025
+NUMBER_OF_FLIGHTS=105
+WORLDS=canyon
+PYTHON SCRIPT=start_python_sing_ql.sh
+PARAMS=--continue_training False --epsilon 1
+GRAPHICS=true
+NOISE=ou
+start ROS
+PID ROS:  25502
+Set rosparam supervision to true
+/esat/qayd/kkelchte/docker_home/simsup_ws/src/simulation_supervised/simulation_supervised/scripts/start_python_sing_ql.sh --log_tag canyon_fully_random/2018-02-13_1615_create_data --checkpoint_path mobilenet_025 --continue_training False --epsilon 1
+PID Python tensorflow: 25939
+run: 0
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:15 -----------------------> Started with run: 0 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.477 x:=-0.32 y:=0.25 starting_height:=0.9 speed:=1.3 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00000_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 26403
+2018-02-13_16-16 finished run 0 in world canyon with bump  resulting in  / 1
+run: 1
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:16 -----------------------> Started with run: 1 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.438 x:=-0.33 y:=0.98 starting_height:=1.21 speed:=1.05 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00001_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 29149
+2018-02-13_16-16 finished run 1 in world canyon with bump  resulting in  / 2
+run: 2
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:16 -----------------------> Started with run: 2 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.486 x:=0.19 y:=0.93 starting_height:=0.96 speed:=1.63 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00002_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 31953
+2018-02-13_16-17 finished run 2 in world canyon with bump  resulting in  / 3
+run: 3
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:17 -----------------------> Started with run: 3 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.639 x:=0.35 y:=0.11 starting_height:=1.44 speed:=1.21 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00003_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 2005
+2018-02-13_16-17 finished run 3 in world canyon with bump  resulting in  / 4
+run: 4
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:17 -----------------------> Started with run: 4 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.48 x:=-0.16 y:=0.54 starting_height:=1.31 speed:=1.42 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00004_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 4566
+2018-02-13_16-17 finished run 4 in world canyon with bump  resulting in  / 5
+run: 5
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:17 -----------------------> Started with run: 5 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.468 x:=-0.25 y:=0.94 starting_height:=1.35 speed:=0.86 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00005_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 7077
+2018-02-13_16-18 finished run 5 in world canyon with bump  resulting in  / 6
+run: 6
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:18 -----------------------> Started with run: 6 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.591 x:=0.34 y:=0.69 starting_height:=0.85 speed:=1.09 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00006_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 10207
+2018-02-13_16-18 finished run 6 in world canyon with bump  resulting in  / 7
+run: 7
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:18 -----------------------> Started with run: 7 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.663 x:=0.07 y:=0.15 starting_height:=1.01 speed:=1.73 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00007_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 13110
+2018-02-13_16-19 finished run 7 in world canyon with bump  resulting in  / 8
+run: 8
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:19 -----------------------> Started with run: 8 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.699 x:=0.31 y:=0.31 starting_height:=0.5 speed:=1.3 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00008_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 16044
+2018-02-13_16-19 finished run 8 in world canyon with bump  resulting in  / 9
+run: 9
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:19 -----------------------> Started with run: 9 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.606 x:=0.22 y:=0.49 starting_height:=0.54 speed:=1.34 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00009_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 18587
+2018-02-13_16-20 finished run 9 in world canyon with bump  resulting in  / 10
+run: 10
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:20 -----------------------> Started with run: 10 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.651 x:=0.37 y:=0.52 starting_height:=0.82 speed:=1.29 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00010_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 20933
+2018-02-13_16-20 finished run 10 in world canyon with bump  resulting in  / 11
+run: 11
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:20 -----------------------> Started with run: 11 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.435 x:=0.08 y:=0.15 starting_height:=0.67 speed:=1.75 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00011_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 24169
+2018-02-13_16-21 finished run 11 in world canyon with bump  resulting in  / 12
+run: 12
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:21 -----------------------> Started with run: 12 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.537 x:=-0.33 y:=0.81 starting_height:=1.08 speed:=1.35 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00012_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 27815
+2018-02-13_16-22 finished run 12 in world canyon with bump  resulting in  / 13
+run: 13
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:22 -----------------------> Started with run: 13 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.504 x:=0.45 y:=0.63 starting_height:=1.27 speed:=1.24 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00013_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 31425
+2018-02-13_16-22 finished run 13 in world canyon with bump  resulting in  / 14
+run: 14
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:22 -----------------------> Started with run: 14 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.426 x:=-0.12 y:=0.56 starting_height:=0.6 speed:=1.65 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00014_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 2117
+2018-02-13_16-23 finished run 14 in world canyon with bump  resulting in  / 15
+run: 15
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:23 -----------------------> Started with run: 15 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.504 x:=-0.05 y:=0.28 starting_height:=0.86 speed:=1.78 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00015_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 4564
+2018-02-13_16-23 finished run 15 in world canyon with bump  resulting in  / 16
+run: 16
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:23 -----------------------> Started with run: 16 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.459 x:=0.31 y:=0.77 starting_height:=1.08 speed:=1.43 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00016_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 7398
+2018-02-13_16-23 finished run 16 in world canyon with bump  resulting in  / 17
+run: 17
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:23 -----------------------> Started with run: 17 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.438 x:=0.39 y:=0.83 starting_height:=0.73 speed:=1.24 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00017_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 9775
+2018-02-13_16-24 finished run 17 in world canyon with bump  resulting in  / 18
+run: 18
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:24 -----------------------> Started with run: 18 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.693 x:=0.35 y:=0.51 starting_height:=0.62 speed:=1.01 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00018_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 14317
+2018-02-13_16-25 finished run 18 in world canyon with bump  resulting in  / 19
+run: 19
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:25 -----------------------> Started with run: 19 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.696 x:=0.47 y:=0.3 starting_height:=1.06 speed:=1.72 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00019_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 16690
+2018-02-13_16-25 finished run 19 in world canyon with bump  resulting in  / 20
+run: 20
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:25 -----------------------> Started with run: 20 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.564 x:=0.29 y:=0.16 starting_height:=0.62 speed:=0.91 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00020_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 19441
+2018-02-13_16-26 finished run 20 in world canyon with bump  resulting in  / 21
+run: 21
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:26 -----------------------> Started with run: 21 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.663 x:=-0.38 y:=0.64 starting_height:=0.8 speed:=0.91 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00021_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 21892
+2018-02-13_16-26 finished run 21 in world canyon with bump  resulting in  / 22
+run: 22
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:26 -----------------------> Started with run: 22 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.654 x:=-0.39 y:=0.76 starting_height:=0.9 speed:=1.23 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00022_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 24350
+2018-02-13_16-27 finished run 22 in world canyon with bump  resulting in  / 23
+run: 23
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:27 -----------------------> Started with run: 23 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.486 x:=0.45 y:=0.11 starting_height:=1.05 speed:=1.1 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00023_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 28511
+2018-02-13_16-27 finished run 23 in world canyon with bump  resulting in  / 24
+run: 24
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:27 -----------------------> Started with run: 24 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.564 x:=-0.49 y:=0.86 starting_height:=0.79 speed:=1.58 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00024_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 31636
+2018-02-13_16-28 finished run 24 in world canyon with bump  resulting in  / 25
+run: 25
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:28 -----------------------> Started with run: 25 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.597 x:=0.43 y:=0.26 starting_height:=1.38 speed:=1.29 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00025_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 1668
+2018-02-13_16-29 finished run 25 in world canyon with success  resulting in 1 / 26
+run: 26
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:29 -----------------------> Started with run: 26 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.42 x:=0.02 y:=0.99 starting_height:=1.15 speed:=1.09 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00026_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 7658
+2018-02-13_16-30 finished run 26 in world canyon with bump  resulting in 1 / 27
+run: 27
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:30 -----------------------> Started with run: 27 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.594 x:=0.22 y:=0.12 starting_height:=1.23 speed:=0.95 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00027_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 10243
+2018-02-13_16-30 finished run 27 in world canyon with bump  resulting in 1 / 28
+run: 28
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:30 -----------------------> Started with run: 28 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.468 x:=-0.49 y:=0.35 starting_height:=1.14 speed:=1.49 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00028_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 12820
+2018-02-13_16-31 finished run 28 in world canyon with bump  resulting in 1 / 29
+run: 29
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:31 -----------------------> Started with run: 29 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.528 x:=0.06 y:=0.82 starting_height:=0.86 speed:=1.74 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00029_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 16355
+2018-02-13_16-32 finished run 29 in world canyon with bump  resulting in 1 / 30
+run: 30
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:32 -----------------------> Started with run: 30 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.678 x:=0.33 y:=0.3 starting_height:=1.27 speed:=0.97 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00030_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 20103
+2018-02-13_16-32 finished run 30 in world canyon with bump  resulting in 1 / 31
+run: 31
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:32 -----------------------> Started with run: 31 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.522 x:=0.21 y:=0.48 starting_height:=0.75 speed:=1.66 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00031_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 22603
+2018-02-13_16-32 finished run 31 in world canyon with bump  resulting in 1 / 32
+run: 32
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:32 -----------------------> Started with run: 32 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.633 x:=-0.43 y:=0.29 starting_height:=0.99 speed:=1.24 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00032_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 25225
+2018-02-13_16-33 finished run 32 in world canyon with bump  resulting in 1 / 33
+run: 33
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:33 -----------------------> Started with run: 33 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.498 x:=-0.09 y:=0.58 starting_height:=0.62 speed:=0.97 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00033_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 28289
+2018-02-13_16-33 finished run 33 in world canyon with bump  resulting in 1 / 34
+run: 34
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:33 -----------------------> Started with run: 34 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.45 x:=0.49 y:=0.73 starting_height:=0.95 speed:=1.11 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00034_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 30892
+2018-02-13_16-34 finished run 34 in world canyon with bump  resulting in 1 / 35
+run: 35
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:34 -----------------------> Started with run: 35 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.438 x:=-0.4 y:=0.45 starting_height:=1.23 speed:=1.55 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00035_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 1007
+2018-02-13_16-34 finished run 35 in world canyon with bump  resulting in 1 / 36
+run: 36
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:34 -----------------------> Started with run: 36 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.435 x:=-0.34 y:=0.52 starting_height:=1.23 speed:=0.87 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00036_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 4382
+2018-02-13_16-35 finished run 36 in world canyon with bump  resulting in 1 / 37
+run: 37
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:35 -----------------------> Started with run: 37 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.531 x:=-0.49 y:=0.17 starting_height:=0.91 speed:=0.81 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00037_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 6844
+2018-02-13_16-35 finished run 37 in world canyon with bump  resulting in 1 / 38
+run: 38
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:35 -----------------------> Started with run: 38 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.693 x:=-0.06 y:=0.54 starting_height:=0.68 speed:=1.76 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00038_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 9212
+2018-02-13_16-35 finished run 38 in world canyon with bump  resulting in 1 / 39
+run: 39
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:35 -----------------------> Started with run: 39 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.627 x:=0.31 y:=0.11 starting_height:=1.41 speed:=1.77 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00039_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 11764
+2018-02-13_16-36 finished run 39 in world canyon with bump  resulting in 1 / 40
+run: 40
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:36 -----------------------> Started with run: 40 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.669 x:=0.1 y:=0.62 starting_height:=0.85 speed:=1.19 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00040_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 14400
+2018-02-13_16-36 finished run 40 in world canyon with bump  resulting in 1 / 41
+run: 41
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:36 -----------------------> Started with run: 41 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.63 x:=0 y:=0.51 starting_height:=1.16 speed:=1.16 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00041_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 17684
+2018-02-13_16-37 finished run 41 in world canyon with bump  resulting in 1 / 42
+run: 42
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:37 -----------------------> Started with run: 42 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.462 x:=-0.27 y:=0.21 starting_height:=0.52 speed:=1.65 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00042_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 20054
+2018-02-13_16-37 finished run 42 in world canyon with bump  resulting in 1 / 43
+run: 43
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:37 -----------------------> Started with run: 43 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.633 x:=0.49 y:=0.57 starting_height:=0.65 speed:=1.46 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00043_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 23504
+2018-02-13_16-38 finished run 43 in world canyon with bump  resulting in 1 / 44
+run: 44
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:38 -----------------------> Started with run: 44 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.525 x:=0.37 y:=0.97 starting_height:=1.23 speed:=0.81 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00044_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 25762
+2018-02-13_16-38 finished run 44 in world canyon with bump  resulting in 1 / 45
+run: 45
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:38 -----------------------> Started with run: 45 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.48 x:=-0.01 y:=0.13 starting_height:=1.34 speed:=1.24 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00045_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 28700
+2018-02-13_16-39 finished run 45 in world canyon with bump  resulting in 1 / 46
+run: 46
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:39 -----------------------> Started with run: 46 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.462 x:=0.21 y:=0.71 starting_height:=0.55 speed:=1.66 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00046_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 31432
+2018-02-13_16-39 finished run 46 in world canyon with bump  resulting in 1 / 47
+run: 47
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:39 -----------------------> Started with run: 47 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.531 x:=-0.15 y:=0.05 starting_height:=1.14 speed:=0.97 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00047_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 2172
+2018-02-13_16-40 finished run 47 in world canyon with bump  resulting in 1 / 48
+run: 48
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:40 -----------------------> Started with run: 48 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.627 x:=0.49 y:=0.1 starting_height:=1.41 speed:=0.97 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00048_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 6371
+2018-02-13_16-41 finished run 48 in world canyon with bump  resulting in 1 / 49
+run: 49
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:41 -----------------------> Started with run: 49 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.435 x:=-0.24 y:=0.15 starting_height:=0.55 speed:=1.77 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00049_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 9245
+2018-02-13_16-42 finished run 49 in world canyon with bump  resulting in 1 / 50
+run: 50
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:42 -----------------------> Started with run: 50 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.546 x:=0.34 y:=0.51 starting_height:=0.65 speed:=1.48 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00050_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 13189
+2018-02-13_16-42 finished run 50 in world canyon with bump  resulting in 1 / 51
+run: 51
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:43 -----------------------> Started with run: 51 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.576 x:=0.45 y:=0.49 starting_height:=0.55 speed:=1.46 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00051_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 17392
+2018-02-13_16-43 finished run 51 in world canyon with bump  resulting in 1 / 52
+run: 52
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:43 -----------------------> Started with run: 52 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.636 x:=0.41 y:=0.04 starting_height:=0.65 speed:=1.65 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00052_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 20908
+2018-02-13_16-44 finished run 52 in world canyon with bump  resulting in 1 / 53
+run: 53
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:44 -----------------------> Started with run: 53 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.603 x:=0.19 y:=0.69 starting_height:=1.4 speed:=1.47 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00053_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 23289
+2018-02-13_16-44 finished run 53 in world canyon with bump  resulting in 1 / 54
+run: 54
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:44 -----------------------> Started with run: 54 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.681 x:=-0.46 y:=0.79 starting_height:=1.23 speed:=0.86 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00054_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 25880
+2018-02-13_16-44 finished run 54 in world canyon with bump  resulting in 1 / 55
+run: 55
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:44 -----------------------> Started with run: 55 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.627 x:=-0.06 y:=0.4 starting_height:=0.7 speed:=1.75 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00055_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 28384
+2018-02-13_16-45 finished run 55 in world canyon with bump  resulting in 1 / 56
+run: 56
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:45 -----------------------> Started with run: 56 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.672 x:=-0.29 y:=0.98 starting_height:=1.32 speed:=1.04 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00056_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 30746
+2018-02-13_16-45 finished run 56 in world canyon with bump  resulting in 1 / 57
+run: 57
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:45 -----------------------> Started with run: 57 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.468 x:=0.42 y:=0.67 starting_height:=0.94 speed:=0.82 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00057_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 1001
+2018-02-13_16-45 finished run 57 in world canyon with bump  resulting in 1 / 58
+run: 58
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:45 -----------------------> Started with run: 58 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.45 x:=-0.46 y:=0.31 starting_height:=0.78 speed:=0.85 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00058_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 3657
+2018-02-13_16-46 finished run 58 in world canyon with bump  resulting in 1 / 59
+run: 59
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:46 -----------------------> Started with run: 59 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.603 x:=0.34 y:=0.63 starting_height:=0.89 speed:=0.85 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00059_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 7123
+2018-02-13_16-46 finished run 59 in world canyon with bump  resulting in 1 / 60
+run: 60
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:46 -----------------------> Started with run: 60 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.648 x:=0.39 y:=0.62 starting_height:=1.11 speed:=1.33 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00060_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 9482
+2018-02-13_16-47 finished run 60 in world canyon with bump  resulting in 1 / 61
+run: 61
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:47 -----------------------> Started with run: 61 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.6 x:=0.07 y:=0.13 starting_height:=0.58 speed:=1.32 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00061_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 11784
+2018-02-13_16-47 finished run 61 in world canyon with bump  resulting in 1 / 62
+run: 62
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:47 -----------------------> Started with run: 62 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.522 x:=-0.33 y:=0.21 starting_height:=0.71 speed:=1.37 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00062_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 14271
+2018-02-13_16-47 finished run 62 in world canyon with bump  resulting in 1 / 63
+run: 63
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:47 -----------------------> Started with run: 63 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.66 x:=-0.4 y:=0.25 starting_height:=1.08 speed:=1.01 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00063_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 16540
+2018-02-13_16-48 finished run 63 in world canyon with bump  resulting in 1 / 64
+run: 64
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:48 -----------------------> Started with run: 64 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.612 x:=-0.35 y:=0.45 starting_height:=1.01 speed:=0.98 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00064_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 19021
+2018-02-13_16-49 finished run 64 in world canyon with bump  resulting in 1 / 65
+run: 65
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:49 -----------------------> Started with run: 65 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.477 x:=0.45 y:=0.59 starting_height:=0.58 speed:=1.52 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00065_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 23277
+2018-02-13_16-49 finished run 65 in world canyon with bump  resulting in 1 / 66
+run: 66
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:49 -----------------------> Started with run: 66 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.609 x:=-0.19 y:=0.34 starting_height:=1.41 speed:=0.96 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00066_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 25636
+2018-02-13_16-50 finished run 66 in world canyon with bump  resulting in 1 / 67
+run: 67
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:50 -----------------------> Started with run: 67 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.702 x:=-0.45 y:=0.65 starting_height:=0.94 speed:=1.37 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00067_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 28743
+2018-02-13_16-50 finished run 67 in world canyon with bump  resulting in 1 / 68
+run: 68
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:50 -----------------------> Started with run: 68 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.66 x:=-0.17 y:=0.91 starting_height:=1.4 speed:=0.91 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00068_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 31311
+2018-02-13_16-50 finished run 68 in world canyon with bump  resulting in 1 / 69
+run: 69
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:50 -----------------------> Started with run: 69 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.426 x:=0.14 y:=0.81 starting_height:=1.44 speed:=1.47 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00069_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 1536
+2018-02-13_16-51 finished run 69 in world canyon with bump  resulting in 1 / 70
+run: 70
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:51 -----------------------> Started with run: 70 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.477 x:=0.39 y:=0.12 starting_height:=1.16 speed:=0.98 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00070_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 4428
+2018-02-13_16-51 finished run 70 in world canyon with bump  resulting in 1 / 71
+run: 71
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:52 -----------------------> Started with run: 71 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.651 x:=0.34 y:=0.69 starting_height:=1.36 speed:=1.34 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00071_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 7458
+2018-02-13_16-52 finished run 71 in world canyon with bump  resulting in 1 / 72
+run: 72
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:52 -----------------------> Started with run: 72 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.441 x:=0.44 y:=0.31 starting_height:=0.62 speed:=1.18 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00072_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 11712
+2018-02-13_16-53 finished run 72 in world canyon with bump  resulting in 1 / 73
+run: 73
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:53 -----------------------> Started with run: 73 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.714 x:=0.43 y:=0.52 starting_height:=0.76 speed:=1.15 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00073_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 13989
+2018-02-13_16-53 finished run 73 in world canyon with bump  resulting in 1 / 74
+run: 74
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:53 -----------------------> Started with run: 74 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.636 x:=0.22 y:=0.4 starting_height:=0.79 speed:=1.66 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00074_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 17124
+2018-02-13_16-54 finished run 74 in world canyon with bump  resulting in 1 / 75
+run: 75
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:54 -----------------------> Started with run: 75 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.606 x:=0.05 y:=0.92 starting_height:=1.2 speed:=1.25 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00075_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 19377
+2018-02-13_16-54 finished run 75 in world canyon with bump  resulting in 1 / 76
+run: 76
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:54 -----------------------> Started with run: 76 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.63 x:=-0.02 y:=0.37 starting_height:=1.42 speed:=1.21 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00076_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 21707
+2018-02-13_16-54 finished run 76 in world canyon with bump  resulting in 1 / 77
+run: 77
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:54 -----------------------> Started with run: 77 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.567 x:=-0.06 y:=0.69 starting_height:=1.24 speed:=1.26 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00077_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 24475
+2018-02-13_16-55 finished run 77 in world canyon with bump  resulting in 1 / 78
+run: 78
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:55 -----------------------> Started with run: 78 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.444 x:=-0.37 y:=0.74 starting_height:=1.43 speed:=0.9 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00078_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 27434
+2018-02-13_16-55 finished run 78 in world canyon with bump  resulting in 1 / 79
+run: 79
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:56 -----------------------> Started with run: 79 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.45 x:=0.39 y:=0.21 starting_height:=0.88 speed:=1.78 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00079_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 30571
+2018-02-13_16-56 finished run 79 in world canyon with bump  resulting in 1 / 80
+run: 80
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:56 -----------------------> Started with run: 80 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.666 x:=-0.43 y:=0.5 starting_height:=1.42 speed:=1.06 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00080_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 344
+2018-02-13_16-56 finished run 80 in world canyon with bump  resulting in 1 / 81
+run: 81
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:56 -----------------------> Started with run: 81 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.645 x:=-0.07 y:=0.11 starting_height:=1.08 speed:=1.43 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00081_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 3714
+2018-02-13_16-57 finished run 81 in world canyon with bump  resulting in 1 / 82
+run: 82
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:57 -----------------------> Started with run: 82 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.579 x:=-0.19 y:=0.24 starting_height:=1.44 speed:=1.31 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00082_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 7060
+2018-02-13_16-57 finished run 82 in world canyon with bump  resulting in 1 / 83
+run: 83
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:57 -----------------------> Started with run: 83 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.693 x:=0.05 y:=0.63 starting_height:=1.29 speed:=1.68 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00083_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 9609
+2018-02-13_16-58 finished run 83 in world canyon with bump  resulting in 1 / 84
+run: 84
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:58 -----------------------> Started with run: 84 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.471 x:=0.19 y:=0.38 starting_height:=0.56 speed:=1.27 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00084_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 12011
+2018-02-13_16-58 finished run 84 in world canyon with bump  resulting in 1 / 85
+run: 85
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:58 -----------------------> Started with run: 85 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.483 x:=0.24 y:=0.79 starting_height:=0.95 speed:=0.89 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00085_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 14704
+2018-02-13_16-59 finished run 85 in world canyon with bump  resulting in 1 / 86
+run: 86
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:59 -----------------------> Started with run: 86 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.666 x:=-0.45 y:=0.1 starting_height:=0.63 speed:=1.32 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00086_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 17084
+2018-02-13_16-59 finished run 86 in world canyon with bump  resulting in 1 / 87
+run: 87
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+16:59 -----------------------> Started with run: 87 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.504 x:=0.26 y:=0.95 starting_height:=0.88 speed:=0.84 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00087_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 20582
+2018-02-13_17-00 finished run 87 in world canyon with bump  resulting in 1 / 88
+run: 88
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:00 -----------------------> Started with run: 88 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.663 x:=-0.5 y:=0.15 starting_height:=1.34 speed:=1.52 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00088_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 24974
+2018-02-13_17-01 finished run 88 in world canyon with bump  resulting in 1 / 89
+run: 89
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:01 -----------------------> Started with run: 89 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.657 x:=-0.04 y:=0.87 starting_height:=1.37 speed:=1.38 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00089_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 27386
+2018-02-13_17-01 finished run 89 in world canyon with bump  resulting in 1 / 90
+run: 90
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:01 -----------------------> Started with run: 90 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.567 x:=-0.44 y:=0.45 starting_height:=1.41 speed:=1.69 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00090_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 29937
+2018-02-13_17-01 finished run 90 in world canyon with bump  resulting in 1 / 91
+run: 91
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:01 -----------------------> Started with run: 91 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.486 x:=0.23 y:=0 starting_height:=0.7 speed:=1.15 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00091_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 32678
+2018-02-13_17-02 finished run 91 in world canyon with bump  resulting in 1 / 92
+run: 92
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:02 -----------------------> Started with run: 92 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.534 x:=0.18 y:=0.56 starting_height:=0.69 speed:=1.25 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00092_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 3489
+2018-02-13_17-02 finished run 92 in world canyon with bump  resulting in 1 / 93
+run: 93
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:03 -----------------------> Started with run: 93 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.426 x:=-0.28 y:=0.97 starting_height:=1.48 speed:=1.62 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00093_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 6164
+2018-02-13_17-03 finished run 93 in world canyon with bump  resulting in 1 / 94
+run: 94
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:03 -----------------------> Started with run: 94 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.471 x:=0.16 y:=0.71 starting_height:=0.57 speed:=1.27 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00094_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 9025
+2018-02-13_17-04 finished run 94 in world canyon with bump  resulting in 1 / 95
+run: 95
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:04 -----------------------> Started with run: 95 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.468 x:=-0.24 y:=0.22 starting_height:=0.98 speed:=1.16 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00095_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 11912
+2018-02-13_17-04 finished run 95 in world canyon with bump  resulting in 1 / 96
+run: 96
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:04 -----------------------> Started with run: 96 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.66 x:=0.41 y:=0.42 starting_height:=0.94 speed:=1.45 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00096_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 14961
+2018-02-13_17-04 finished run 96 in world canyon with bump  resulting in 1 / 97
+run: 97
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:05 -----------------------> Started with run: 97 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.696 x:=0.11 y:=0.5 starting_height:=0.8 speed:=0.93 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00097_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 17315
+2018-02-13_17-05 finished run 97 in world canyon with bump  resulting in 1 / 98
+run: 98
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:05 -----------------------> Started with run: 98 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.615 x:=-0.47 y:=0.7 starting_height:=0.77 speed:=1.55 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00098_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 19845
+2018-02-13_17-06 finished run 98 in world canyon with bump  resulting in 1 / 99
+run: 99
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:06 -----------------------> Started with run: 99 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.657 x:=-0.11 y:=0.18 starting_height:=0.91 speed:=1.61 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00099_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 23005
+2018-02-13_17-06 finished run 99 in world canyon with bump  resulting in 1 / 100
+run: 100
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:06 -----------------------> Started with run: 100 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.585 x:=-0.12 y:=0.83 starting_height:=1.37 speed:=1.47 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00100_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 25493
+2018-02-13_17-07 finished run 100 in world canyon with bump  resulting in 1 / 101
+run: 101
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:07 -----------------------> Started with run: 101 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.555 x:=0.04 y:=0.41 starting_height:=1.4 speed:=1.43 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00101_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 28819
+2018-02-13_17-08 finished run 101 in world canyon with bump  resulting in 1 / 102
+run: 102
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:08 -----------------------> Started with run: 102 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.612 x:=0.08 y:=0.41 starting_height:=0.87 speed:=1.56 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00102_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 32764
+2018-02-13_17-08 finished run 102 in world canyon with bump  resulting in 1 / 103
+run: 103
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:08 -----------------------> Started with run: 103 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.513 x:=0.41 y:=0.54 starting_height:=0.69 speed:=1.64 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00103_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 3157
+2018-02-13_17-08 finished run 103 in world canyon with bump  resulting in 1 / 104
+run: 104
+saved /esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world 
+17:08 -----------------------> Started with run: 104 crash_number: 0
+roslaunch simulation_supervised_demo canyon.launch Yspawned:=1.702 x:=0.05 y:=0.58 starting_height:=1.44 speed:=1.05 log_folder:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random saving_location:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/00104_canyon evaluate:=true noise:=ou recovery:= background:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.png world_name:=/esat/qayd/kkelchte/docker_home/pilot_data/canyon_fully_random/canyon.world graphics:=true
+Run started in xterm: 5607
+2018-02-13_17-09 finished run 104 in world canyon with bump  resulting in 1 / 105
+kill ros:
+2018-02-13_170938
+done
