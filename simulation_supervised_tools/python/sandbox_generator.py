@@ -11,7 +11,10 @@ import numpy as np
 #   result_world=sys.argv[1]
 # else:
 result_world='sandbox.world'
- 
+
+#np.random.seed(150)
+#random.seed(100)
+
 # example file that is adapted:
 template_world='template.world'
 worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'

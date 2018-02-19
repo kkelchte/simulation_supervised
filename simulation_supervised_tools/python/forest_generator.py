@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os,sys
 
+#np.random.seed(100)
+
 result_world='forest.world'
 worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
 

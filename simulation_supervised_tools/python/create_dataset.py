@@ -290,7 +290,7 @@ if __name__=="__main__":
       os.makedirs(saving_location+'/Depth')
   
   if rospy.has_param('rgb_image'):
-    rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, saving_location)
+    rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, saving_location, queue_size = 1)
   if rospy.has_param('depth_image'):
     rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback, saving_location, queue_size = 1)
   

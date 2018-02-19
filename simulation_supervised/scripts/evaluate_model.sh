@@ -14,7 +14,8 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --continue_training False\" ]" 1>&2; exit 1; }
-python_script="start_python_sing.sh"
+# python_script="start_python_sing.sh"
+python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_evaluate_online
 GRAPHICS=true
@@ -44,7 +45,8 @@ done
 shift $((OPTIND-1))
 
 if [ -z "$WORLDS" ] ; then
-  WORLDS=(canyon forest sandbox)
+  # WORLDS=(canyon forest sandbox)
+  WORLDS=(canyon)
 fi
 
 if [ -z "$MODELDIR" ] ; then
@@ -83,11 +85,12 @@ echo "GRAPHICS=$GRAPHICS"
 echo "RECOVERY=$RECOVERY"
 
 RANDOM=125 #seed the random sequence
-
+# Change params to string in order to parse it with sed.
+PARAMS="${PARAMS[@]}"
 ######################################################
 # Start roscore and load general parameters
 start_ros(){
-  echo "start ROS"
+  echo "start_ros"
   roslaunch simulation_supervised load_params.launch global_param:=online_param.yaml&
   pidros=$!
   echo "PID ROS: " $pidros
@@ -96,16 +99,21 @@ start_ros(){
 start_ros
 
 ######################################################
+# If graphics is false ensure showdepth is false
+if [ $GRAPHICS = false ] ; then
+  PARAMS="$(echo $PARAMS | sed 's/--show_depth\s\S+//')"
+  PARAMS="$PARAMS --show_depth False"
+fi  
+######################################################
 # Start tensorflow with command defined above
 mkdir -p $HOME/tensorflow/log/$TAG
 cd $HOME/tensorflow/log/$TAG
+
 start_python(){
+  echo "start python"
   LOGDIR="$TAG/$(date +%F_%H%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
   ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
-  if [ $GRAPHICS = false ] ; then
-    ARGUMENTS="$ARGUMENTS --show_depth False"
-  fi
   if [ $RECOVERY = true ] ; then
     ARGUMENTS="$ARGUMENTS --recovery True"
   fi
@@ -119,15 +127,18 @@ start_python(){
     sleep 1 
     cnt=$((cnt+1)) 
     if [ $cnt -gt 300 ] ; then 
-      echo "$(tput setaf 1) Waited for 5minutes on tf_log... $(tput sgr 0)" 
+      echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... $(tput sgr 0)" 
       exit 
     fi 
   done
 }
 start_python
 
+# create location for logging the xterm outputs.
+XLOC=$HOME/tensorflow/log/${TAG}/xterm_log  
+mkdir -p $XLOC
 ######################################################
-# Kill ros function
+# kill all processes
 kill_combo(){
   echo "kill ros:"
   kill -9 $pidlaunch >/dev/null 2>&1 
@@ -141,12 +152,10 @@ kill_combo(){
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 10
+  sleep 60
 }
 
 crash_number=0
-#location for logging
-mkdir -p $LLOC/xterm_log
 
 i=0
 while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;

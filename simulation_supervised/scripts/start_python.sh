@@ -8,5 +8,6 @@ export PATH=$PATH:/usr/local/cuda-8.0/bin
 
 cd $HOME/tensorflow/pilot/pilot
 python_command="python main.py --offline False  $@"
+echo "start_python.sh:"
 echo $python_command
 $python_command
