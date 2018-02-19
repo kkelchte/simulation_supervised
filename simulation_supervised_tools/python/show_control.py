@@ -166,7 +166,7 @@ if __name__=="__main__":
   rospy.Subscriber('tf_vel', Twist, pilot_cb)
   rospy.Subscriber('cmd_vel', Twist, pilot_cb)
 
-  rospy.Subscriber('/bebop/states/common/CommonState/BatteryStateChanged', CommonCommonStateBatteryStateChanged, battery_cb)
+  # rospy.Subscriber('/bebop/states/common/CommonState/BatteryStateChanged', CommonCommonStateBatteryStateChanged, battery_cb)
 
 
 

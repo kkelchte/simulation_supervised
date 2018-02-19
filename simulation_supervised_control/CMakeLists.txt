@@ -22,16 +22,23 @@ find_package(OpenCV REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS}
                            ${catkin_INCLUDE_DIRS}
                            ${OpenCV_INCLUDE_DIRS}
+                          include
+                          python
 )
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-	include
-)
+#include_directories(
+#  ${catkin_INCLUDE_DIRS}	
+#)
 catkin_package()
+
+catkin_install_python(PROGRAMS
+    python/depth_heuristic.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 add_library(behaviourLib src/BehaviourArbitration)
 target_link_libraries(behaviourLib ${OpenCV_LIBS})
 
@@ -45,4 +52,5 @@ target_link_libraries(teleop_autopilot_behaviour_arbitration
    behaviourLib
    ouNoise
 )
+
 

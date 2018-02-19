@@ -4,7 +4,7 @@
   <arg name="joy_dev" default="/dev/input/js0" />
   <arg name="joy_config" default="bigben" />
   <arg name="teleop_config" default="$(find simulation_supervised)/config/$(arg joy_config).yaml" />
-  <arg name="namespace" default="bebop" />
+  <!-- <arg name="namespace" default="bebop" /> -->
 
   <!-- <group ns="$(arg namespace)"> -->
     <rosparam file="$(arg teleop_config)" command="load" />

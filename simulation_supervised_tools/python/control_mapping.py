@@ -7,7 +7,7 @@ import cv2
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Empty
 from std_msgs.msg import String
-
+import copy
 #
 # Maps control from pilot_online and from PS3 on right cmd_vel values
 # Possible different states: 
@@ -18,6 +18,7 @@ state_pub = None
 state = ""
 estimated_yaw = 0
 tweak_roll = False
+estimated_control=None
 
 def tweak_roll_on_cb(msg):
 	global tweak_roll
@@ -46,22 +47,25 @@ def ready_cb(msg):
 		state_pub.publish(state)
 
 def pilot_cb(data):
-	global estimated_yaw
+	global estimated_yaw, estimated_control
 	estimated_yaw = data.angular.z
-	# print('pilot control: {}'.format(estimated_yaw))
+	estimated_control = copy.deepcopy(data)
+
+	print('pilot control: {}'.format(data.angular))
 	# pass
 
 def ps3_cb(data):
 	# print('ps3 control: {}'.format(data.angular.z))
-	if state=="autopilot":
-		data.angular.z = 0.5*estimated_yaw
-		data.linear.x = 0.05
+	if state=="autopilot" and estimated_control:
+		# data.angular.z = 0.5*estimated_yaw
+		# data.linear.x = 0.05
+		data=copy.deepcopy(estimated_control)
 	# compensate yaw with roll:
 	if rospy.has_param('tweak_roll') and tweak_roll:
 		data.angular.x = np.tanh(rospy.get_param('tweak_roll')*data.linear.x*data.angular.z/10.)
 		# print 'change for yaw: ',str(data.angular.z),' is in roll: ',data.angular.x
 	cmd_pub.publish(data)
-	print data
+	# print data
 	# pass
 
 if __name__=="__main__":
@@ -71,6 +75,7 @@ if __name__=="__main__":
 		cmd_pub = rospy.Publisher(rospy.get_param('control'), Twist, queue_size=10)
 	else:
 		raise IOError('[cmd control.py] did not find any control topic!')
+	# publish supervised velocity
 	sup_pub = rospy.Publisher('/supervised_vel', Twist, queue_size=10)
 	
 	if rospy.has_param('overtake'): 
@@ -81,8 +86,8 @@ if __name__=="__main__":
 	pilot_sub = rospy.Subscriber('tf_vel', Twist, pilot_cb)
 	ps3_sub = rospy.Subscriber(rospy.get_param('ps3_top'), Twist, ps3_cb)
 	
-	tweak_roll_on_sub = rospy.Subscriber('/bebop/tweak_roll_on', Empty, tweak_roll_on_cb)
-	tweak_roll_off_sub = rospy.Subscriber('/bebop/tweak_roll_off', Empty, tweak_roll_off_cb)
+	# tweak_roll_on_sub = rospy.Subscriber('/bebop/tweak_roll_on', Empty, tweak_roll_on_cb)
+	# tweak_roll_off_sub = rospy.Subscriber('/bebop/tweak_roll_off', Empty, tweak_roll_off_cb)
 	
 	# spin() simply keeps python from exiting until this node is stopped	
 	rospy.spin()
