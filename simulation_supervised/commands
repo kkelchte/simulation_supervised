@@ -1,0 +1,1 @@
+./scripts/create_data.sh -t canyon_random -w canyon -n 105 -m mobilenet_025 -p "--continue_training False --epsilon 1" 
