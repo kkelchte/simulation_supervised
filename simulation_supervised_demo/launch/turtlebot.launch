@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Load parameters with topics of turtlebot -->
+
+  <include file="$(find simulation_supervised)/launch/load_params.launch">
+    <arg name="global_param" value="debug_param.yaml"/> 
+    <arg name="drone_config" value="turtlebot.yaml"/>
+  </include>
+
+  <!-- start joy node with big ben config -->
+  <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
+    <arg name="joy_config" value="bigben_turtlebot"/>
+  </include>
+
+  <!-- map control to right topics -->
+  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+
+  <!-- map depth to control with heuristic -->
+  <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/>
+  
+  <!-- display control -->
+  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
+  
+  
+</launch>
