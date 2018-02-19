@@ -20,8 +20,8 @@ bridge = CvBridge()
 
 # Graphical User Interface that shows current view of drone and cmd_vels but does not receive any input
 
-target_depth = np.zeros((64))
-predicted_depth = np.zeros((64))
+target_depth = np.zeros((80,80))
+predicted_depth = np.zeros((55,74))
 real=False
 ready=False
 finished=False
@@ -84,13 +84,16 @@ def predicted_callback(data):
   # print('received depth prediction')
   if not ready: return
   img = data.data
-  img = img.reshape(55,74)
-  # img = predicted_depth.reshape(55,74)
+  try:
+    img = img.reshape(-1,55,74)
+  except:
+    return
+    # img = predicted_depth.reshape(55,74)
   img = img*1/5.
   n=3
   img = np.kron(img, np.ones((n,n)))
   # print('max: ',np.amax(img),'min: ', np.amin(img))
-  predicted_depth = img[:,:]
+  predicted_depth = img[:,:,:]
   # cv2.imshow('predicted depth',img)
   # cv2.waitKey(1) 
   #print predicted_depth.shape
@@ -101,10 +104,13 @@ def show():
   # print('show ',ready)
   if predicted_depth.sum()==0 or not ready: return
   # cv2.namedWindow(window_name)
-  big_image = np.zeros((200,450))
-  big_image[10:10+predicted_depth.shape[0], 0:predicted_depth.shape[1]] = predicted_depth[:,:]
+  big_image = np.zeros((200,250+predicted_depth.shape[0]*250))
+  
+  for i in range(predicted_depth.shape[0]):
+    big_image[10:10+predicted_depth.shape[1], 20+target_depth.shape[1]+i*predicted_depth.shape[2]:20+target_depth.shape[1]+(1+i)*predicted_depth.shape[2]] = predicted_depth[i,:,:]
+  
   if target_depth.sum()!= 0:
-    big_image[10:10+target_depth.shape[0], predicted_depth.shape[1]+10:predicted_depth.shape[1]+10+target_depth.shape[1]] = target_depth[:,:]
+    big_image[10:10+target_depth.shape[0], 10:10+target_depth.shape[1]] = target_depth[:,:]
   cv2.imshow(window_name_pred, big_image)
   cv2.waitKey(1)
   # if save_images:

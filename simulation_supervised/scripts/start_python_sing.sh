@@ -13,6 +13,7 @@ $HOME/drone_ws/devel/lib:/opt/ros/kinetic/lib:\
 
 cd $HOME/tensorflow/pilot/pilot
 python_command="python main.py --offline False  $@"
+echo "start_python_sing.sh:"
 echo $python_command
 $python_command
 
