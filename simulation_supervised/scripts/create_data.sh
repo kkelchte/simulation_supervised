@@ -79,6 +79,8 @@ start_ros
 if [ -d $HOME/pilot_data/$TAG ] ; then
   # echo "$(tput setaf 1) $TAG already exists in pilot_data $(tput sgr0)"
   # exit
+  echo "$(tput setaf 1) $TAG removed in pilot_data $(tput sgr0)"
+
   rm -r $HOME/pilot_data/$TAG
 fi
 
@@ -91,7 +93,7 @@ if [ ! -z $MODELDIR ] ; then
   start_python(){
     LOGDIR="$TAG/$(date +%F_%H%M)_create_data"
     LLOC="$HOME/tensorflow/log/$LOGDIR"
-    ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
+    ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR --noise $NOISE ${PARAMS[@]}"
     if [ $GRAPHICS = false ] ; then
       ARGUMENTS="$ARGUMENTS --show_depth False"
     fi
@@ -169,14 +171,14 @@ do
     z=$(awk "BEGIN {print 0.5+1.*$((RANDOM%=100))/100}")
     Y=$(awk "BEGIN {print 1.57-0.15+0.3*$((RANDOM%=100))/100}")
   fi
-  speed=$(awk "BEGIN {print 1.3-0.5+$((RANDOM%=100))/100}") #vary from 0.8 till 1.8
+  speed=$(awk "BEGIN {print 1.3-0.8+1.6*$((RANDOM%=100))/100}") #vary from 0.5 till 2.1
   saving_location=$LLOC/$(printf %05d $i)_${WORLDS[NUM]}
   
 
 
 
   # TODO DELETE DATA PART OF LAUNCH FILENAME
-  LAUNCHFILE="${WORLDS[NUM]}.launch"
+  LAUNCHFILE="${WORLDS[NUM]}_data.launch"
   
 
 
@@ -238,7 +240,7 @@ do
     sleep 0.1
   done
   if [ crashed != true ] ; then 
-    if [ $(tail -1 ${LLOC}/log) == 'success' ] ; then
+    if [[ "$(tail -1 ${LLOC}/log)" == 'success' ]] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
@@ -251,12 +253,6 @@ do
   else #if it was a fail: clean up!
     rm -r $saving_location
   fi
-  #  else #if it was a fail: clean up!
-  #    rm -r $saving_location
-  #  fi
-  #else #if it was a fail: clean up!
-  #  rm -r $saving_location
-  #fi
   
   if [ ! -z $MODELDIR ] ; then
     mv $saving_location/control_info.txt $saving_location/predicted_info.txt 
