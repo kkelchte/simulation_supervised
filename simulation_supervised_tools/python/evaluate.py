@@ -104,7 +104,7 @@ def depth_callback(msg):
   else:
     # print('min distance: ', min_distance)
     if min_distance < min_allowed_distance and not shuttingdown:
-      print('[evaluate.py] bump @ time: {0}'.format(time.time()))
+      print('[evaluate.py]: {0}: bump'.format(time.time()))
       success=False
       shuttingdown=True
       shutdown()

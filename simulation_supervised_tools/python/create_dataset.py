@@ -10,7 +10,7 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import Empty
 
 import numpy as np
-import copy
+import copy, time
 import tf
 import sys, select, tty, os, os.path, re
 
@@ -84,7 +84,7 @@ def process_rgb(msg, sloc, index):
   else:
     # Save your OpenCV2 image as a jpeg 
     if index > skip_first: 
-      print('write RGB image {1} to {0}'.format(sloc, index))
+      print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.format(sloc, index, time.time()))
       cv2.imwrite(sloc+"/RGB/{:010d}.jpg".format(index), rgb_image)
     return True  
 
@@ -125,7 +125,7 @@ def process_depth(msg, sloc, index):
   else:
     im=im*1/5.*255
     if index > skip_first: 
-      print('write Depth image {1} to {0}'.format(sloc, index))
+      print('[create_dataset.py]: {2}: write Depth image {1} to {0}'.format(sloc, index, time.time()))
       cv2.imwrite(sloc+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))
     return True
 

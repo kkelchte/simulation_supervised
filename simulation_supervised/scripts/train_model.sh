@@ -111,9 +111,13 @@ start_python(){
   cnt=0
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
-    cnt=$((cnt+1)) 
+    cnt=$((cnt+1))
     if [ $cnt -gt 300 ] ; then 
-      echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... $(tput sgr 0)" 
+      echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
+      echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/qayd/kkelchte/docker_home/.debug/$TAG
+    fi 
+    if [ $cnt -gt 18000 ] ; then 
+      echo "$(tput setaf 1) Waited for 5hours on tf_log, seems like tensorlfow crashed... $(tput sgr 0)" 
       exit 
     fi 
   done
@@ -220,7 +224,7 @@ do
     # Check if job got suspended: if between last update and now has been more than 30 seconds (should be less than 0.1s)
     if [[ $(( NOW - START - TS)) -gt 30 ]] ; then
       sleep 30 #wait for big tick to update
-      TOTAL_SUS="$(condor_q -glob -l $cluser_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
+      TOTAL_SUS="$(condor_q -glob -l $cluster_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
       echo "I was suspended for the $TOTAL_SUS 'th time."
       START=$(( NOW - TS ))
     else
