@@ -55,25 +55,6 @@ if [ -z "$MODELDIR" ] ; then
   exit
 fi
 
-#### Ensure scratch is False and continue training is True
-next_val=''
-CLEAN_PARAMS=()
-for p in ${PARAMS[@]} ; do
-  if [  ! -z $next_val ] ; then
-    CLEAN_PARAMS=(${CLEAN_PARAMS[@]} $next_val)
-    next_val=''
-  else
-    CLEAN_PARAMS=(${CLEAN_PARAMS[@]} $p)
-  fi
-  if [[ "$p" = "--continue_training" ]] ; then
-    next_val='True'
-  fi
-  if [[ "$p" = "--scratch" ]] ; then
-    next_val='False'
-  fi
-done
-PARAMS=''
-PARAMS=(${CLEAN_PARAMS[@]} '--scratch' 'False' '--continue_training' 'True')
 echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
@@ -87,7 +68,13 @@ echo "RECOVERY=$RECOVERY"
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
+PARAMS="$(echo $PARAMS | sed 's/--scratch\s\S+//')"
+PARAMS="$PARAMS --scratch False"
+# ensure continue_training is True [without assuming anything]
+PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
+PARAMS="$PARAMS --continue_training True"
 ######################################################
+
 # Start roscore and load general parameters
 start_ros(){
   echo "start_ros"
@@ -113,7 +100,7 @@ start_python(){
   echo "start python"
   LOGDIR="$TAG/$(date +%F_%H%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR ${PARAMS[@]}"
+  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
   if [ $RECOVERY = true ] ; then
     ARGUMENTS="$ARGUMENTS --recovery True"
   fi

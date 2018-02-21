@@ -48,7 +48,7 @@ teleop:
       -
         axis: 3  # Right thumb stick (up/down)
         target: linear.x
-        scale: 0.2
+        scale: 0.1
         offset: 0.0
       -
         axis: 2  # Right thumb stick (left/right)
@@ -63,7 +63,7 @@ teleop:
       -
         axis: 0  # Left thumb stick (left/right)
         target: angular.z
-        scale: 0.5
+        scale: 1
         offset: 0.0
   overtake:
     type: topic
