@@ -2,15 +2,20 @@
 import rospy
 # OpenCV2 for saving an image
 from cv_bridge import CvBridge, CvBridgeError
+
 import cv2
+
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Empty
 from nav_msgs.msg import Odometry
+
 import time
 import sys, select, tty, os, os.path
 import numpy as np
 import commands
+
 from subprocess import call
 
 # Check groundtruth for height
@@ -22,11 +27,15 @@ from subprocess import call
 # Instantiate CvBridge
 bridge = CvBridge()
 
+turtle=False # boolean indicating we are working with a trutlebot 
+
+
 flight_duration = -1 #amount of seconds drone should be flying, in case of no checking: use -1
 delay_evaluation = 3
 success=False
 shuttingdown=False
 ready=False
+finished=True
 min_allowed_distance=0.5 #0.8
 start_time = 0
 log_file ='/tmp/log'
@@ -80,7 +89,19 @@ def shutdown():
     # time.sleep(5)
     time.sleep(1)
     call("$(kill -9 "+pid+")", shell=True)
-    
+  
+  # Call drive-me-back to free space and wait for a free road sign
+  if turtle:
+    print("Calling drive-me-back service")
+    drive_back_pub.publish(Empty()) 
+        
+def free_road_callback(msg):
+  print('road is free.')
+  # wait for new tf log to indicate learning is ready
+  # ...
+  # ready for the next round!
+  ready_pub.publish(Empty())    
+  shuttingdown=False
 
 def time_check():
   global start_time, shuttingdown, success
@@ -94,20 +115,39 @@ def time_check():
     
 def depth_callback(msg):
   global shuttingdown, success
-  if shuttingdown or not ready or (rospy.get_time()-start_time)<delay_evaluation: return
-  if flight_duration != -1: 
-    time_check()
+  if shuttingdown: return
+  if flight_duration != -1: time_check()
   try:
-    min_distance = np.nanmin(bridge.imgmsg_to_cv2(msg))
+    de=bridge.imgmsg_to_cv2(msg)
+    # print("depth min: {0}, max: {1}, min allowed: {2}".format(np.nanmin(de[de!=0]),np.nanmax(de), min_allowed_distance))
+    min_distance = np.nanmin(de)
   except CvBridgeError, e:
     print(e)
   else:
     # print('min distance: ', min_distance)
-    if min_distance < min_allowed_distance and not shuttingdown:
+    if min_distance < min_allowed_distance and not shuttingdown and ready and (rospy.get_time()-start_time)>delay_evaluation:
       print('[evaluate.py]: {0}: bump'.format(time.time()))
       success=False
       shuttingdown=True
       shutdown()
+
+def scan_callback(data):
+  global shuttingdown, ready
+  if shuttingdown or not ready: return
+  if flight_duration != -1: time_check()
+
+  # Preprocess depth:
+  ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
+  # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
+  ranges=list(reversed(ranges[:45]))+list(reversed(ranges[-45:]))
+
+  min_distance = min(ranges)
+  print('min dis: {0} min allowed: {1}'.format(min_distance,min_allowed_distance))
+  if min_distance < min_allowed_distance and not shuttingdown:
+    print('[evaluate.py]: {0}: bump'.format(time.time()))
+    success=False
+    shuttingdown=True
+    shutdown()
 
 def gt_callback(data):
   global current_pos, ready, success, shuttingdown, positions
@@ -115,8 +155,8 @@ def gt_callback(data):
                   data.pose.pose.position.y,
                   data.pose.pose.position.z]
   positions.append(current_pos)
-  if current_pos[2] > starting_height and not ready and not starting_height==-1:
-    #print('EVA: ready!')
+  if current_pos[2] >= starting_height and not ready and not starting_height==-1 and (rospy.get_time()-start_time)>delay_evaluation:
+    print('[evaluate.py]: {}: ready!'.format(rospy.get_time()))
     ready_pub.publish(Empty())
     ready = True
   # print 'dis: ',(current_pos[0]**2+current_pos[1]**2)
@@ -127,9 +167,26 @@ def gt_callback(data):
     shuttingdown = True
     shutdown()
 
+def ready_callback(msg):
+  global ready, finished
+  """Called when ready is received from joystick (traingle), only used when working with turtlebot"""
+  if not ready and finished:
+    print('[evaluate.py]: ready')
+    ready = True
+    finished = False
+
+def finished_callback(msg):
+  global ready, finished
+  """ Called when ready is received from joystick (x) when user is taking over, only used when working with turtlebot"""
+  if ready and not finished:
+    print('[evaluate.py]: finished')
+    ready = False
+    finished = True
 
 if __name__=="__main__":
   rospy.init_node('evaluate', anonymous=True)
+  start_time=rospy.get_time()
+  print('[evaluate.py]: starting time: {}'.format(start_time))
   ## create necessary directories
   if rospy.has_param('delay_evaluation'):
     delay_evaluation=rospy.get_param('delay_evaluation')
@@ -141,6 +198,7 @@ if __name__=="__main__":
     starting_height=rospy.get_param('starting_height')
     if starting_height==-1: #no starting height, so user is flying, so evaluate node should stay ready
       starting_height=0.5
+  print('[evaluate.py]: starting_height: {}'.format(starting_height))
   if rospy.has_param('eva_dis'):
     eva_dis=rospy.get_param('eva_dis')
   if rospy.has_param('log_folder'):
@@ -156,23 +214,35 @@ if __name__=="__main__":
   if rospy.has_param('world_name') :
     world_name = os.path.basename(rospy.get_param('world_name').split('.')[0])
     if 'sandbox' in world_name: world_name='sandbox'
-    
-  # print '-----------------------------EVALUATION: flight_duration= ',flight_duration
-
-  if rospy.has_param('depth_image'): 
-    rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback)
-  else:
-    raise IOError('[evaluate.py] did not find any depth image topic!')
+  if rospy.has_param('depth_image'):
+    if rospy.get_param('depth_image')!= '/scan':
+      rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback)
+    else:
+      print("[evaluate.py]: turtle robot")
+      turtle=True
+      # should listen to turtlebot scan instead...
+      rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_callback)
+  
+  if rospy.has_param('ready'): 
+    if turtle:
+      rospy.Subscriber(rospy.get_param('ready'), Empty, ready_callback)
+      ready_pub = rospy.Publisher(rospy.get_param('ready'), Empty, queue_size=10)
+      rospy.Subscriber(rospy.get_param('overtake'), Empty, finished_callback)
+      finished_pub = rospy.Publisher(rospy.get_param('overtake'), Empty, queue_size=10)
+      drive_back_pub = rospy.Publisher('/drive_back', Empty, queue_size=1)
+      rospy.Subscriber('/free_road', Empty, free_road_callback)
+    else:
+      ready_pub = rospy.Publisher(rospy.get_param('ready'), Empty, queue_size=10)
     
   #rospy.Subscriber('/kinect/depth/image_raw', Image, depth_callback)
   #rospy.Subscriber('/ardrone/imu', Imu, imu_callback)
-  #rospy.Subscriber('/ready', Empty, ready_callback)
   
-  if rospy.has_param('ready'): 
-    ready_pub = rospy.Publisher(rospy.get_param('ready'), Empty, queue_size=10)
+  
   if rospy.has_param('finished'): 
     finished_pub = rospy.Publisher(rospy.get_param('finished'), Empty, queue_size=10)
-  rospy.Subscriber('/ground_truth/state', Odometry, gt_callback)
+  
+  if rospy.has_param('gt_info'): 
+    rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
   
   # spin() simply keeps python from exiting until this node is stopped	
   rospy.spin()

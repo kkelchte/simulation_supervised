@@ -164,8 +164,8 @@ if __name__=="__main__":
   rospy.Subscriber(rospy.get_param('ps3_top'), Twist, user_cb)
   rospy.Subscriber('supervised_vel', Twist, user_cb)
   rospy.Subscriber('tf_vel', Twist, pilot_cb)
-  rospy.Subscriber('cmd_vel', Twist, pilot_cb)
-
+  rospy.Subscriber(rospy.get_param('control'), Twist, pilot_cb)
+  
   # rospy.Subscriber('/bebop/states/common/CommonState/BatteryStateChanged', CommonCommonStateBatteryStateChanged, battery_cb)
 
 

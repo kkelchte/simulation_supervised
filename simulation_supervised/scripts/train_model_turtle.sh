@@ -43,7 +43,6 @@ shift $((OPTIND-1))
 
 if [ -z "$WORLDS" ] ; then
   WORLDS=(canyon)
-  # WORLDS=(canyon forest sandbox)
 fi
 
 echo "+++++++++++++++++++++++TRAIN+++++++++++++++++++++"
@@ -62,7 +61,7 @@ PARAMS="${PARAMS[@]}"
 # Start roscore and load general parameters
 start_ros(){
   echo "start_ros"
-  roslaunch simulation_supervised load_params.launch global_param:=online_param.yaml&
+  roslaunch simulation_supervised load_params.launch global_param:=turtle_param.yaml drone_config:=sim_turtle.yaml&
   pidros=$!
   echo "PID ROS: " $pidros
   sleep 10  
@@ -140,7 +139,7 @@ kill_combo(){
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 5
+  sleep 1
 }
 ######################################################
 # restart ros-python-ros
@@ -193,16 +192,11 @@ do
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
   echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
   x=0
-  y=$(awk "BEGIN {print -0.25+0.5*$((RANDOM%=100))/100}")   
-  if [ ${WORLDS[NUM]} == sandbox ] ; then
-    z=$(awk "BEGIN {print 0.4+0.2*$((RANDOM%=100))/100}")
-  else 
-    z=$(awk "BEGIN {print 0.5+1.*$((RANDOM%=100))/100}")
-  fi
+  y=0
   Y=1.57
-  LAUNCHFILE="${WORLDS[NUM]}.launch"
+  LAUNCHFILE="${WORLDS[NUM]}_turtle.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-   Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC\
+   Yspawned:=$Y x:=$x y:=$y log_folder:=$LLOC\
    $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
   echo $COMMANDR
   # STARTING TIME

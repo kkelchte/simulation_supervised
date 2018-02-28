@@ -33,6 +33,7 @@ save_images=False
 
 
 fig=plt.figure(figsize=(15,5))
+plt.title('Predictions')
 
 
 target_depth = np.zeros((120,240))

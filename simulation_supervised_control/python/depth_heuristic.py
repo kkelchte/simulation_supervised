@@ -32,6 +32,8 @@ finished=True
 control_pub=None
 
 fig=plt.figure(figsize=(10,5))
+plt.title('Depth_heuristic')
+
 x=np.zeros((3))
 barcollection=plt.bar(range(3),[0.5 for k in range(3)],align='center',color='blue')
 

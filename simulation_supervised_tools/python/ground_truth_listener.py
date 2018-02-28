@@ -14,6 +14,7 @@ from nav_msgs.msg import Odometry
 # Listen to current ground truth positions 
 # in order to create evaluation plots
 #
+turtle=False
 size = (200,200)
 img = np.zeros(size)
 img_type = "unknown"
@@ -66,11 +67,11 @@ def finished_cb(data):
 		draw_positions()
 
 def gt_callback(data):
-    global current_pos
-    if not ready: return
-    current_pos.append(transform(data.pose.pose.position.x,
-                    data.pose.pose.position.y))
-    # print("added current pos: {}".format(current_pos[-1]))
+	global current_pos
+	if not ready: return
+	if not turtle: current_pos.append(transform(data.pose.pose.position.x,data.pose.pose.position.y))
+	else:	current_pos.append(transform(data.pose.pose.position.y, data.pose.pose.position.x))
+
 
 if __name__=="__main__":
   	rospy.init_node('gt_listener', anonymous=True)
@@ -104,9 +105,17 @@ if __name__=="__main__":
 		log_folder = '/tmp/log'
 	if rospy.has_param('ready'): 
 		ready_sub = rospy.Subscriber(rospy.get_param('ready'), Empty, ready_cb)
-	if rospy.has_param('finished'): 
-  		finished_sub = rospy.Subscriber(rospy.get_param('finished'), Empty, finished_cb)
-  	rospy.Subscriber('/ground_truth/state', Odometry, gt_callback)
 	
-  	rospy.spin()
+	if rospy.has_param('finished'):
+		finished_sub = rospy.Subscriber(rospy.get_param('finished'), Empty, finished_cb)
+	
+	if rospy.has_param('gt_info'):
+		rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
+		if rospy.get_param('gt_info')=='/odom': turtle = True #switch x and y
+
+	else:
+		exit
+
+
+	rospy.spin()
 	
