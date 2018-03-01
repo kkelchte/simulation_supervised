@@ -108,7 +108,7 @@ def time_check():
   if start_time == 0:
     start_time = int(rospy.get_time())
   if (int(rospy.get_time()-start_time)) > (flight_duration+delay_evaluation) and not shuttingdown:
-    print('time > eva_time----------success!')
+    print('[evaluate.py]: current time {0} > flight_duration {1}----------success!'.format(int(rospy.get_time()-start_time),(flight_duration+delay_evaluation)))
     success=True
     shuttingdown=True
     shutdown()
@@ -126,7 +126,7 @@ def depth_callback(msg):
   else:
     # print('min distance: ', min_distance)
     if min_distance < min_allowed_distance and not shuttingdown and ready and (rospy.get_time()-start_time)>delay_evaluation:
-      print('[evaluate.py]: {0}: bump'.format(time.time()))
+      print('[evaluate.py]: {0}: bump @ {1}'.format(rospy.get_time(), time.time()))
       success=False
       shuttingdown=True
       shutdown()
@@ -144,7 +144,7 @@ def scan_callback(data):
   min_distance = min(ranges)
   print('min dis: {0} min allowed: {1}'.format(min_distance,min_allowed_distance))
   if min_distance < min_allowed_distance and not shuttingdown:
-    print('[evaluate.py]: {0}: bump'.format(time.time()))
+    print('[evaluate.py]: {0}: bump @ {1}'.format(rospy.get_time(), time.time()))
     success=False
     shuttingdown=True
     shutdown()

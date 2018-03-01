@@ -111,8 +111,9 @@ if __name__=="__main__":
 	
 	if rospy.has_param('gt_info'):
 		rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
-		if rospy.get_param('gt_info')=='/odom': turtle = True #switch x and y
-
+		if rospy.get_param('gt_info')=='/odom':
+			turtle = True #switch x and y
+			print('[gt_listener]: turtle=on.')
 	else:
 		exit
 

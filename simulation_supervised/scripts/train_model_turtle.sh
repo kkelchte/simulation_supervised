@@ -99,8 +99,6 @@ start_python(){
   ARGUMENTS="--log_tag $LOGDIR $PARAMS"
   if [ ! -z $MODELDIR ] ; then
     ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
-  # else
-  #   ARGUMENTS="$(echo $ARGUMENTS | sed 's/--continue_training True//') --continue_training False"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
@@ -256,7 +254,7 @@ do
         new_stat="$(stat -c %Y $LLOC/tf_log)"
         cnt=$((cnt+1)) 
         if [ $cnt -gt 300 ] ; then 
-          echo "[evaluate_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
+          echo "[train_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
           restart
         fi 
         sleep 1
