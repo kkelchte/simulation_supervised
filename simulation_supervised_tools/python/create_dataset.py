@@ -39,12 +39,13 @@ delay_evaluation = 3
 rgb_image = None #np.zeros((360,640,3))
 recovery = False
 T_pg = []
+skip_first=5
 
-skip_first=15
 # saving = False # token to avoid overwriting of rgb_image while saving
 
 def write_info(image_type, sloc, index):
-  if not ready or (rospy.get_time()-start_time) < delay_evaluation: return
+  if not ready: return
+  # if not ready or (rospy.get_time()-start_time) < delay_evaluation: return
   # parse compensation:
   dr=0 #direction
   dg=0 #degrees
@@ -75,7 +76,8 @@ def write_info(image_type, sloc, index):
     imagesfile.write("{0}/{1}/{2:010d}.jpg\n".format(sloc, image_type, index))
   
 def process_rgb(msg, sloc, index):
-  if (not ready) or finished or ((rospy.get_time()-start_time) < delay_evaluation): return False
+  if (not ready) or finished: return False
+  # if (not ready) or finished or ((rospy.get_time()-start_time) < delay_evaluation): return False
   try:
     # Convert your ROS Image message to OpenCV2
     rgb_image = bridge.imgmsg_to_cv2(msg, "bgr8")
@@ -84,7 +86,7 @@ def process_rgb(msg, sloc, index):
   else:
     # Save your OpenCV2 image as a jpeg 
     if index > skip_first: 
-      print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.format(sloc, index, time.time()))
+      print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.format(sloc, index, rospy.get_time()))
       cv2.imwrite(sloc+"/RGB/{:010d}.jpg".format(index), rgb_image)
     return True  
 
@@ -94,6 +96,7 @@ def image_callback(msg, sloc):
   if process_rgb(msg, sloc, index):
     if index > skip_first: write_info('RGB', sloc, index)
     index+=1
+
 def image_callback_left_30(msg, sloc):
   global index_left_30  
   if process_rgb(msg, sloc, index_left_30):
@@ -116,7 +119,8 @@ def image_callback_right_60(msg, sloc):
     index_right_60+=1
 
 def process_depth(msg, sloc, index):
-  if (not ready) or finished or ((rospy.get_time()-start_time) < delay_evaluation): return False
+  if (not ready) or finished: return False
+  # if (not ready) or finished or ((rospy.get_time()-start_time) < delay_evaluation): return False
   try:
     # Convert your ROS Image message to OpenCV2
     im = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')#gets float of 32FC1 depth image
@@ -125,7 +129,7 @@ def process_depth(msg, sloc, index):
   else:
     im=im*1/5.*255
     if index > skip_first: 
-      print('[create_dataset.py]: {2}: write Depth image {1} to {0}'.format(sloc, index, time.time()))
+      print('[create_dataset.py]: {2}: write Depth image {1} to {0}'.format(sloc, index, rospy.get_time()))
       cv2.imwrite(sloc+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))
     return True
 
@@ -239,7 +243,7 @@ def ready_callback(msg):
     ready=True
     finished = False
     start_time=rospy.get_time()
-    # print('evaluate start: ', start_time)
+    print('[create_dataset]:{0}: ready'.format(rospy.get_time()))
 
 def finished_callback(msg):
   global ready, start_time, finished
@@ -247,7 +251,7 @@ def finished_callback(msg):
     ready=False
     finished = True
     start_time=0
-    # print('evaluate start: ', start_time)
+    print('[create_dataset]:{0}: finished'.format(rospy.get_time()))
 
 if __name__=="__main__":
   if rospy.has_param('delay_evaluation'):
@@ -270,12 +274,10 @@ if __name__=="__main__":
   if rospy.has_param('save_images'):
     if not rospy.get_param('save_images'): 
       save_images=bool(rospy.get_param('save_images')!='false')
-      print('not saving images') 
+      print('[create_dataset]: not saving images') 
       sys.exit(0)
   
-  if rospy.has_param('direction'):
-    direction=rospy.get_param('direction')
-  print '--> create dataset: ',direction
+  if rospy.has_param('direction'): direction=rospy.get_param('direction')
   
   if rospy.has_param('saving_location'):
     loc=rospy.get_param('saving_location')
@@ -283,7 +285,7 @@ if __name__=="__main__":
       saving_location=loc
     else:
       saving_location=os.printenv('HOME')+'/pilot_data/'+loc
-  print 'saving_location ',saving_location
+  print '[create dataset]: ',saving_location
   if not os.path.exists(saving_location+'/RGB'):
       os.makedirs(saving_location+'/RGB')
   if not os.path.exists(saving_location+'/Depth'):

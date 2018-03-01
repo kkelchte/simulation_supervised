@@ -7,6 +7,7 @@ ready: /ready
 finished: /finished
 rgb_image: /kinect/kinect/rgb/image_raw
 depth_image: /kinect/kinect/depth/image_raw
+gt_info: /ground_truth/state
 rec_on: /rec_on
 rec_off: /rec_off
 ps3_top: /ps3_vel

@@ -115,10 +115,8 @@ start_python(){
     if [ $cnt -gt 300 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/qayd/kkelchte/docker_home/.debug/$TAG
-    fi 
-    if [ $cnt -gt 18000 ] ; then 
-      echo "$(tput setaf 1) Waited for 5hours on tf_log, seems like tensorlfow crashed... $(tput sgr 0)" 
-      exit 
+      kill_combo
+      restart
     fi 
   done
 }
@@ -142,7 +140,7 @@ kill_combo(){
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 60
+  sleep 5
 }
 ######################################################
 # restart ros-python-ros

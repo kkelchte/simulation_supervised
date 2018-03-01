@@ -13,6 +13,9 @@ import numpy as np
 import commands
 from subprocess import call
 
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
 # Check groundtruth for height
 # Log position
 # Check depth images for bump 
@@ -27,6 +30,16 @@ delay_evaluation = 3
 ready=False
 finished=True
 control_pub=None
+
+fig=plt.figure(figsize=(10,5))
+plt.title('Depth_heuristic')
+
+x=np.zeros((3))
+barcollection=plt.bar(range(3),[0.5 for k in range(3)],align='center',color='blue')
+
+def animate(n):
+  for i, b in enumerate(barcollection):
+    b.set_height(x[i])
 
 def ready_callback(msg):
   global ready, finished
@@ -45,35 +58,38 @@ def finished_callback(msg):
     finished = True
 
 def depth_callback(data):
-  global action_pub
-  # clip at 0.5m
-  data.ranges=[0.7 if r > 0.7 or r==0 else r for r in data.ranges]
-  # subsample data from 360 list to 8 bins:
-  bins=[sum(data.ranges[45*d:45*(d+1)]) for d in range(8)]
-  # focus only on bin [1,0,7,6]
-  max_dis_bin=np.argmax([bins[1],bins[0],bins[7],bins[6]])
-  
-  print("| {0} | {1} | {2} | {3} |".format(bins[1],bins[0],bins[7],bins[6]))
+  global action_pub, x
+  # x=np.array(data.ranges)
+  # clip at 0.5m and make 'broken' 0 readings also 0.5
+  ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
+  # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
+  ranges=list(reversed(ranges[:45]))+list(reversed(ranges[-45:]))
 
-  # with corresponding dicts
-  # yaw_dict={0:1, 1:0.5, 2:-0.5, 3:-1}
-  yaw_dict={0:-1, 1:-0.7, 2:0.7, 3:1}
-  # speed_dict={0:0.2, 1:0.5, 2:0.5, 3:0.2}
-  speed_dict={0:0,1:0,2:0,3:0}
+  # turn away from the minimum (non-zero) depth reading
+  # discretize 3 bins (:-front_width/2:front_width/2:)
+  # range that covers going straight.
+  front_width=45
+  x=[min(ranges[0:45-front_width/2]),min(ranges[45-front_width/2:45+front_width/2]),min(ranges[45+front_width/2:])]
+  
+  index=np.argmax(x)
+
+  yaw_dict={0:1, # turn left
+            1:0, # drive straight
+            2:-1} # turn right
+
+  speed_dict={0:0.1, 1:0.3, 2:0.1}  
+
+  print("min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
   
 
-  # yaw_dict={0:-0.1, 1:-0.3, 2:-0.7, 3:-1, 4:1, 5:0.7, 6:0.3, 7:0.1}
-  # yaw_dict={0:0.1, 1:0.3, 2:0.7, 3:1, 4:-1, 5:-0.7, 6:-0.3, 7:-0.1}
-  # speed_dict={0:0.5,1:0.1,2:0.,3:0.,4:0,5:0,6:0.1,7:0.5}
-  
   msg = Twist()
 
-  msg.linear.x = speed_dict[max_dis_bin]
+  msg.linear.x = speed_dict[index]
   msg.linear.y = 0
   msg.linear.z = 0
-  msg.angular.z = yaw_dict[max_dis_bin]
+  msg.angular.z = yaw_dict[index]
 
-  print("speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
+  # print("speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
   action_pub.publish(msg)
 
 
@@ -101,4 +117,7 @@ if __name__=="__main__":
   if rospy.has_param('finished'): 
     finished_pub = rospy.Subscriber(rospy.get_param('finished'), Empty,finished_callback)
   
+  anim=animation.FuncAnimation(fig,animate)
+  plt.show()
+
   rospy.spin()
