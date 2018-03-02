@@ -70,7 +70,7 @@ def gt_callback(data):
 	global current_pos
 	if not ready: return
 	if not turtle: current_pos.append(transform(data.pose.pose.position.x,data.pose.pose.position.y))
-	else:	current_pos.append(transform(data.pose.pose.position.y, data.pose.pose.position.x))
+	else:	current_pos.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
 
 
 if __name__=="__main__":
