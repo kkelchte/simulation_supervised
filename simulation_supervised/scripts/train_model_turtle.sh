@@ -94,8 +94,6 @@ start_python(){
   echo "start python"
   LOGDIR="$TAG/$(date +%F_%H%M)_train"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  #location for logging
-  
   ARGUMENTS="--log_tag $LOGDIR $PARAMS"
   if [ ! -z $MODELDIR ] ; then
     ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
@@ -111,7 +109,7 @@ start_python(){
     cnt=$((cnt+1))
     if [ $cnt -gt 300 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
-      echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/qayd/kkelchte/docker_home/.debug/$TAG
+      echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
       kill_combo
       restart
     fi 
@@ -137,7 +135,7 @@ kill_combo(){
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 1
+  sleep 5
 }
 ######################################################
 # restart ros-python-ros

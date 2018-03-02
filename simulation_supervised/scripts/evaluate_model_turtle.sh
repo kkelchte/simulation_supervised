@@ -8,18 +8,18 @@
 # -p PARAMS
 ######################################################
 
-usage() { echo "Usage: $0 [-t LOGTAG: tag used to name datafolder]
-    [-m MODELDIR: checkpoint to initialize weights within logfolder]
+usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
+    [-m MODELDIR: checkpoint to initialize weights with in logfolder]
     [-n NUMBER_OF_FLIGHTS]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
-    [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing]
-    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --continue_training False\" ]" 1>&2; exit 1; }
+    [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing_ql or start_python_sing_pg]
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+#python_script="start_python_sing.sh"
 python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=1
-TAG=test_createdata
-GRAPHICS=false
-NOISE=ou
-MODELDIR=""
+TAG=test_evaluate_online
+GRAPHICS=true
+RECOVERY=false
 while getopts ":t:m:n:w:s:p:g:r:" o; do
     case "${o}" in
         t)
@@ -35,9 +35,9 @@ while getopts ":t:m:n:w:s:p:g:r:" o; do
         p)
             PARAMS+=(${OPTARG}) ;;
         g)
-            GRAPHICS=${OPTARG} ;;
+            GRAPHICS=${OPTARG} ;; 
         r)
-            NOISE=${OPTARG} ;; 
+            RECOVERY=${OPTARG} ;; 
         *)
             usage ;;
     esac
@@ -48,7 +48,13 @@ if [ -z "$WORLDS" ] ; then
   WORLDS=(canyon)
 fi
 
-echo "+++++++++++++++++++++++CREATE DATA+++++++++++++++++++++"
+if [ -z "$MODELDIR" ] ; then
+  echo "$(tput setaf 1) (evaluate_model.sh): NO MODEL PROVIDED TO EVALUATE."
+  tput sgr 0 
+  exit
+fi
+
+echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
 echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
@@ -56,11 +62,16 @@ echo "WORLDS=${WORLDS[@]}"
 echo "PYTHON SCRIPT=$python_script"
 echo "PARAMS=${PARAMS[@]}"
 echo "GRAPHICS=$GRAPHICS"
-echo "NOISE=$NOISE"
+echo "RECOVERY=$RECOVERY"
 
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
+PARAMS="$(echo $PARAMS | sed 's/--scratch\s\S+//')"
+PARAMS="$PARAMS --scratch False"
+# ensure continue_training is True [without assuming anything]
+PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
+PARAMS="$PARAMS --continue_training True"
 ######################################################
 # Start roscore and load general parameters
 start_ros(){
@@ -68,45 +79,32 @@ start_ros(){
   roslaunch simulation_supervised load_params.launch global_param:=turtle_param.yaml drone_config:=sim_turtle.yaml&
   pidros=$!
   echo "PID ROS: " $pidros
-  sleep 10
-  rosparam set supervision True
-  rosparam set save_images True  
+  sleep 10  
 }
 start_ros
 
-echo "set supervision to $(rosparam get supervision)"
-echo "set save_images to $(rosparam get save_images)"
 ######################################################
-# DELETE DIRECTORY IF IT ALREADY EXISTS
-if [ -d $HOME/pilot_data/$TAG ] ; then
-  # echo "$(tput setaf 1) $TAG already exists in pilot_data $(tput sgr0)"
-  # exit
-  # echo "$(tput setaf 1) $TAG removed in pilot_data $(tput sgr0)"
-  # rm -r $HOME/pilot_data/$TAG
-  i="$(ls $HOME/pilot_data/$TAG | grep 0 | wc -l)"
-  echo "found $TAG already and will continue from run: $i"
-fi
-DATA_LLOC="$HOME/pilot_data/$TAG"
-mkdir -p $DATA_LLOC/xterm_log
-
+# If graphics is false ensure showdepth is false
+if [ $GRAPHICS = false ] ; then
+  PARAMS="$(echo $PARAMS | sed 's/--show_depth\s\S+//')"
+  PARAMS="$PARAMS --show_depth False"
+fi  
 ######################################################
-# Start tensorflow with command defined above if model is provided for flying
-# make rosparam supervision True so BA's control is set to /supervised_vel
-
+# Start tensorflow with command defined above
+mkdir -p $HOME/tensorflow/log/$TAG
+cd $HOME/tensorflow/log/$TAG
 
 start_python(){
   echo "start python"
-  LOGDIR="$TAG/$(date +%F_%H%M)_create_data"
+  LOGDIR="$TAG/$(date +%F_%H-%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  #location for logging
-  
-  ARGUMENTS="--log_tag $LOGDIR $PARAMS --noise $NOISE"
-  if [ ! -z $MODELDIR ] ; then
-    ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
+  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
+  if [ $RECOVERY = true ] ; then
+    ARGUMENTS="$ARGUMENTS --recovery True"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
-  xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
+  xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H-%M) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
   cnt=0
@@ -123,23 +121,31 @@ start_python(){
 }
 start_python
 
-
+# create location for logging the xterm outputs.
+XLOC=$HOME/tensorflow/log/${TAG}/xterm_log  
+mkdir -p $XLOC
 ######################################################
 # kill all processes
 kill_combo(){
   echo "kill ros:"
-  kill -9 $pidlaunch >/dev/null 2>&1 
-  killall -9 roscore >/dev/null 2>&1 
-  killall -9 rosmaster >/dev/null 2>&1
-  killall -9 /*rosout* >/dev/null 2>&1 
-  killall -9 gzclient >/dev/null 2>&1
-  kill -9 $pidros >/dev/null 2>&1
-  while kill -0 $pidpython;
+  kill -9 $pidlaunch > /dev/null 2>&1 
+  killall -9 roscore > /dev/null 2>&1 
+  killall -9 rosmaster > /dev/null 2>&1
+  killall -9 /*rosout* > /dev/null 2>&1 
+  killall -9 gzclient > /dev/null 2>&1
+  kill -9 $pidros > /dev/null 2>&1
+  for i in $(ps -ef | grep ros | grep -v grep | cut -d ' ' -f 2) ; do 
+    while kill -0 $i >/dev/null 2>&1 ; do 
+      kill $i 2>&1 > /dev/null 
+      sleep 0.5
+    done
+  done
+  while kill -0 $pidpython > /dev/null 2>&1 ;
   do      
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 1
+  sleep 5
 }
 ######################################################
 # restart ros-python-ros
@@ -167,28 +173,20 @@ do
   # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
-    python $(rospack find simulation_supervised_tools)/python/${WORLDS[NUM]}_generator.py $DATA_LLOC
-    EXTRA_ARGUMENTS=" background:=$DATA_LLOC/${WORLDS[NUM]}.png world_name:=$DATA_LLOC/${WORLDS[NUM]}.world"
+    python $(rospack find simulation_supervised_tools)/python/${WORLDS[NUM]}_generator.py $LLOC
+    EXTRA_ARGUMENTS=" background:=$LLOC/${WORLDS[NUM]}.png world_name:=$LLOC/${WORLDS[NUM]}.world"
   fi
   crashed=false
   # Clear gazebo log folder to overcome the impressive amount of log data
   if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
-  if [[ ! -d $DATA_LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
-  echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
-  x=$(awk "BEGIN {print -0.5+$((RANDOM%=100))/100}")
-  y=$(awk "BEGIN {print $((RANDOM%=100))/100}")   
-  if [[ ${WORLDS[NUM]} = sandbox ]] ; then
-    z=0.5
-    Y=$(awk "BEGIN {print 1.57-0.5+$((RANDOM%=100))/100}")
-  else
-    Y=$(awk "BEGIN {print 1.57-0.15+0.3*$((RANDOM%=100))/100}")
-  fi
-  saving_location=$DATA_LLOC/$(printf %05d $i)_${WORLDS[NUM]}
-  
+  if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
+  echo "$(date +%F_%H-%M) -----------------------> Started with run: $i crash_number: $crash_number"
+  x=0
+  y=0
+  Y=1.57
   LAUNCHFILE="${WORLDS[NUM]}_turtle.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-   Yspawned:=$Y x:=$x y:=$y log_folder:=$DATA_LLOC\
-   saving_location:=$saving_location evaluate:=true noise:=$NOISE recovery:=$RECOVERY\
+   Yspawned:=$Y x:=$x y:=$y log_folder:=$LLOC\
    $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
   echo $COMMANDR
   # STARTING TIME
@@ -198,11 +196,11 @@ do
   # CURRENT TIME
   NOW=$(date +%s)
 
-  xterm -iconic -l -lf $DATA_LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &
+  xterm -iconic -l -lf $XLOC/run_${i}_$(date +%F_%H-%M) -hold -e $COMMANDR &
   pidlaunch=$!
-  echo $pidlaunch > $DATA_LLOC/$(rosparam get /pidfile)
+  echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
-  while kill -0 $pidlaunch; 
+  while kill -0 $pidlaunch > /dev/null 2>&1; 
   do 
     NOW=$(date +%s)
     # Check if job got suspended: if between last update and now has been more than 30 seconds (should be less than 0.1s)
@@ -220,15 +218,15 @@ do
     then
       echo "$(tput setaf 1) ---CRASH (delay time: $TS) $(tput sgr 0)"
       if [ $crash_number -ge 3 ] ; then
-        message="$(date +%H:%M) ########################### KILLED ROSCORE" 
-        echo $message >> $DATA_LLOC/crash      
+        message="$(date +%F_%H-%M) ########################### KILLED ROSCORE" 
+        echo $message >> $LLOC/crash      
         echo $message     
         sleep 0.5
         restart
         crashed=true
       else
-        message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
-        echo $message >> $DATA_LLOC/crash
+        message="$(date +%F_%H-%M) #### KILLED ROSLAUNCH: $crash_number"
+        echo $message >> $LLOC/crash
         echo $message
         sleep 0.5
         kill -9 $pidlaunch >/dev/null 2>&1
@@ -248,28 +246,23 @@ do
         new_stat="$(stat -c %Y $LLOC/tf_log)"
         cnt=$((cnt+1)) 
         if [ $cnt -gt 300 ] ; then 
-          echo "[create_data_turtle.sh] Waited for 5minutes on tf_log restarting python and ROS."
+          echo "[train_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
           restart
         fi 
         sleep 1
       done
     else 
-      echo "[train_model.sh] Could not find $LLOC/tf_log"
+      echo "[evaluate_model.sh] Could not find $LLOC/tf_log"
       exit 
     fi
     i=$((i+1))
-    if [ $(tail -1 $DATA_LLOC/log) == 'success' ] ; then
+    if [ $(tail -1 $LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
-    echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${DATA_LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-    # keep the validation world, just in case...
-    mv $LLOC/${WORLDS[NUM]}.world $saving_location  
-  else #if it was a fail: clean up!
-    rm -r $saving_location
-  fi
-  sleep 5
+    echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
+  fi  
 done
 kill_combo
-date +%F_%H%M%S
+date +%F_%H-%M
 echo 'done'

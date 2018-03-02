@@ -63,7 +63,8 @@ echo "GRAPHICS=$GRAPHICS"
 echo "NOISE=$NOISE"
 
 RANDOM=125 #seed the random sequence
-
+# Change params to string in order to parse it with sed.
+PARAMS="${PARAMS[@]}"
 ######################################################
 # Start roscore and load general parameters
 start_ros(){
@@ -79,9 +80,13 @@ start_ros
 if [ -d $HOME/pilot_data/$TAG ] ; then
   # echo "$(tput setaf 1) $TAG already exists in pilot_data $(tput sgr0)"
   # exit
-  echo "$(tput setaf 1) $TAG removed in pilot_data $(tput sgr0)"
+  # echo "$(tput setaf 1) $TAG removed in pilot_data $(tput sgr0)"
 
-  rm -r $HOME/pilot_data/$TAG
+  # rm -r $HOME/pilot_data/$TAG
+  i="$(ls $HOME/pilot_data/$TAG | grep 00 | wc -l)"
+  echo "found $TAG already and will continue from run: $i"
+else 
+  i=0
 fi
 
 ######################################################
@@ -91,9 +96,10 @@ if [ ! -z $MODELDIR ] ; then
   rosparam set supervision true
   echo "Set rosparam supervision to $(rosparam get supervision)"
   start_python(){
+    echo "start python"
     LOGDIR="$TAG/$(date +%F_%H%M)_create_data"
     LLOC="$HOME/tensorflow/log/$LOGDIR"
-    ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR --noise $NOISE ${PARAMS[@]}"
+    ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR --noise $NOISE $PARAMS"
     if [ $GRAPHICS = false ] ; then
       ARGUMENTS="$ARGUMENTS --show_depth False"
     fi
@@ -136,7 +142,21 @@ kill_combo(){
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 10
+  sleep 60
+}
+######################################################
+# restart ros-python-ros
+restart(){
+  kill_combo
+  crash_number=0
+  #location for logging
+  start_ros
+
+  if [ ! -z $MODELDIR ] ; then
+    rosparam set supervision true
+    echo "Set rosparam supervision to $(rosparam get supervision)"
+    start_python
+  fi
 }
 
 crash_number=0
@@ -145,7 +165,6 @@ start_time=$(date +%s)
 LLOC="$HOME/pilot_data/$TAG"
 mkdir -p $LLOC/xterm_log
 
-i=0
 while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
 do
   echo "run: $i"
@@ -175,13 +194,9 @@ do
   saving_location=$LLOC/$(printf %05d $i)_${WORLDS[NUM]}
   
 
-
-
   # TODO DELETE DATA PART OF LAUNCH FILENAME
   LAUNCHFILE="${WORLDS[NUM]}_data.launch"
   
-
-
 
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
    Yspawned:=$Y x:=$x y:=$y starting_height:=$z speed:=$speed log_folder:=$LLOC\
@@ -202,7 +217,6 @@ do
       TOTAL_SUS="$(condor_q -glob -l $cluser_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
       echo "I was suspended for the $TOTAL_SUS 'th time."
       START=$(( $(date +%s) - $DIFF ))
-      DIFF=$(( $END - $START ))
     fi
     END=$(date +%s)
     DIFF=$(( $END - $START ))
@@ -215,16 +229,7 @@ do
         echo $message >> $LLOC/crash      
         echo $message     
         sleep 0.5
-        kill_combo
-        crash_number=0
-        #location for logging
-        mkdir -p $LLOC/xterm_log
-        echo "restart python:"
-        start_ros
-      	if [ ! -z $MODELDIR ] ; then
-      	  start_python
-          LLOC="$HOME/pilot_data/$TAG"
-      	fi
+        restart
         crashed=true
       else
         message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
@@ -239,31 +244,27 @@ do
     fi
     sleep 0.1
   done
-  if [ crashed != true ] ; then 
+  if [ $crashed != true ] ; then 
     if [[ "$(tail -1 ${LLOC}/log)" == 'success' ]] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
   fi
-  # if [ $(tail -1 ${LLOC}/log) == 'success' ] ; then
-  #  if [ $(ls -l $saving_location/RGB | wc -l) -gt 20 ] ; then
-  if [ crashed != true ] ; then
+  if [ $crashed != true ] ; then
     i=$((i+1))
-  else #if it was a fail: clean up!
+    if [ ! -z $MODELDIR ] ; then
+      mv $saving_location/control_info.txt $saving_location/predicted_info.txt 
+      mv $saving_location/supervised_info.txt $saving_location/control_info.txt
+    fi
+    # keep the validation world, just in case...
+    mv $LLOC/${WORLDS[NUM]}.world $saving_location
+  else
     rm -r $saving_location
   fi
   
-  if [ ! -z $MODELDIR ] ; then
-    mv $saving_location/control_info.txt $saving_location/predicted_info.txt 
-    mv $saving_location/supervised_info.txt $saving_location/control_info.txt
-  fi
-  # keep the validation world, just in case...
-  mv $LLOC/${WORLDS[NUM]}.world $saving_location
+  
 done
 kill_combo
-
-
-
 date +%F_%H%M%S
 echo 'done'
