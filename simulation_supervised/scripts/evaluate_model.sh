@@ -72,7 +72,6 @@ PARAMS="$PARAMS --scratch False"
 # ensure continue_training is True [without assuming anything]
 PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
 PARAMS="$PARAMS --continue_training True"
-
 if [ -z $(echo $PARAMS | grep load_config) ] ; then
   PARAMS="$PARAMS --load_config True"
 fi
