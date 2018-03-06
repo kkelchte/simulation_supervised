@@ -16,7 +16,9 @@ import sys, select, tty, os, os.path
 import numpy as np
 import commands
 
-from subprocess import call
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import matplotlib.patches as mpatches
 
 # Check groundtruth for height
 # Log position
@@ -41,25 +43,55 @@ last_depth=0
 last_rgb=0
 last_ctr=0
 
+fig=plt.figure(figsize=(10,5))
+plt.title('Monitor delays')
+
+delays=np.zeros((3))
+
+colors=['r','g','b']
+plt.legend(handles=[mpatches.Patch(color='red', label='delay control'),
+                    mpatches.Patch(color='green', label='delay rgb'),
+                    mpatches.Patch(color='blue', label='delay depth')])
+barcollection=plt.bar(range(3),[0.1 for k in range(3)],align='center',color='blue')
+
+def animate(n):
+  for i, b in enumerate(barcollection):
+    b.set_height(delays[i])
+    b.set_color(colors[i])
+
 def ctr_callback(data):
-  global last_ctr
-  if finished or not ready: return
+  global last_ctr, delays
+  # if finished or not ready: return
   now=rospy.get_rostime()
   current_time=now.secs+now.nsecs*10e-10
-  print("{2}: {0}s {1} ns".format(now.secs, now.nsecs,current_time))
+  delays[0]=current_time-last_ctr
+  last_ctr=current_time
+  # print("{2}: {0}s {1} ns".format(now.secs, now.nsecs,current_time))
 
 def rgb_callback(data):
-  global last_rgb
-  if finished or not ready: return
+  global last_rgb, delays
+  # if finished or not ready: return
+  now=rospy.get_rostime()
+  current_time=now.secs+now.nsecs*10e-10
+  delays[1]=current_time-last_rgb
+  last_rgb=current_time
     
 def depth_callback(data):
-  global last_depth
-  if finished or not ready: return
-
+  global last_depth, delays
+  # if finished or not ready: return
+  now=rospy.get_rostime()
+  current_time=now.secs+now.nsecs*10e-10
+  delays[2]=current_time-last_depth
+  last_depth=current_time
+  
 def scan_callback(data):
-  global last_depth
-  if finished or not ready: return
-
+  global last_depth, delays
+  # if finished or not ready: return
+  now=rospy.get_rostime()
+  current_time=now.secs+now.nsecs*10e-10
+  delays[2]=current_time-last_depth
+  last_depth=current_time
+  
   # Preprocess depth:
   ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
 
@@ -118,6 +150,9 @@ if __name__=="__main__":
   
   if rospy.has_param('gt_info'): 
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
+  
+  anim=animation.FuncAnimation(fig,animate)
+  plt.show()
   
   # spin() simply keeps python from exiting until this node is stopped	
   rospy.spin()
