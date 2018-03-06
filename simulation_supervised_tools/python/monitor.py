@@ -43,6 +43,8 @@ last_depth=0
 last_rgb=0
 last_ctr=0
 
+log_delays=[]
+
 fig=plt.figure(figsize=(10,5))
 plt.title('Monitor delays')
 
@@ -60,38 +62,43 @@ def animate(n):
     b.set_color(colors[i])
 
 def ctr_callback(data):
-  global last_ctr, delays
+  global last_ctr, delays, log_delays
   # if finished or not ready: return
   now=rospy.get_rostime()
   current_time=now.secs+now.nsecs*10e-10
   delays[0]=current_time-last_ctr
   last_ctr=current_time
+  log_delays.append(delays)
+
   # print("{2}: {0}s {1} ns".format(now.secs, now.nsecs,current_time))
 
 def rgb_callback(data):
-  global last_rgb, delays
+  global last_rgb, delays, log_delays
   # if finished or not ready: return
   now=rospy.get_rostime()
   current_time=now.secs+now.nsecs*10e-10
   delays[1]=current_time-last_rgb
   last_rgb=current_time
-    
+  log_delays.append(delays)
+
 def depth_callback(data):
-  global last_depth, delays
+  global last_depth, delays, log_delays
   # if finished or not ready: return
   now=rospy.get_rostime()
   current_time=now.secs+now.nsecs*10e-10
   delays[2]=current_time-last_depth
   last_depth=current_time
-  
+  log_delays.append(delays)
+
 def scan_callback(data):
-  global last_depth, delays
+  global last_depth, delays, log_delays
   # if finished or not ready: return
   now=rospy.get_rostime()
   current_time=now.secs+now.nsecs*10e-10
   delays[2]=current_time-last_depth
   last_depth=current_time
-  
+  log_delays.append(delays)
+
   # Preprocess depth:
   ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
 
@@ -110,6 +117,9 @@ def finished_callback(msg):
     print('[monitor.py]: finished')
     ready = False
     finished = True
+    with open(log_file,'w') as lf:
+      for d in log_delays:
+        lf.write("{0} {1} {2} \n".format(d[0],d[1],d[2]))
 
 def gt_callback(data):
   if finished or not ready: return
