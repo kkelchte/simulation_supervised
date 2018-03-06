@@ -72,6 +72,10 @@ PARAMS="$PARAMS --scratch False"
 # ensure continue_training is True [without assuming anything]
 PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
 PARAMS="$PARAMS --continue_training True"
+
+if [ -z $(echo $PARAMS | grep load_config) ] ; then
+  PARAMS="$PARAMS --load_config True"
+fi
 ######################################################
 # Start roscore and load general parameters
 start_ros(){
@@ -186,7 +190,7 @@ do
   Y=1.57
   LAUNCHFILE="${WORLDS[NUM]}_turtle.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-   Yspawned:=$Y x:=$x y:=$y log_folder:=$LLOC\
+   Yspawned:=$Y x:=$x y:=$y log_folder:=$LLOC evaluate:=true\
    $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
   echo $COMMANDR
   # STARTING TIME
@@ -246,7 +250,7 @@ do
         new_stat="$(stat -c %Y $LLOC/tf_log)"
         cnt=$((cnt+1)) 
         if [ $cnt -gt 300 ] ; then 
-          echo "[train_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
+          echo "[evaluate_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
           restart
         fi 
         sleep 1

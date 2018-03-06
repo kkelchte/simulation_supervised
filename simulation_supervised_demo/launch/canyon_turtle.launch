@@ -72,6 +72,7 @@
   <node name="gt_listener" pkg="simulation_supervised_tools" type="ground_truth_listener.py" output="screen"/>
   
   
-  
+    <!-- monitor delays and set cmd_vel to zero -->
+    <node name="monitor" pkg="simulation_supervised_tools" type="monitor.py" output="screen"/>
 
 </launch>
