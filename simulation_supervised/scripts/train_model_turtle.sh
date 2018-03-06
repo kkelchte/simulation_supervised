@@ -16,7 +16,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
 #python_script="start_python_sing.sh"
 python_script="start_python_sing_ql.sh"
-NUMBER_OF_FLIGHTS=1
+NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
 GRAPHICS=true
 while getopts ":t:m:n:w:s:p:g:" o; do
