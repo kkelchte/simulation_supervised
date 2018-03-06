@@ -64,7 +64,7 @@ if show_plan:
     plt.plot([0,0],[0,5],color='k')
     plt.show()
 
-template_world='empty_world.world'
+template_world='empty_world_with_wall.world'
 tree = ET.parse(worlds_location+template_world)
 root = tree.getroot()
 world = root.find('world')
