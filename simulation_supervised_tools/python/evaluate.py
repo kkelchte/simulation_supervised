@@ -37,7 +37,7 @@ shuttingdown=False
 ready=False
 finished=True
 min_allowed_distance=0.5 #0.8
-start_time = 0
+start_time = -1
 log_file ='/tmp/log'
 named_log_file =log_file+'_named'
 position_log_file = log_file+'_positions.txt'
@@ -105,8 +105,7 @@ def free_road_callback(msg):
 
 def time_check():
   global start_time, shuttingdown, success
-  if start_time == 0:
-    start_time = int(rospy.get_time())
+  if start_time == -1: start_time = rospy.get_time()
   if (int(rospy.get_time()-start_time)) > (flight_duration+delay_evaluation) and not shuttingdown:
     print('[evaluate.py]: current time {0} > flight_duration {1}----------success!'.format(int(rospy.get_time()-start_time),(flight_duration+delay_evaluation)))
     success=True
@@ -125,7 +124,7 @@ def depth_callback(msg):
     print(e)
   else:
     # print('min distance: ', min_distance)
-    if min_distance < min_allowed_distance and not shuttingdown and ready and (rospy.get_time()-start_time)>delay_evaluation:
+    if min_distance < min_allowed_distance and not shuttingdown and ready:
       print('[evaluate.py]: {0}: bump @ {1}'.format(rospy.get_time(), time.time()))
       success=False
       shuttingdown=True
@@ -133,7 +132,7 @@ def depth_callback(msg):
 
 def scan_callback(data):
   global shuttingdown, ready
-  if shuttingdown or not ready: return
+  if shuttingdown: return
   if flight_duration != -1: time_check()
 
   # Preprocess depth:
@@ -150,13 +149,14 @@ def scan_callback(data):
     shutdown()
 
 def gt_callback(data):
-  global current_pos, ready, success, shuttingdown, positions
+  global current_pos, ready, success, shuttingdown, positions, start_time
   current_pos=[data.pose.pose.position.x,
                   data.pose.pose.position.y,
                   data.pose.pose.position.z]
+  if start_time==-1: start_time = rospy.get_time()
   positions.append(current_pos)
   if current_pos[2] >= starting_height and not ready and not starting_height==-1 and (rospy.get_time()-start_time)>delay_evaluation:
-    print('[evaluate.py]: {}: ready!'.format(rospy.get_time()))
+    print('[evaluate.py]: {0} = {1} - {2}: ready!'.format(rospy.get_time()-start_time, rospy.get_time(), start_time))
     ready_pub.publish(Empty())
     ready = True
   # print 'dis: ',(current_pos[0]**2+current_pos[1]**2)
@@ -185,8 +185,6 @@ def finished_callback(msg):
 
 if __name__=="__main__":
   rospy.init_node('evaluate', anonymous=True)
-  start_time=rospy.get_time()
-  print('[evaluate.py]: starting time: {}'.format(start_time))
   ## create necessary directories
   if rospy.has_param('delay_evaluation'):
     delay_evaluation=rospy.get_param('delay_evaluation')
@@ -198,7 +196,7 @@ if __name__=="__main__":
     starting_height=rospy.get_param('starting_height')
     if starting_height==-1: #no starting height, so user is flying, so evaluate node should stay ready
       starting_height=0.5
-  print('[evaluate.py]: starting_height: {}'.format(starting_height))
+  print('[evaluate.py]: delay_evaluation: {}'.format(delay_evaluation))
   if rospy.has_param('eva_dis'):
     eva_dis=rospy.get_param('eva_dis')
   if rospy.has_param('log_folder'):
