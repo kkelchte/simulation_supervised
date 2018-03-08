@@ -8,7 +8,7 @@ $HOME/simsup_ws/devel/lib/python2.7/dist-packages:\
 
 export LD_LIBRARY_PATH=$HOME/simsup_ws/devel/lib:\
 $HOME/drone_ws/devel/lib:/opt/ros/kinetic/lib:\
-/usr/local/cuda-8.0/lib64:/usr/local/cudnn/lib64:\
+/usr/local/cuda/lib64:/usr/local/cudnn/lib64:\
 /.singularity.d/libs
 
 cd $HOME/tensorflow/pilot/pilot
