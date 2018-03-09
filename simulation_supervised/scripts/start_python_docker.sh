@@ -12,7 +12,7 @@ $HOME/drone_ws/devel/lib:/opt/ros/kinetic/lib:\
 /usr/local/nvidia/lib64
 
 cd $HOME/tensorflow/pilot/pilot
-python_command="python main.py --offline False  $@"
+python_command="python main.py --offline $@"
 echo "start_python_docker.sh:"
 echo $python_command
 $python_command

@@ -7,7 +7,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cudnn/lib64:/usr/local/cuda/l
 export PATH=$PATH:/usr/local/cuda/bin
 
 cd $HOME/tensorflow/pilot/pilot
-python_command="python main.py --offline False  $@"
+python_command="python main.py --offline  $@"
 echo "start_python.sh:"
 echo $python_command
 $python_command

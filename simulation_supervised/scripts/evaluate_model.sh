@@ -13,10 +13,10 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-n NUMBER_OF_FLIGHTS]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing_ql or start_python_sing_pg]
-    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --max_episodes 20 \" ]" 1>&2; exit 1; }
 #python_script="start_python_sing.sh"
 python_script="start_python_sing_ql.sh"
-NUMBER_OF_FLIGHTS=1
+NUMBER_OF_FLIGHTS=2
 TAG=test_evaluate_online
 GRAPHICS=true
 RECOVERY=false
@@ -67,13 +67,14 @@ echo "RECOVERY=$RECOVERY"
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
-PARAMS="$(echo $PARAMS | sed 's/--scratch\s\S+//')"
-PARAMS="$PARAMS --scratch False"
+PARAMS="$(echo $PARAMS | sed 's/--scratch\s//')"
+# PARAMS="$PARAMS --scratch False"
 # ensure continue_training is True [without assuming anything]
-PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
-PARAMS="$PARAMS --continue_training True"
+PARAMS="$(echo $PARAMS | sed 's/--continue_training\s//')"
+PARAMS="$PARAMS --continue_training"
+
 if [ -z $(echo $PARAMS | grep load_config) ] ; then
-  PARAMS="$PARAMS --load_config True"
+  PARAMS="$PARAMS --load_config"
 fi
 ######################################################
 # Start roscore and load general parameters
@@ -89,8 +90,8 @@ start_ros
 ######################################################
 # If graphics is false ensure showdepth is false
 if [ $GRAPHICS = false ] ; then
-  PARAMS="$(echo $PARAMS | sed 's/--show_depth\s\S+//')"
-  PARAMS="$PARAMS --show_depth False"
+  PARAMS="$(echo $PARAMS | sed 's/--show_depth\s//')"
+  PARAMS="$PARAMS --show_depth"
 fi  
 ######################################################
 # Start tensorflow with command defined above
@@ -99,11 +100,11 @@ cd $HOME/tensorflow/log/$TAG
 
 start_python(){
   echo "start python"
-  LOGDIR="$TAG/$(date +%F_%H%M)_eval"
+  LOGDIR="$TAG/$(date +%F_%H-%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
   ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
   if [ $RECOVERY = true ] ; then
-    ARGUMENTS="$ARGUMENTS --recovery True"
+    ARGUMENTS="$ARGUMENTS --recovery"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
@@ -114,7 +115,7 @@ start_python(){
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
     cnt=$((cnt+1))
-    if [ $cnt -gt 300 ] ; then 
+    if [ $cnt -gt 600 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
       kill_combo

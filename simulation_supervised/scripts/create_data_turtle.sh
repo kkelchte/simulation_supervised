@@ -17,7 +17,7 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name datafolder]
 python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=1
 TAG=test_createdata
-GRAPHICS=false
+GRAPHICS=true
 NOISE=ou
 MODELDIR=""
 while getopts ":t:m:n:w:s:p:g:r:" o; do
@@ -98,22 +98,20 @@ start_python(){
   echo "start python"
   LOGDIR="$TAG/$(date +%F_%H%M)_create_data"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  #location for logging
-  
   ARGUMENTS="--log_tag $LOGDIR $PARAMS --noise $NOISE"
   if [ ! -z $MODELDIR ] ; then
     ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
-  xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
+  xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H-%M) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
   cnt=0
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
     cnt=$((cnt+1))
-    if [ $cnt -gt 300 ] ; then 
+    if [ $cnt -gt 600 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
       kill_combo
@@ -128,18 +126,24 @@ start_python
 # kill all processes
 kill_combo(){
   echo "kill ros:"
-  kill -9 $pidlaunch >/dev/null 2>&1 
-  killall -9 roscore >/dev/null 2>&1 
-  killall -9 rosmaster >/dev/null 2>&1
-  killall -9 /*rosout* >/dev/null 2>&1 
-  killall -9 gzclient >/dev/null 2>&1
-  kill -9 $pidros >/dev/null 2>&1
-  while kill -0 $pidpython;
+  kill -9 $pidlaunch > /dev/null 2>&1 
+  killall -9 roscore > /dev/null 2>&1 
+  killall -9 rosmaster > /dev/null 2>&1
+  killall -9 /*rosout* > /dev/null 2>&1 
+  killall -9 gzclient > /dev/null 2>&1
+  kill -9 $pidros > /dev/null 2>&1
+  for i in $(ps -ef | grep ros | grep -v grep | cut -d ' ' -f 2) ; do 
+    while kill -0 $i >/dev/null 2>&1 ; do 
+      kill $i 2>&1 > /dev/null 
+      sleep 0.5
+    done
+  done
+  while kill -0 $pidpython > /dev/null 2>&1 ;
   do      
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 1
+  sleep 5
 }
 ######################################################
 # restart ros-python-ros
@@ -198,11 +202,11 @@ do
   # CURRENT TIME
   NOW=$(date +%s)
 
-  xterm -iconic -l -lf $DATA_LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &
+  xterm -iconic -l -lf $DATA_LLOC/xterm_log/run_${i}_$(date +%F_%H-%M) -hold -e $COMMANDR &
   pidlaunch=$!
   echo $pidlaunch > $DATA_LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
-  while kill -0 $pidlaunch; 
+  while kill -0 $pidlaunch > /dev/null 2>&1; 
   do 
     NOW=$(date +%s)
     # Check if job got suspended: if between last update and now has been more than 30 seconds (should be less than 0.1s)
@@ -220,14 +224,14 @@ do
     then
       echo "$(tput setaf 1) ---CRASH (delay time: $TS) $(tput sgr 0)"
       if [ $crash_number -ge 3 ] ; then
-        message="$(date +%H:%M) ########################### KILLED ROSCORE" 
+        message="$(date +%F_%H-%M) ########################### KILLED ROSCORE" 
         echo $message >> $DATA_LLOC/crash      
         echo $message     
         sleep 0.5
         restart
         crashed=true
       else
-        message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
+        message="$(date +%F_%H-%M) #### KILLED ROSLAUNCH: $crash_number"
         echo $message >> $DATA_LLOC/crash
         echo $message
         sleep 0.5
@@ -271,5 +275,5 @@ do
   sleep 5
 done
 kill_combo
-date +%F_%H%M%S
+date +%F_%H-%M
 echo 'done'

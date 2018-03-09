@@ -13,10 +13,10 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-n NUMBER_OF_FLIGHTS]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing_ql or start_python_sing_pg]
-    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --auxiliary_depth True --max_episodes 20 \" ]" 1>&2; exit 1; }
+    [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --max_episodes 20 \" ]" 1>&2; exit 1; }
 #python_script="start_python_sing.sh"
 python_script="start_python_sing_ql.sh"
-NUMBER_OF_FLIGHTS=1
+NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
 GRAPHICS=true
 while getopts ":t:m:n:w:s:p:g:" o; do
@@ -43,7 +43,6 @@ shift $((OPTIND-1))
 
 if [ -z "$WORLDS" ] ; then
   WORLDS=(canyon)
-  # WORLDS=(canyon forest sandbox)
 fi
 
 echo "+++++++++++++++++++++++TRAIN+++++++++++++++++++++"
@@ -72,8 +71,9 @@ start_ros
 ######################################################
 # If graphics is false ensure showdepth is false
 if [ $GRAPHICS = false ] ; then
-  PARAMS="$(echo $PARAMS | sed 's/--show_depth\s\S+//')"
-  PARAMS="$PARAMS --show_depth False"
+  # PARAMS="$(echo $PARAMS | sed 's/--show_depth\s\S+//')"
+  # PARAMS="$PARAMS --show_depth False"
+  PARAMS="$PARAMS --show_depth" #default is True ==> change to False
 fi  
 ######################################################
 # Start tensorflow with command defined above
@@ -81,11 +81,13 @@ fi
 if [[ -d $HOME/tensorflow/log/$TAG && $TAG != 'test_train_online' && $(ls $HOME/tensorflow/log/$TAG/2018* | wc -l ) -gt 6 ]] ; then
   MODELDIR=$HOME/tensorflow/log/$TAG
   # in case scratch was True, change it to False [without assuming anything]
-  PARAMS="$(echo $PARAMS | sed 's/--scratch\s\S+//')"
-  PARAMS="$PARAMS --scratch False"
+  # PARAMS="$(echo $PARAMS | sed 's/--scratch\s\S+//')"
+  # PARAMS="$PARAMS --scratch False"
   # ensure continue_training is True [without assuming anything]
-  PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
-  PARAMS="$PARAMS --continue_training True" 
+  # PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
+  PARAMS="$(echo $PARAMS | sed 's/--continue_training//')"
+  # PARAMS="$PARAMS --continue_training True" 
+  PARAMS="$PARAMS --continue_training" 
 else
   mkdir -p $HOME/tensorflow/log/$TAG
 fi
@@ -95,24 +97,20 @@ start_python(){
   echo "start python"
   LOGDIR="$TAG/$(date +%F_%H%M)_train"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  #location for logging
-  
   ARGUMENTS="--log_tag $LOGDIR $PARAMS"
   if [ ! -z $MODELDIR ] ; then
     ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
-  # else
-  #   ARGUMENTS="$(echo $ARGUMENTS | sed 's/--continue_training True//') --continue_training False"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
-  xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H%M%S) -hold -e $COMMANDP &
+  xterm -l -lf $HOME/tensorflow/log/$TAG/xterm_python_$(date +%F_%H-%M) -hold -e $COMMANDP &
   pidpython=$!
   echo "PID Python tensorflow: $pidpython"
   cnt=0
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
     cnt=$((cnt+1))
-    if [ $cnt -gt 300 ] ; then 
+    if [ $cnt -gt 600 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
       kill_combo
@@ -129,13 +127,19 @@ mkdir -p $XLOC
 # kill all processes
 kill_combo(){
   echo "kill ros:"
-  kill -9 $pidlaunch >/dev/null 2>&1 
-  killall -9 roscore >/dev/null 2>&1 
-  killall -9 rosmaster >/dev/null 2>&1
-  killall -9 /*rosout* >/dev/null 2>&1 
-  killall -9 gzclient >/dev/null 2>&1
-  kill -9 $pidros >/dev/null 2>&1
-  while kill -0 $pidpython;
+  kill -9 $pidlaunch > /dev/null 2>&1 
+  killall -9 roscore > /dev/null 2>&1 
+  killall -9 rosmaster > /dev/null 2>&1
+  killall -9 /*rosout* > /dev/null 2>&1 
+  killall -9 gzclient > /dev/null 2>&1
+  kill -9 $pidros > /dev/null 2>&1
+  for i in $(ps -ef | grep ros | grep -v grep | cut -d ' ' -f 2) ; do 
+    while kill -0 $i >/dev/null 2>&1 ; do 
+      kill $i 2>&1 > /dev/null 
+      sleep 0.5
+    done
+  done
+  while kill -0 $pidpython > /dev/null 2>&1 ;
   do      
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
@@ -150,17 +154,16 @@ restart(){
   #location for logging
   start_ros
 
-  if [ "$(ls $LLOC | wc -l)" -ge 6 ] ; then
+  if [ "$(ls $LLOC | wc -l)" -ge 7 ] ; then
     echo "Continue training from $LLOC"
     MODELDIR="$LLOC"
     # in case scratch was True, change it to False [without assuming anything]
-    PARAMS="$(echo $PARAMS | sed 's/--scratch True//')"
-    PARAMS="$(echo $PARAMS | sed 's/--scratch False//')"
-    PARAMS="$PARAMS --scratch False"
+    # PARAMS="$(echo $PARAMS | sed 's/--scratch \s\S+//')"
+    # PARAMS="$PARAMS --scratch False"
     # ensure continue_training is True [without assuming anything]
-    PARAMS="$(echo $PARAMS | sed 's/--continue_training True//')"
-    PARAMS="$(echo $PARAMS | sed 's/--continue_training False//')"
-    PARAMS="$PARAMS --continue_training True"  
+    # PARAMS="$(echo $PARAMS | sed 's/--continue_training \s\S+//')"
+    PARAMS="$(echo $PARAMS | sed 's/--continue_training//')"
+    PARAMS="$PARAMS --continue_training"  
   else 
     echo "Clean up $LLOC"
     rm -r $LLOC
@@ -191,7 +194,7 @@ do
   # Clear gazebo log folder to overcome the impressive amount of log data
   if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
-  echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
+  echo "$(date +%F_%H-%M) -----------------------> Started with run: $i crash_number: $crash_number"
   x=0
   y=$(awk "BEGIN {print -0.25+0.5*$((RANDOM%=100))/100}")   
   if [ ${WORLDS[NUM]} == sandbox ] ; then
@@ -212,11 +215,11 @@ do
   # CURRENT TIME
   NOW=$(date +%s)
 
-  xterm -iconic -l -lf $XLOC/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &
+  xterm -iconic -l -lf $XLOC/run_${i}_$(date +%F_%H-%M) -hold -e $COMMANDR &
   pidlaunch=$!
   echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
-  while kill -0 $pidlaunch; 
+  while kill -0 $pidlaunch > /dev/null 2>&1; 
   do 
     NOW=$(date +%s)
     # Check if job got suspended: if between last update and now has been more than 30 seconds (should be less than 0.1s)
@@ -234,14 +237,14 @@ do
     then
       echo "$(tput setaf 1) ---CRASH (delay time: $TS) $(tput sgr 0)"
       if [ $crash_number -ge 3 ] ; then
-        message="$(date +%H:%M) ########################### KILLED ROSCORE" 
+        message="$(date +%F_%H-%M) ########################### KILLED ROSCORE" 
         echo $message >> $LLOC/crash      
         echo $message     
         sleep 0.5
         restart
         crashed=true
       else
-        message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
+        message="$(date +%F_%H-%M) #### KILLED ROSLAUNCH: $crash_number"
         echo $message >> $LLOC/crash
         echo $message
         sleep 0.5
@@ -262,7 +265,7 @@ do
         new_stat="$(stat -c %Y $LLOC/tf_log)"
         cnt=$((cnt+1)) 
         if [ $cnt -gt 300 ] ; then 
-          echo "[evaluate_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
+          echo "[train_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
           restart
         fi 
         sleep 1
@@ -280,5 +283,5 @@ do
   fi  
 done
 kill_combo
-date +%F_%H%M%S
+date +%F_%H-%M
 echo 'done'
