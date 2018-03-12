@@ -56,6 +56,7 @@ def shutdown():
   try: 
     f=open(log_file, 'a')
     message = '{0} \n'.format('success' if success else 'bump')
+    # message = 'success \n'
     f.write(message)
     f.close()
   except :
