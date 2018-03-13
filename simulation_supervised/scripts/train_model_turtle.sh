@@ -18,6 +18,7 @@ python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
 GRAPHICS=true
+EVALUATE_N=100
 while getopts ":t:m:n:w:s:p:g:" o; do
     case "${o}" in
         t)
@@ -52,6 +53,8 @@ echo "WORLDS=${WORLDS[@]}"
 echo "PYTHON SCRIPT=$python_script"
 echo "PARAMS=${PARAMS[@]}"
 echo "GRAPHICS=$GRAPHICS"
+echo "EVALUATING EVERY $EVALUATE_N TIMES"
+
 
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
@@ -178,11 +181,19 @@ do
   echo "run: $i"
   NUM=$((i%${#WORLDS[@]}))
 
+  # evaluate every EVALUATE_N runs
+  if [[ $((i%EVALUATE_N)) = 0 && $i != 0 ]] ; then
+    echo "EVALUATING"
+    EVALUATE=true
+  else
+    EVALUATE=false
+  fi
   if [ -e $LLOC/tf_log ] ; then
     old_stat="$(stat -c %Y $LLOC/tf_log)"
   else
     echo "Could not find $LLOC/tf_log"
   fi
+
   # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
@@ -200,7 +211,7 @@ do
   LAUNCHFILE="${WORLDS[NUM]}_turtle.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
    Yspawned:=$Y x:=$x y:=$y log_folder:=$LLOC\
-   $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
+   $EXTRA_ARGUMENTS graphics:=$GRAPHICS evaluate:=$EVALUATE"
   echo $COMMANDR
   # STARTING TIME
   START=$(date +%s)
