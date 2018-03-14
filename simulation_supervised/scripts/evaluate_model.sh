@@ -14,7 +14,6 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-w \" WORLDS \" : space-separated list of environments ex \" canyon forest sandbox \"]
     [-s \" python_script \" : choose the python script to launch tensorflow: start_python or start_python_docker or start_python_sing_ql or start_python_sing_pg]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --max_episodes 20 \" ]" 1>&2; exit 1; }
-#python_script="start_python_sing.sh"
 python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_evaluate_online
@@ -68,7 +67,6 @@ RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
 PARAMS="$(echo $PARAMS | sed 's/--scratch\s//')"
-# PARAMS="$PARAMS --scratch False"
 # ensure continue_training is True [without assuming anything]
 PARAMS="$(echo $PARAMS | sed 's/--continue_training\s//')"
 PARAMS="$PARAMS --continue_training"
@@ -100,7 +98,7 @@ cd $HOME/tensorflow/log/$TAG
 
 start_python(){
   echo "start python"
-  LOGDIR="$TAG/$(date +%F_%H-%M)_eval"
+  LOGDIR="$TAG/$(date +%F_%H%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
   ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
   if [ $RECOVERY = true ] ; then
@@ -118,7 +116,6 @@ start_python(){
     if [ $cnt -gt 600 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
-      kill_combo
       restart
     fi 
   done
@@ -163,17 +160,18 @@ restart(){
 
 crash_number=0
 
-i=0
-while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
+flight_num=0
+while [[ $flight_num -lt $NUMBER_OF_FLIGHTS ]] ;
 do
-  echo "run: $i"
-  NUM=$((i%${#WORLDS[@]}))
+  echo "run: $flight_num"
+  NUM=$((flight_num%${#WORLDS[@]}))
 
   if [ -e $LLOC/tf_log ] ; then
     old_stat="$(stat -c %Y $LLOC/tf_log)"
   else
     echo "Could not find $LLOC/tf_log"
   fi
+
   # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
@@ -182,9 +180,9 @@ do
   fi
   crashed=false
   # Clear gazebo log folder to overcome the impressive amount of log data
-  if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
+  if [ $((flight_num%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
-  echo "$(date +%F_%H-%M) -----------------------> Started with run: $i crash_number: $crash_number"
+  echo "$(date +%F_%H-%M) -----------------------> Started with run: $flight_num crash_number: $crash_number"
   x=0
   y=0
   if [ ${WORLDS[NUM]} == sandbox ] ; then
@@ -205,7 +203,7 @@ do
   # CURRENT TIME
   NOW=$(date +%s)
 
-  xterm -iconic -l -lf $XLOC/run_${i}_$(date +%F_%H-%M) -hold -e $COMMANDR &
+  xterm -iconic -l -lf $XLOC/run_${flight_num}_$(date +%F_%H-%M) -hold -e $COMMANDR &
   pidlaunch=$!
   echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
@@ -264,12 +262,12 @@ do
       echo "[evaluate_model.sh] Could not find $LLOC/tf_log"
       exit 
     fi
-    i=$((i+1))
+    flight_num=$((flight_num+1))
     if [ $(tail -1 $LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
-    echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
+    echo "$(date +%F_%H-%M) finished run $flight_num in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
   fi  
 done
 kill_combo
