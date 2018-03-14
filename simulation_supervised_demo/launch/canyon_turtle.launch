@@ -73,6 +73,6 @@
   
   
     <!-- monitor delays and set cmd_vel to zero -->
-    <node name="monitor" pkg="simulation_supervised_tools" type="monitor.py" output="screen"/>
+    <!-- <node name="monitor" pkg="simulation_supervised_tools" type="monitor.py" output="screen"/> -->
 
 </launch>
