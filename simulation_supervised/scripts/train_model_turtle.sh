@@ -73,8 +73,6 @@ start_ros
 ######################################################
 # If graphics is false ensure showdepth is false
 if [ $GRAPHICS = false ] ; then
-  # PARAMS="$(echo $PARAMS | sed 's/--show_depth\s\S+//')"
-  # PARAMS="$PARAMS --show_depth False"
   PARAMS="$PARAMS --show_depth" #default is True ==> change to False
 fi  
 ######################################################
@@ -115,7 +113,6 @@ start_python(){
     if [ $cnt -gt 600 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
-      kill_combo
       restart
     fi 
   done
@@ -175,14 +172,14 @@ restart(){
 
 crash_number=0
 
-i=0
-while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
+flight_num=0
+while [[ $flight_num -lt $NUMBER_OF_FLIGHTS ]] ;
 do
-  echo "run: $i"
-  NUM=$((i%${#WORLDS[@]}))
+  echo "run: $flight_num"
+  NUM=$((flight_num%${#WORLDS[@]}))
 
   # evaluate every EVALUATE_N runs
-  if [[ $((i%EVALUATE_N)) = 0 && $i != 0 ]] ; then
+  if [[ $((flight_num%EVALUATE_N)) = 0 && $flight_num != 0 ]] ; then
     echo "EVALUATING"
     EVALUATE=true
   else
@@ -202,9 +199,9 @@ do
   fi
   crashed=false
   # Clear gazebo log folder to overcome the impressive amount of log data
-  if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
+  if [ $((flight_num%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
   if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
-  echo "$(date +%F_%H-%M) -----------------------> Started with run: $i crash_number: $crash_number"
+  echo "$(date +%F_%H-%M) -----------------------> Started with run: $flight_num crash_number: $crash_number"
   x=0
   y=0
   Y=1.57
@@ -220,7 +217,7 @@ do
   # CURRENT TIME
   NOW=$(date +%s)
 
-  xterm -iconic -l -lf $XLOC/run_${i}_$(date +%F_%H-%M) -hold -e $COMMANDR &
+  xterm -iconic -l -lf $XLOC/run_${flight_num}_$(date +%F_%H-%M) -hold -e $COMMANDR &
   pidlaunch=$!
   echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
@@ -279,12 +276,12 @@ do
       echo "[train_model.sh] Could not find $LLOC/tf_log"
       exit 
     fi
-    i=$((i+1))
+    flight_num=$((flight_num+1))
     if [ $(tail -1 $LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
-    echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
+    echo "$(date +%F_%H-%M) finished run $flight_num in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
   fi  
 done
 kill_combo
