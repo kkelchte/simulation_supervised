@@ -18,7 +18,7 @@ python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
 GRAPHICS=true
-EVALUATE_N=100
+EVALUATE_N=20
 while getopts ":t:m:n:w:s:p:g:" o; do
     case "${o}" in
         t)

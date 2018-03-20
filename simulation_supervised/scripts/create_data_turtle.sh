@@ -111,7 +111,7 @@ start_python(){
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
     cnt=$((cnt+1))
-    if [ $cnt -gt 600 ] ; then 
+    if [ $cnt -gt 200 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
       kill_combo
