@@ -56,6 +56,9 @@ echo "GRAPHICS=$GRAPHICS"
 echo "EVALUATING EVERY $EVALUATE_N TIMES"
 
 
+# Add 10 evaluation flights:
+NUMBER_OF_FLIGHTS=$((NUMBER_OF_FLIGHTS+10))
+
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
@@ -155,7 +158,7 @@ restart(){
 
   if [ "$(ls $LLOC | wc -l)" -ge 7 ] ; then
     echo "Continue training from $LLOC"
-    MODELDIR="$LLOC"
+    MODELDIR="$(dirname $LLOC)"
     # in case scratch was True, change it to False [without assuming anything]
     # PARAMS="$(echo $PARAMS | sed 's/--scratch \s\S+//')"
     # PARAMS="$PARAMS --scratch False"
@@ -179,12 +182,14 @@ do
   NUM=$((flight_num%${#WORLDS[@]}))
 
   # evaluate every EVALUATE_N runs
-  if [[ $((flight_num%EVALUATE_N)) = 0 && $flight_num != 0 ]] ; then
+  if [[ ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) || ( $flight_num -gt $((NUMBER_OF_FLIGHTS-10)) ) ]] ; then
     echo "EVALUATING"
     EVALUATE=true
   else
     EVALUATE=false
   fi
+
+  
   if [ -e $LLOC/tf_log ] ; then
     old_stat="$(stat -c %Y $LLOC/tf_log)"
   else
