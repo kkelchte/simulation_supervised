@@ -57,7 +57,9 @@ echo "EVALUATING EVERY $EVALUATE_N TIMES"
 
 
 # Add 10 evaluation flights:
-NUMBER_OF_FLIGHTS=$((NUMBER_OF_FLIGHTS+10))
+if [ $NUMBER_OF_FLIGHTS -gt 50 ] ; then 
+  NUMBER_OF_FLIGHTS=$((NUMBER_OF_FLIGHTS+10))
+fi
 
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
@@ -182,7 +184,7 @@ do
   NUM=$((flight_num%${#WORLDS[@]}))
 
   # evaluate every EVALUATE_N runs
-  if [[ ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) || ( $flight_num -gt $((NUMBER_OF_FLIGHTS-10)) ) ]] ; then
+  if [[ ( ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) || ( $flight_num -gt $((NUMBER_OF_FLIGHTS-10)) ) ) && ( $NUMBER_OF_FLIGHTS -gt 50 ) ]] ; then
     echo "EVALUATING"
     EVALUATE=true
   else
