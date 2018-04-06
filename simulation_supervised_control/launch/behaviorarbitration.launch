@@ -9,5 +9,5 @@
   <param name="goal_angle" value="$(arg goal_angle)"/>
   <arg name="ba_params_file" default="behavior_arbitration.xml"/>
   <param name="ba_parameters_path" value="$(find simulation_supervised_control)/parameters/$(arg ba_params_file)"/>
-  <node name="teleop_autopilot_behaviour_arbitration" pkg="simulation_supervised_control" type="teleop_autopilot_behaviour_arbitration" output="log" />
+  <node name="teleop_autopilot_behaviour_arbitration" pkg="simulation_supervised_control" type="teleop_autopilot_behaviour_arbitration" output="screen" />
 </launch>
