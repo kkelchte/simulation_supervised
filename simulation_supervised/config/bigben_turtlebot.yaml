@@ -71,10 +71,10 @@ teleop:
     topic_name: overtake
     deadman_buttons: [1] #cross
     axis_mappings: []
-  ready:
+  go:
     type: topic
     message_type: "std_msgs/Empty"
-    topic_name: ready
+    topic_name: go
     deadman_buttons: [3] #Triangle
     axis_mappings: []
   
