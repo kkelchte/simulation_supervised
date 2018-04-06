@@ -1,5 +1,5 @@
 delay_evaluation: 4
-flight_duration: 500
+flight_duration: 1000
 min_allowed_distance: 0.6
 pidfile: .rospid
 supervision: true

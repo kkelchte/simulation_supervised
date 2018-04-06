@@ -12,7 +12,7 @@ $HOME/drone_ws/devel/lib:/opt/ros/kinetic/lib:\
 /.singularity.d/libs
 
 cd $HOME/tensorflow/pilot/pilot
-python_command="python main.py --offline $@"
+python_command="python main.py --online $@"
 echo "start_python_sing.sh:"
 echo $python_command
 $python_command

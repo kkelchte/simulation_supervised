@@ -127,7 +127,7 @@ def process_depth(msg, sloc, index):
   except CvBridgeError as e:
     print(e)
   else:
-    im=im*1/5.*255
+    im=im*(1/5.*255)
     if index > skip_first: 
       print('[create_dataset.py]: {2}: write Depth image {1} to {0}'.format(sloc, index, rospy.get_time()))
       cv2.imwrite(sloc+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))

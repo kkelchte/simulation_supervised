@@ -93,14 +93,14 @@ mkdir -p $DATA_LLOC/xterm_log
 # Start tensorflow with command defined above if model is provided for flying
 # make rosparam supervision True so BA's control is set to /supervised_vel
 
-
+mkdir -p $HOME/tensorflow/log/$TAG
 start_python(){
   echo "start python"
   LOGDIR="$TAG/$(date +%F_%H%M)_create_data"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
   ARGUMENTS="--log_tag $LOGDIR $PARAMS --noise $NOISE"
   if [ ! -z $MODELDIR ] ; then
-    ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
+    ARGUMENTS="$ARGUMENTS --load_config --continue_training --checkpoint_path $MODELDIR"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
@@ -111,7 +111,7 @@ start_python(){
   while [ ! -e $LLOC/tf_log ] ; do 
     sleep 1 
     cnt=$((cnt+1))
-    if [ $cnt -gt 600 ] ; then 
+    if [ $cnt -gt 200 ] ; then 
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)"
       echo "$(tput setaf 1) Waited for 5minutes on tf_log, seems like tensorlfow crashed... on $(cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1) $(tput sgr 0)" > /esat/opal/kkelchte/docker_home/.debug/$TAG
       kill_combo
@@ -261,9 +261,13 @@ do
       echo "[train_model.sh] Could not find $LLOC/tf_log"
       exit 
     fi
-    i=$((i+1))
     if [ $(tail -1 $DATA_LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
+      # ONLY KEEP TO SUCCESS
+      i=$((i+1))
+    else
+      # CLEAN UP DATASET
+      rm -r $saving_location
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
     echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${DATA_LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"

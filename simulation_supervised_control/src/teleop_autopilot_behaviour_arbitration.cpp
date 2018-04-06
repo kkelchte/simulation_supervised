@@ -165,7 +165,7 @@ void callbackGt(const geometry_msgs::PoseStamped& msg)
 	}else{
 		adjust_height=0;
 	}
-	// cout << "adjust_height: " << adjust_height <<"; current height: " << msg.pose.position.z << " starting_height: "<< starting_height<< endl;
+	cout << "adjust_height: " << adjust_height <<"; current height: " << msg.pose.position.z << " starting_height: "<< starting_height<< endl;
 	CURRENT_YAW = getYaw(msg.pose.orientation) + CV_PI;
 }
 
