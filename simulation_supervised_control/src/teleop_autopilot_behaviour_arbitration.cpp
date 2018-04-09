@@ -217,7 +217,7 @@ geometry_msgs::Twist get_twist() {
 	  case 2: //Do obstacle avoidance
 	  	if(type_of_noise.compare("ou") == 0 ){
 
-			DYAW = DYAW + NOISE_AMP*ounoise_Y->noise(); 
+				DYAW = DYAW + NOISE_AMP*ounoise_Y->noise(); 
 		  	// DYAW = +1;
 		  	twist.linear.x = speed; //speed
 		    twist.linear.y = NOISE_AMP*ounoise_y->noise(); 
