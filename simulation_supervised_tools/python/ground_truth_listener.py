@@ -97,7 +97,7 @@ if __name__=="__main__":
 		else:
 			log_folder=log_folder+'/runs'
 			if not os.path.isdir(log_folder):
-		 		os.mkdir(log_folder)
+		 		os.makedirs(log_folder)
 	 		run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f ]), img_type)
 	 		print log_folder
 	 		print 'RUNFILE: ',run_file
