@@ -52,9 +52,6 @@ if [ -z "$MODELDIR" ] ; then
   echo "Using behavior arbitration to fly."
 fi
 
-if [ $TAG == 'test_createdata' ] ; then
-  rm -r $HOME/pilot_data/$TAG
-fi
 
 echo "+++++++++++++++++++++++CREATE DATA+++++++++++++++++++++"
 echo "TAG=$TAG"
