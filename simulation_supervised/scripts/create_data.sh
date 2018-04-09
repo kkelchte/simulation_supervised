@@ -65,6 +65,10 @@ echo "NOISE=$NOISE"
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
+
+if [ $TAG == 'test_createdata' ] ; then
+  rm -r $HOME/pilot_data/$TAG
+fi
 ######################################################
 # Start roscore and load general parameters
 start_ros(){
