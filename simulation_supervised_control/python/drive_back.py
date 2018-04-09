@@ -36,12 +36,13 @@ def drive_back_callback(msg):
   """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
   if state != 'driving':
 		state='driving'
-		print('Driving back service started.')
+		print('[drive_back]: Driving back service started.')
 
 
 def depth_callback(data):
 	global action_pub, x, state
 
+	if state == 'idle': return
 	# 1. Process lazer range data: getting the closest octant
 
 	# clip at 0.5m and make 'broken' 0 readings also 0.5
@@ -54,18 +55,18 @@ def depth_callback(data):
 	x=np.array(ranges)
 	
 	# 2. check if current depth is indicating a free road quit driving and go to idle state
-	print("min index: {0}".format(np.argmin(ranges)))
+	# print("[drive_back]: min index: {0}".format(np.argmin(ranges)))
 
 	if 3./8*num_bins < np.argmin(ranges) and np.argmin(ranges) < 5./8*num_bins:
-		print("Drive back to free road is done.")
+		print("[drive_back]: Drive back to free road is done.")
 		state='idle'
 		drive_back_pub.publish(Empty())
-	# else:
-	# 	# 3. else turn so that road becomes free.
-	# 	print('turning turning turning...')
-	# 	msg = Twist()
-	# 	msg.angular.z = -1
-	# 	# action_pub.publish(msg)
+	else:
+		# 3. else turn so that road becomes free.
+		print('[drive_back]: turning turning turning...')
+		msg = Twist()
+		msg.angular.z = -1
+		action_pub.publish(msg)
 
 
 if __name__=="__main__":
@@ -83,7 +84,7 @@ if __name__=="__main__":
   rospy.Subscriber('/drive_back', Empty, drive_back_callback)
   drive_back_pub = rospy.Publisher('/free_road', Empty, queue_size=1)
   
-  anim=animation.FuncAnimation(fig,animate)
-  plt.show()
+  # anim=animation.FuncAnimation(fig,animate)
+  # plt.show()
 
   rospy.spin()

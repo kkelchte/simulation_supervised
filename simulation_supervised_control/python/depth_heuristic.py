@@ -45,7 +45,7 @@ def ready_callback(msg):
   global ready, finished
   """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
   if not ready and finished:
-    print('Control activated.')
+    print('[depth_heuristic]: Control activated.')
     ready = True
     finished = False
     
@@ -53,7 +53,7 @@ def finished_callback(msg):
   global ready, finished
   """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
   if ready and not finished:
-    print('Control deactivated.')
+    print('[depth_heuristic]: Control deactivated.')
     ready = False
     finished = True
 
@@ -68,7 +68,7 @@ def depth_callback(data):
   # turn away from the minimum (non-zero) depth reading
   # discretize 3 bins (:-front_width/2:front_width/2:)
   # range that covers going straight.
-  front_width=45
+  front_width=47
   x=[min(ranges[0:45-front_width/2]),min(ranges[45-front_width/2:45+front_width/2]),min(ranges[45+front_width/2:])]
   
   index=np.argmax(x)
@@ -79,7 +79,7 @@ def depth_callback(data):
 
   speed_dict={0:0.1, 1:0.3, 2:0.1}  
 
-  print("min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
+  print("[depth_heuristic]: min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
   
 
   msg = Twist()
@@ -89,7 +89,7 @@ def depth_callback(data):
   msg.linear.z = 0
   msg.angular.z = yaw_dict[index]
 
-  # print("speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
+  # print("[depth_heuristic]: speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
   action_pub.publish(msg)
 
 

@@ -1,6 +1,6 @@
-delay_evaluation: 1
-flight_duration: -1
-min_allowed_distance: 0.25
+delay_evaluation: 4
+# flight_duration: 60
+min_allowed_distance: 0.15
 pidfile: .rospid
 supervision: false
 save_images: false

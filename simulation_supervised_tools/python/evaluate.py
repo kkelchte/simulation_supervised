@@ -31,9 +31,11 @@ turtle=False # boolean indicating we are working with a trutlebot
 
 
 flight_duration = -1 #amount of seconds drone should be flying, in case of no checking: use -1
+starting_height = -1 
 delay_evaluation = 3
 success=False
 shuttingdown=False
+go=False
 ready=False
 finished=True
 min_allowed_distance=0.5 #0.8
@@ -60,14 +62,14 @@ def shutdown():
     f.write(message)
     f.close()
   except :
-    print('FAILED TO WRITE LOGFILE: log_file')
+    print('[evaluate]: FAILED TO WRITE LOGFILE: log_file')
   try: 
     f=open(named_log_file, 'a')
     message = '{0} {1} \n'.format('success' if success else 'bump', world_name)
     f.write(message)
     f.close()
   except :
-    print('FAILED TO WRITE LOGFILE: named_log_file')
+    print('[evaluate]: FAILED TO WRITE LOGFILE: named_log_file')
   else:
     time.sleep(1)
   try: 
@@ -76,7 +78,7 @@ def shutdown():
       f.write('{0} {1} {2}\n'.format(pos[0],pos[1],pos[2]))
     f.close()
   except :
-    print('FAILED TO WRITE LOGFILE: position_log_file')
+    print('[evaluate]: FAILED TO WRITE LOGFILE: position_log_file')
   else:
     time.sleep(1)
   
@@ -93,16 +95,18 @@ def shutdown():
   
   # Call drive-me-back to free space and wait for a free road sign
   if turtle:
-    print("Calling drive-me-back service")
+    print("[evaluate]: Calling drive-me-back service")
     drive_back_pub.publish(Empty()) 
         
 def free_road_callback(msg):
-  print('road is free.')
+  print('[evaluate]: road is free.')
   # wait for new tf log to indicate learning is ready
   # ...
   # ready for the next round!
   ready_pub.publish(Empty())    
   shuttingdown=False
+  ready=True
+  finished=False
 
 def time_check():
   global start_time, shuttingdown, success
@@ -124,7 +128,6 @@ def depth_callback(msg):
   except CvBridgeError, e:
     print(e)
   else:
-    # print('min distance: ', min_distance)
     if min_distance < min_allowed_distance and not shuttingdown and ready:
       print('[evaluate.py]: {0}: bump @ {1}'.format(rospy.get_time(), time.time()))
       success=False
@@ -142,8 +145,8 @@ def scan_callback(data):
   ranges=list(reversed(ranges[:45]))+list(reversed(ranges[-45:]))
 
   min_distance = min(ranges)
-  print('min dis: {0} min allowed: {1}'.format(min_distance,min_allowed_distance))
-  if min_distance < min_allowed_distance and not shuttingdown:
+  # print('[evaluate]: min dis: {0} min allowed: {1}'.format(min_distance,min_allowed_distance))
+  if min_distance < min_allowed_distance and not shuttingdown and ready:
     print('[evaluate.py]: {0}: bump @ {1}'.format(rospy.get_time(), time.time()))
     success=False
     shuttingdown=True
@@ -156,33 +159,23 @@ def gt_callback(data):
                   data.pose.pose.position.z]
   if start_time==-1: start_time = rospy.get_time()
   positions.append(current_pos)
-  if current_pos[2] >= starting_height and not ready and not starting_height==-1 and (rospy.get_time()-start_time)>delay_evaluation:
+  if (starting_height==-1 or current_pos[2] >= starting_height) and not ready and (not turtle or go) and (rospy.get_time()-start_time)>delay_evaluation:
     print('[evaluate.py]: {0} = {1} - {2}: ready!'.format(rospy.get_time()-start_time, rospy.get_time(), start_time))
     ready_pub.publish(Empty())
     ready = True
   # print 'dis: ',(current_pos[0]**2+current_pos[1]**2)
   # if (current_pos[0] > 52 or current_pos[1] > 30) and not shuttingdown:  
   if eva_dis!=-1 and (current_pos[0]**2+current_pos[1]**2) > eva_dis and not shuttingdown:
-    print 'dis > evadis-----------success!'
+    print '[evaluate]: dis > evadis-----------success!'
     success = True
     shuttingdown = True
     shutdown()
 
-def ready_callback(msg):
-  global ready, finished
-  """Called when ready is received from joystick (traingle), only used when working with turtlebot"""
-  if not ready and finished:
-    print('[evaluate.py]: ready')
-    ready = True
-    finished = False
-
-def finished_callback(msg):
-  global ready, finished
-  """ Called when ready is received from joystick (x) when user is taking over, only used when working with turtlebot"""
-  if ready and not finished:
-    print('[evaluate.py]: finished')
-    ready = False
-    finished = True
+def go_callback(msg):
+  global go
+  if not go:
+    go=True
+    print('[evaluate] go.')
 
 if __name__=="__main__":
   rospy.init_node('evaluate', anonymous=True)
@@ -195,9 +188,6 @@ if __name__=="__main__":
     min_allowed_distance=rospy.get_param('min_allowed_distance')
   if rospy.has_param('starting_height'):
     starting_height=rospy.get_param('starting_height')
-    if starting_height==-1: #no starting height, so user is flying, so evaluate node should stay ready
-      starting_height=0.5
-  print('[evaluate.py]: delay_evaluation: {}'.format(delay_evaluation))
   if rospy.has_param('eva_dis'):
     eva_dis=rospy.get_param('eva_dis')
   if rospy.has_param('log_folder'):
@@ -221,22 +211,15 @@ if __name__=="__main__":
       turtle=True
       # should listen to turtlebot scan instead...
       rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_callback)
+      rospy.Subscriber(rospy.get_param('go'),Empty, go_callback)
   
   if rospy.has_param('ready'): 
-    if turtle:
-      rospy.Subscriber(rospy.get_param('ready'), Empty, ready_callback)
-      ready_pub = rospy.Publisher(rospy.get_param('ready'), Empty, queue_size=10)
-      rospy.Subscriber(rospy.get_param('overtake'), Empty, finished_callback)
-      finished_pub = rospy.Publisher(rospy.get_param('overtake'), Empty, queue_size=10)
-      drive_back_pub = rospy.Publisher('/drive_back', Empty, queue_size=1)
-      rospy.Subscriber('/free_road', Empty, free_road_callback)
-    else:
-      ready_pub = rospy.Publisher(rospy.get_param('ready'), Empty, queue_size=10)
+    ready_pub = rospy.Publisher(rospy.get_param('ready'), Empty, queue_size=10)
+
+  if turtle:
+    drive_back_pub = rospy.Publisher('/drive_back', Empty, queue_size=1)
+    rospy.Subscriber('/free_road', Empty, free_road_callback)
     
-  #rospy.Subscriber('/kinect/depth/image_raw', Image, depth_callback)
-  #rospy.Subscriber('/ardrone/imu', Imu, imu_callback)
-  
-  
   if rospy.has_param('finished'): 
     finished_pub = rospy.Publisher(rospy.get_param('finished'), Empty, queue_size=10)
   
