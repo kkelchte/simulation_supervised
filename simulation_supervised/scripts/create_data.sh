@@ -52,6 +52,10 @@ if [ -z "$MODELDIR" ] ; then
   echo "Using behavior arbitration to fly."
 fi
 
+if [ $TAG == 'test_createdata' ] ; then
+  rm -r $HOME/pilot_data/$TAG
+fi
+
 echo "+++++++++++++++++++++++CREATE DATA+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
@@ -85,13 +89,14 @@ if [ -d $HOME/pilot_data/$TAG ] ; then
   # echo "$(tput setaf 1) $TAG already exists in pilot_data $(tput sgr0)"
   # exit
   # echo "$(tput setaf 1) $TAG removed in pilot_data $(tput sgr0)"
-
   # rm -r $HOME/pilot_data/$TAG
-  i="$(ls $HOME/pilot_data/$TAG | grep 00 | wc -l)"
+  i="$(ls $HOME/pilot_data/$TAG | grep 0 | wc -l)"
   echo "found $TAG already and will continue from run: $i"
 else 
   i=0
 fi
+DATA_LLOC="$HOME/pilot_data/$TAG"
+mkdir -p $DATA_LLOC/xterm_log
 
 ######################################################
 # Start tensorflow with command defined above if model is provided for flying
@@ -99,6 +104,7 @@ if [ ! -z $MODELDIR ] ; then
   # make rosparam supervision True so BA's control is set to /supervised_vel
   rosparam set supervision true
   echo "Set rosparam supervision to $(rosparam get supervision)"
+  mkdir -p $HOME/tensorflow/log/$TAG
   start_python(){
     echo "start python"
     LOGDIR="$TAG/$(date +%F_%H%M)_create_data"
@@ -126,27 +132,27 @@ if [ ! -z $MODELDIR ] ; then
 fi
 
 ######################################################
-convertsecs() {
-  ((h=${1}/3600))
-  ((m=(${1}%3600)/60))
-  ((s=${1}%60))
-  printf "%02d hours %02d min %02d sec\n" $h $m $s
-}
-# Kill ros function
+# kill all processes
 kill_combo(){
   echo "kill ros:"
-  kill -9 $pidlaunch >/dev/null 2>&1 
-  killall -9 roscore >/dev/null 2>&1 
-  killall -9 rosmaster >/dev/null 2>&1
-  killall -9 /*rosout* >/dev/null 2>&1 
-  killall -9 gzclient >/dev/null 2>&1
-  kill -9 $pidros >/dev/null 2>&1
-  while kill -0 $pidpython;
+  kill -9 $pidlaunch > /dev/null 2>&1 
+  killall -9 roscore > /dev/null 2>&1 
+  killall -9 rosmaster > /dev/null 2>&1
+  killall -9 /*rosout* > /dev/null 2>&1 
+  killall -9 gzclient > /dev/null 2>&1
+  kill -9 $pidros > /dev/null 2>&1
+  for i in $(ps -ef | grep ros | grep -v grep | cut -d ' ' -f 2) ; do 
+    while kill -0 $i >/dev/null 2>&1 ; do 
+      kill $i 2>&1 > /dev/null 
+      sleep 0.5
+    done
+  done
+  while kill -0 $pidpython > /dev/null 2>&1 ;
   do      
     kill $pidpython >/dev/null 2>&1
     sleep 0.05
   done
-  sleep 60
+  sleep 5
 }
 ######################################################
 # restart ros-python-ros
@@ -177,13 +183,13 @@ do
   # If it is not esat simulated, you can create a new world
   EXTRA_ARGUMENTS=""
   if [[ ${WORLDS[NUM]} == canyon  || ${WORLDS[NUM]} == forest || ${WORLDS[NUM]} == sandbox ]] ; then
-    python $(rospack find simulation_supervised_tools)/python/${WORLDS[NUM]}_generator.py $LLOC
-    EXTRA_ARGUMENTS=" background:=$LLOC/${WORLDS[NUM]}.png world_name:=$LLOC/${WORLDS[NUM]}.world"
+    python $(rospack find simulation_supervised_tools)/python/${WORLDS[NUM]}_generator.py $DATA_LLOC
+    EXTRA_ARGUMENTS=" background:=$DATA_LLOC/${WORLDS[NUM]}.png world_name:=$DATA_LLOC/${WORLDS[NUM]}.world"
   fi
   crashed=false
   # Clear gazebo log folder to overcome the impressive amount of log data
   if [ $((i%50)) = 0 ] ; then rm -r $HOME/.gazebo/log/* ; fi
-  if [[ ! -d $LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
+  if [[ ! -d $DATA_LLOC ]] ; then echo "$(tput setaf 1)log location is unmounted so stop.$(tput sgr 0)" ; kill_combo; exit ; fi
   echo "$(date +%H:%M) -----------------------> Started with run: $i crash_number: $crash_number"
   x=$(awk "BEGIN {print -0.5+$((RANDOM%=100))/100}")
   y=$(awk "BEGIN {print $((RANDOM%=100))/100}")   
@@ -197,47 +203,50 @@ do
   speed=$(awk "BEGIN {print 1.3-0.8+1.6*$((RANDOM%=100))/100}") #vary from 0.5 till 2.1
   saving_location=$LLOC/$(printf %05d $i)_${WORLDS[NUM]}
   
-
-  # TODO DELETE DATA PART OF LAUNCH FILENAME
-  LAUNCHFILE="${WORLDS[NUM]}_data.launch"
-  
-
+  LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
    Yspawned:=$Y x:=$x y:=$y starting_height:=$z speed:=$speed log_folder:=$LLOC\
    saving_location:=$saving_location evaluate:=true noise:=$NOISE recovery:=$RECOVERY\
    $EXTRA_ARGUMENTS graphics:=$GRAPHICS"
   echo $COMMANDR
-  START=$(date +%s)     
-  xterm -l -lf $LLOC/xterm_log/run_${i}_$(date +%F_%H%M%S) -hold -e $COMMANDR &
+  # STARTING TIME
+  START=$(date +%s)
+  # TIME SPAN TRAINING/EVALUATING     
+  TS=0
+  # CURRENT TIME
+  NOW=$(date +%s)
+
+  xterm -iconic -l -lf $DATA_LLOC/xterm_log/run_${i}_$(date +%F_%H-%M) -hold -e $COMMANDR &
   pidlaunch=$!
-  echo $pidlaunch > $LLOC/$(rosparam get /pidfile)
+  echo $pidlaunch > $DATA_LLOC/$(rosparam get /pidfile)
   echo "Run started in xterm: $pidlaunch"
-  DIFF=0
-  while kill -0 $pidlaunch; 
+  while kill -0 $pidlaunch > /dev/null 2>&1; 
   do 
-    # Check if job got suspended
-    if [[ $(( $(date +%s) - START - DIFF)) -gt 30 ]] ; then
+    NOW=$(date +%s)
+    # Check if job got suspended: if between last update and now has been more than 30 seconds (should be less than 0.1s)
+    if [[ $(( NOW - START - TS)) -gt 30 ]] ; then
       sleep 30 #wait for big tick to update
-      TOTAL_SUS="$(condor_q -glob -l $cluser_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
+      TOTAL_SUS="$(condor_q -glob -l $cluster_id | grep TotalSuspensions | tail -1 | cut -d ' ' -f 3)"
       echo "I was suspended for the $TOTAL_SUS 'th time."
-      START=$(( $(date +%s) - $DIFF ))
+      START=$(( NOW - TS ))
+    else
+      # otherwise: time span update: 
+      TS=$(( NOW - START ))
     fi
-    END=$(date +%s)
-    DIFF=$(( $END - $START ))
     
-    if [ $DIFF -gt 300 ] ; 
+    if [ $TS -gt 300 ] ; 
     then
-      echo "$(tput setaf 1) ---CRASH (delay time: $DIFF) $(tput sgr 0)"
+      echo "$(tput setaf 1) ---CRASH (delay time: $TS) $(tput sgr 0)"
       if [ $crash_number -ge 3 ] ; then
-        message="$(date +%H:%M) ########################### KILLED ROSCORE" 
-        echo $message >> $LLOC/crash      
+        message="$(date +%F_%H-%M) ########################### KILLED ROSCORE" 
+        echo $message >> $DATA_LLOC/crash      
         echo $message     
         sleep 0.5
         restart
         crashed=true
       else
-        message="$(date +%H:%M) #### KILLED ROSLAUNCH: $crash_number"
-        echo $message >> $LLOC/crash
+        message="$(date +%F_%H-%M) #### KILLED ROSLAUNCH: $crash_number"
+        echo $message >> $DATA_LLOC/crash
         echo $message
         sleep 0.5
         kill -9 $pidlaunch >/dev/null 2>&1
@@ -248,27 +257,24 @@ do
     fi
     sleep 0.1
   done
-  if [ $crashed != true ] ; then 
-    if [[ "$(tail -1 ${LLOC}/log)" == 'success' ]] ; then
+  if [ $crashed != true ] ; then
+    if [ $(tail -1 $DATA_LLOC/log) == 'success' ] ; then
       COUNTSUC[NUM]="$((COUNTSUC[NUM]+1))"
+      # ONLY KEEP TO SUCCESS
+      i=$((i+1))
+    else
+      # CLEAN UP DATASET
+      rm -r $saving_location
     fi
     COUNTTOT[NUM]="$((COUNTTOT[NUM]+1))"
-    echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
-  fi
-  if [ $crashed != true ] ; then
-    i=$((i+1))
-    if [ ! -z $MODELDIR ] ; then
-      mv $saving_location/control_info.txt $saving_location/predicted_info.txt 
-      mv $saving_location/supervised_info.txt $saving_location/control_info.txt
-    fi
+    echo "$(date +%F_%H-%M) finished run $i in world ${WORLDS[NUM]} with $(tail -1 ${DATA_LLOC}/log) resulting in ${COUNTSUC[NUM]} / ${COUNTTOT[NUM]}"
     # keep the validation world, just in case...
-    mv $LLOC/${WORLDS[NUM]}.world $saving_location
-  else
+    mv $LLOC/${WORLDS[NUM]}.world $saving_location  
+  else #if it was a fail: clean up!
     rm -r $saving_location
   fi
-  
-  
+  sleep 5
 done
 kill_combo
-date +%F_%H%M%S
+date +%F_%H-%M
 echo 'done'

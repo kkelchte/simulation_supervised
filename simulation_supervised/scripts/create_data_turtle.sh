@@ -85,6 +85,8 @@ if [ -d $HOME/pilot_data/$TAG ] ; then
   # rm -r $HOME/pilot_data/$TAG
   i="$(ls $HOME/pilot_data/$TAG | grep 0 | wc -l)"
   echo "found $TAG already and will continue from run: $i"
+else 
+  i=0
 fi
 DATA_LLOC="$HOME/pilot_data/$TAG"
 mkdir -p $DATA_LLOC/xterm_log
@@ -157,7 +159,6 @@ restart(){
 
 crash_number=0
 
-i=0
 while [[ $i -lt $NUMBER_OF_FLIGHTS ]] ;
 do
   echo "run: $i"
