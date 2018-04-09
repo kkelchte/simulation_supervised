@@ -30,8 +30,8 @@
   <arg name="y" default="0"/>
   <arg name="Yspawned" default="1.57"/>
   <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
-    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam_and_kinect.gazebo.xacro" unless="$(arg recovery)"/>
-    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_multiple_kinects.gazebo.xacro" if="$(arg recovery)"/>
+    <!-- <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam_and_kinect.gazebo.xacro" unless="$(arg recovery)"/>
+    <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_multiple_kinects.gazebo.xacro" if="$(arg recovery)"/>-->
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
     <arg name="Y" default="$(arg Yspawned)"/>
