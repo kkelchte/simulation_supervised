@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import xml.etree.ElementTree as ET
+# import xml.dom.minidom
 import numpy as np
 import matplotlib.pyplot as plt
 import os,sys
@@ -55,10 +56,19 @@ for t in trees:
 	if abs(t[0])< 4 and abs(t[1]) < 4:
 		continue
 	incl=ET.SubElement(world, 'include')
+	name=ET.SubElement(incl, 'name')
+	name.text='tree_'+str(t[0])+'_'+str(t[1])
 	ure=ET.SubElement(incl,'uri')
 	ure.text='model://tree'
 	pos=ET.SubElement(incl,'pose')
 	pos.text= str(t[0])+' '+str(t[1])+' '+str(2)+' 0 0 0'    
 
+# xml = xml.dom.minidom.parse(tree) # or xml.dom.minidom.parseString(xml_string)
+# pretty_xml_as_string = xml.toprettyxml()
+
 print('make: {}'.format(result_world))
+
 tree.write(os.path.join(location,result_world), encoding="us-ascii", xml_declaration=True, method="xml")
+# f=open(os.path.join(location,result_world),'w')
+# f.write(pretty_xml_as_string)
+# f.close()
