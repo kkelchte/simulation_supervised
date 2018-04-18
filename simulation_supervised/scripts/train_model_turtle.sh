@@ -18,6 +18,7 @@ python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=2
 TAG=test_train_online
 GRAPHICS=true
+# EVALUATE_N=3
 EVALUATE_N=20
 while getopts ":t:m:n:w:s:p:g:" o; do
     case "${o}" in
@@ -184,6 +185,7 @@ do
   NUM=$((flight_num%${#WORLDS[@]}))
 
   # evaluate every EVALUATE_N runs
+  # if [[ ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) ]] ; then
   if [[ ( ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) || ( $flight_num -gt $((NUMBER_OF_FLIGHTS-10)) ) ) && ( $NUMBER_OF_FLIGHTS -gt 50 ) ]] ; then
     echo "EVALUATING"
     EVALUATE=true
