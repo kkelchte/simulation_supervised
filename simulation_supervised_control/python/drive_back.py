@@ -16,6 +16,14 @@ from subprocess import call
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+#--------------------------------------------------------------------------------------------------------------
+#
+# Drive back turns the turtlebot away from a bump by rotating around its z-axis.
+# When the road is free /go is published an empty message to bring fsm in running state.
+# The service is started with an empty message on '/db_start'
+# Control is published on /db_vel
+# 
+#--------------------------------------------------------------------------------------------------------------
 
 
 state='idle' #idle or driving back...
@@ -75,14 +83,13 @@ if __name__=="__main__":
   if rospy.has_param('depth_image'): 
     rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, depth_callback)
   else:
-    raise IOError('[depth_heuristic.py] did not find any depth image topic!')
+    raise IOError('[drive_back.py] did not find any depth image topic!')
     
 
-  if rospy.has_param('control'): 
-    action_pub = rospy.Publisher(rospy.get_param('control'), Twist, queue_size=1)
+  action_pub = rospy.Publisher('db_vel', Twist, queue_size=1)
 
-  rospy.Subscriber('/drive_back', Empty, drive_back_callback)
-  drive_back_pub = rospy.Publisher('/free_road', Empty, queue_size=1)
+  rospy.Subscriber('/db_start', Empty, drive_back_callback)
+  drive_back_pub = rospy.Publisher('/go', Empty, queue_size=1)
   
   # anim=animation.FuncAnimation(fig,animate)
   # plt.show()

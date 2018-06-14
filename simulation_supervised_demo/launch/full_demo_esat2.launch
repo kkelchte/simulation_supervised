@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <include file="$(find simulation_supervised)/launch/load_params.launch"/>
-  <include file="$(find simulation_supervised_demo)/launch/esat_v2.launch">
-  	<arg name="gui" value="true"/>
-  </include>
-</launch>

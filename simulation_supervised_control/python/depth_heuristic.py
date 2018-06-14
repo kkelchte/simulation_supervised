@@ -16,11 +16,13 @@ from subprocess import call
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-# Check groundtruth for height
-# Log position
-# Check depth images for bump 
-# Check time for success
-# write log when finished and shutdown
+
+#--------------------------------------------------------------------------------------------------------------
+#
+# Oracle for driving turtlebot in simulation or the real-world based on the LiDAR lazer range finder
+# Starts with start_dh topic and publishes control on dh_vel topic.
+#
+#--------------------------------------------------------------------------------------------------------------
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -49,17 +51,8 @@ def ready_callback(msg):
     ready = True
     finished = False
     
-def finished_callback(msg):
-  global ready, finished
-  """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
-  if ready and not finished:
-    print('[depth_heuristic]: Control deactivated.')
-    ready = False
-    finished = True
-
 def depth_callback(data):
   global action_pub, x
-  # x=np.array(data.ranges)
   # clip at 0.5m and make 'broken' 0 readings also 0.5
   ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
@@ -94,28 +87,17 @@ def depth_callback(data):
 
 
 if __name__=="__main__":
-  rospy.init_node('control_heuristic', anonymous=True)
-  # create necessary directories
-  if rospy.has_param('delay_evaluation'):
-    delay_evaluation=rospy.get_param('delay_evaluation')
-  if rospy.has_param('flight_duration'):
-    flight_duration=rospy.get_param('flight_duration')
-  if rospy.has_param('min_allowed_distance'):
-    min_allowed_distance=rospy.get_param('min_allowed_distance')
+  rospy.init_node('depth_heuristic', anonymous=True)
   
   if rospy.has_param('depth_image'): 
     rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, depth_callback)
   else:
     raise IOError('[depth_heuristic.py] did not find any depth image topic!')
     
+  action_pub = rospy.Publisher('/dh_vel', Twist, queue_size=1)
 
-  if rospy.has_param('control'): 
-    action_pub = rospy.Publisher('/tf_vel', Twist, queue_size=1)
-
-  if rospy.has_param('ready'): 
-    ready_pub = rospy.Subscriber(rospy.get_param('ready'), Empty,ready_callback)
-  if rospy.has_param('finished'): 
-    finished_pub = rospy.Subscriber(rospy.get_param('finished'), Empty,finished_callback)
+  ready_pub = rospy.Subscriber('dh_start', Empty,ready_callback)  
+  # finished_pub = rospy.Subscriber('dh_stop', Empty,finished_callback)
   
   anim=animation.FuncAnimation(fig,animate)
   plt.show()

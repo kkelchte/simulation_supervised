@@ -1,4 +1,4 @@
-# PS3 wireless controller
+# con wireless controller
 
 #define PS3_BUTTON_SELECT            0
 #define PS3_BUTTON_STICK_LEFT        1
@@ -43,7 +43,7 @@ teleop:
   piloting:
     type: topic
     message_type: "geometry_msgs/Twist"
-    topic_name: /ps3_vel
+    topic_name: /con_vel
     axis_mappings:
       -
         axis: 3  # Right thumb stick (up/down)

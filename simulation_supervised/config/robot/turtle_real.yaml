@@ -1,0 +1,12 @@
+#sensor topics
+rgb_image: /raspicam_node/image/compressed
+depth_image: /scan
+gt_info: /odom
+# #general simulation topics
+# control: /tf_vel
+# ready: /ready
+# finished: /finished
+# #used between joystick and control mapping
+# go: /go
+# overtake: /overtake
+# ps3_top: /ps3_vel

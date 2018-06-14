@@ -1,0 +1,12 @@
+takeoff: /bebop/takeoff
+land: /bebop/land
+emergency: /bebop/emergency
+flattrim: /bebop/flattrim
+control: /bebop/cmd_vel
+# ready: /bebop/ready
+# overtake: /bebop/overtake
+rgb_image: /bebop/image_raw
+# rec_on: /bebop/rec_on
+# rec_off: /bebop/rec_off
+# ps3_top: /bebop/ps3_vel
+# tweak_roll: 50

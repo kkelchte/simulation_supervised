@@ -31,14 +31,14 @@ include_directories(
 catkin_package()
 
 catkin_install_python(PROGRAMS
-    python/evaluate.py
     python/create_dataset.py
     python/create_dataset_turtle.py
-    python/show_control.py
-    python/ground_truth_listener.py
-    python/console_display.py
+    python/visualizers/show_control.py
+    python/visualizers/ground_truth_listener.py
+    python/visualizers/console_display.py
     python/control_mapping.py
-    python/show_depth_prediction.py
-    python/monitor.py
+    python/fsm.py
+    python/visualizers/show_depth_prediction.py
+    python/visualizers/monitor.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
