@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find simulation_supervised)/launch/load_params.launch">
+    <arg name="drone_config" value="bebop_real.yaml"/>
+  </include>
+  
+  <!-- start bebops driver -->
+  <include file="$(find bebop_driver)/launch/bebop_node.launch"/>
+  
+  <!-- start joy node with big ben config -->
+  <arg name="namespace" default="bebop" />
+  <group ns="$(arg namespace)">
+    <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch"/>
+  </group>
+  <!-- map control to right topics -->
+  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+
+  <!-- display console -->
+  <node name="console_display" pkg="simulation_supervised_tools" type="console_display.py" output="log"/>
+  
+  <arg name="saving_location" default="/tmp"/>
+  <param name="saving_location" value="$(arg saving_location)"/>
+  <param name="save_images" value="true"/>
+  
+  <!-- display control -->
+  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
+  
+  <!-- display depth prediction -->
+  <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="log"/>
+
+  <!-- visualize the image raw topic
+  <node name="image_view" pkg="image_view" type="image_view" output="screen" args="image:=/kinect/rgb/image_raw"/>-->
+
+</launch>

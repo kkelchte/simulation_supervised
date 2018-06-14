@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Define parameters from arguments -->
+  <arg name="world_name" default="canyon"/>
+  <param name="world_name" value="$(arg world_name)"/><!-- used by rosinterface to label runs -->
+
+  <!-- Load parameters for environment-->
+  <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+
+  <!-- Load parameters for fsm-->
+  <arg name="fsm_config" default="console_fsm"/>
+  <rosparam command="load" file="$(find simulation_supervised)/config/fsm/$(arg fsm_config).yaml"/> 
+  
+  <!-- Gazebo with world -->
+  <arg name="gui" default="true"/>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched-->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!--use line for spawning world from .dae mesh in gz model folder-->
+    <arg name="world_name" value="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" default="true"/>
+  </include>
+
+  <!-- Turtle robot  -->
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="Yspawned" default="1.57"/>
+  <include file="$(find klaas_robots)/launch/spawn_turtlebot.launch">
+    <arg name="x_pos" value="$(arg x)"/>
+    <arg name="y_pos" value="$(arg y)"/>
+    <arg name="Y_pos" default="$(arg Yspawned)"/>
+  </include>
+  
+  <!-- FSM node -->
+  <!-- <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/> -->
+
+  <!-- Console: Big Ben -->
+<!--   <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
+    <arg name="joy_config" value="bigben_turtlebot"/> 
+  </include>
+ -->  <!-- Oracle: Depth Heuristic -->
+  <!-- Drive Back Service -->
+
+  <!-- Create data -->
+
+  <!-- Visualizations -->
+  <!-- Show control -->
+  <!-- Show depth prediction -->
+  <!-- Keep trajectory -->
+</launch>

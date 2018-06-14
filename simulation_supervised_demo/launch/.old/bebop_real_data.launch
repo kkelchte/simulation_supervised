@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find simulation_supervised)/launch/load_params.launch">
+    <arg name="drone_config" value="bebop_real.yaml"/>
+  </include>
+  
+  <!-- start bebops driver -->
+  <include file="$(find bebop_driver)/launch/bebop_node.launch"/>
+  
+  <!-- start joy node with big ben config -->
+  <arg name="namespace" default="bebop" />
+  <group ns="$(arg namespace)">
+    <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
+      <arg name="joy_config" value="bigben_direct"/> 
+      <!-- use bigben direct to map from ps3 directly to cmd_vel without control mapping -->
+    </include>
+  </group>
+  
+  <!-- display console -->
+  <node name="console_display" pkg="simulation_supervised_tools" type="console_display.py" output="log"/>
+  <!-- <param name="save_images" value="true"/> -->
+  
+  <!-- display control -->
+  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="log"/>
+  
+</launch>
