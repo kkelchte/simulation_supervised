@@ -2,9 +2,12 @@
 <launch>
   <!-- Define parameters from arguments -->
   <arg name="world_name" default="canyon"/>
-  <param name="world_name" value="$(arg world_name)"/><!-- used by rosinterface to label runs -->
+  <param name="world_name" value="$(arg world_name)"/>
+  <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the correct model is used -->
+  <param name="evaluate" value="$(arg evaluate)"/>
 
   <!-- Load parameters for environment-->
+  <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->
   <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
 
   <!-- Load parameters for fsm-->
@@ -31,15 +34,22 @@
     <arg name="Y_pos" default="$(arg Yspawned)"/>
   </include>
   
-  <!-- FSM node -->
-  <!-- <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/> -->
-
-  <!-- Console: Big Ben -->
-<!--   <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
-    <arg name="joy_config" value="bigben_turtlebot"/> 
+  <!-- Console: simple (only overtake and go) -->
+  <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
+    <arg name="joy_config" value="simple_console"/> 
   </include>
- -->  <!-- Oracle: Depth Heuristic -->
+  
+  <!-- Control Mapping (should start before fsm) -->
+  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+
+  <!-- FSM node -->
+  <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/>
+
+  <!-- Oracle: Depth Heuristic -->
+  <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/>
+
   <!-- Drive Back Service -->
+  <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/>
 
   <!-- Create data -->
 
@@ -47,4 +57,10 @@
   <!-- Show control -->
   <!-- Show depth prediction -->
   <!-- Keep trajectory -->
+
+
+
+  <!-- Debugging -->
+  <!-- add RQT to visualize the changes and avoid the launch to quit -->
+  <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/>
 </launch>

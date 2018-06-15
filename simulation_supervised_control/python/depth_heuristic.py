@@ -24,37 +24,27 @@ import matplotlib.animation as animation
 #
 #--------------------------------------------------------------------------------------------------------------
 
+clip_distance = 0.8
+
 # Instantiate CvBridge
 bridge = CvBridge()
 
-flight_duration = -1 #amount of seconds drone should be flying, in case of no checking: use -1
-delay_evaluation = 3
-ready=False
-finished=True
 control_pub=None
 
 fig=plt.figure(figsize=(10,5))
 plt.title('Depth_heuristic')
 
 x=np.zeros((3))
-barcollection=plt.bar(range(3),[0.5 for k in range(3)],align='center',color='blue')
+barcollection=plt.bar(range(3),[clip_distance for k in range(3)],align='center',color='blue')
 
 def animate(n):
   for i, b in enumerate(barcollection):
     b.set_height(x[i])
 
-def ready_callback(msg):
-  global ready, finished
-  """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
-  if not ready and finished:
-    print('[depth_heuristic]: Control activated.')
-    ready = True
-    finished = False
-    
 def depth_callback(data):
   global action_pub, x
-  # clip at 0.5m and make 'broken' 0 readings also 0.5
-  ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
+  # clip at clip_distance m and make 'broken' 0 readings also clip_distance 
+  ranges=[clip_distance if r > clip_distance or r==0 else r for r in data.ranges]
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
   ranges=list(reversed(ranges[:45]))+list(reversed(ranges[-45:]))
 
@@ -64,7 +54,10 @@ def depth_callback(data):
   front_width=47
   x=[min(ranges[0:45-front_width/2]),min(ranges[45-front_width/2:45+front_width/2]),min(ranges[45+front_width/2:])]
   
-  index=np.argmax(x)
+  if sum(x) == 3*clip_distance: # In case all space is free, go straight. 
+    index=1
+  else:
+    index=np.argmax(x)
 
   yaw_dict={0:1, # turn left
             1:0, # drive straight
@@ -72,9 +65,7 @@ def depth_callback(data):
 
   speed_dict={0:0.1, 1:0.3, 2:0.1}  
 
-  print("[depth_heuristic]: min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
-  
-
+  # print("[depth_heuristic]: min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
   msg = Twist()
 
   msg.linear.x = speed_dict[index]
@@ -94,11 +85,8 @@ if __name__=="__main__":
   else:
     raise IOError('[depth_heuristic.py] did not find any depth image topic!')
     
-  action_pub = rospy.Publisher('/dh_vel', Twist, queue_size=1)
+  action_pub = rospy.Publisher('dh_vel', Twist, queue_size=1)
 
-  ready_pub = rospy.Subscriber('dh_start', Empty,ready_callback)  
-  # finished_pub = rospy.Subscriber('dh_stop', Empty,finished_callback)
-  
   anim=animation.FuncAnimation(fig,animate)
   plt.show()
 

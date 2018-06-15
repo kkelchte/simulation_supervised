@@ -1,4 +1,4 @@
-control: /cmd_vel_mux/input/teleop
-rgb_image: /camera/camera/rgb/image_raw
-depth_image: /camera/camera/depth/image_raw
+control: /cmd_vel
+rgb_image: /rp/camera/image_raw
+depth_image: /scan
 gt_info: /odom

@@ -1,4 +1,10 @@
-# con wireless controller
+#------------------------------------------------------------------------------------
+# 
+# This is a simple definition of only navigation with the two continuous joysticks
+# and /overtake as well as /go functionality.
+#
+#------------------------------------------------------------------------------------
+
 
 #define PS3_BUTTON_SELECT            0
 #define PS3_BUTTON_STICK_LEFT        1
@@ -48,17 +54,17 @@ teleop:
       -
         axis: 3  # Right thumb stick (up/down)
         target: linear.x
-        scale: 0.1
+        scale: 0.5
         offset: 0.0
       -
         axis: 2  # Right thumb stick (left/right)
         target: linear.y
-        scale: 0.0
+        scale: 0.5
         offset: 0.0
       -
         axis: 1  # Left thumb stick (up/down)
         target: linear.z
-        scale: 0.2
+        scale: 1
         offset: 0.0
       -
         axis: 0  # Left thumb stick (left/right)

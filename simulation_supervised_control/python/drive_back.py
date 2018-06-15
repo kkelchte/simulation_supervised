@@ -71,7 +71,7 @@ def depth_callback(data):
 		drive_back_pub.publish(Empty())
 	else:
 		# 3. else turn so that road becomes free.
-		print('[drive_back]: turning turning turning...')
+		# print('[drive_back]: turning turning turning...')
 		msg = Twist()
 		msg.angular.z = -1
 		action_pub.publish(msg)
