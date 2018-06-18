@@ -16,11 +16,10 @@ usage() { echo "Usage: $0 [-t LOGTAG: tag used to name logfolder]
     [-p \" PARAMS \" : space-separated list of tensorflow flags ex \" --max_episodes 20 \" ]" 1>&2; exit 1; }
 python_script="start_python_sing_ql.sh"
 NUMBER_OF_FLIGHTS=2
-TAG=test_train_online
+TAG=test_evaluate_online
 GRAPHICS=true
-# EVALUATE_N=3
-EVALUATE_N=20
-while getopts ":t:m:n:w:s:p:g:" o; do
+RECOVERY=false
+while getopts ":t:m:n:w:s:p:g:r:" o; do
     case "${o}" in
         t)
             TAG=${OPTARG} ;;
@@ -36,6 +35,8 @@ while getopts ":t:m:n:w:s:p:g:" o; do
             PARAMS+=(${OPTARG}) ;;
         g)
             GRAPHICS=${OPTARG} ;; 
+        r)
+            RECOVERY=${OPTARG} ;; 
         *)
             usage ;;
     esac
@@ -46,7 +47,13 @@ if [ -z "$WORLDS" ] ; then
   WORLDS=(canyon)
 fi
 
-echo "+++++++++++++++++++++++TRAIN+++++++++++++++++++++"
+if [ -z "$MODELDIR" ] ; then
+  echo "$(tput setaf 1) (evaluate_model.sh): NO MODEL PROVIDED TO EVALUATE."
+  tput sgr 0 
+  exit
+fi
+
+echo "+++++++++++++++++++++++EVALUATE+++++++++++++++++++++"
 echo "TAG=$TAG"
 echo "MODELDIR=$MODELDIR"
 echo "NUMBER_OF_FLIGHTS=$NUMBER_OF_FLIGHTS"
@@ -54,22 +61,24 @@ echo "WORLDS=${WORLDS[@]}"
 echo "PYTHON SCRIPT=$python_script"
 echo "PARAMS=${PARAMS[@]}"
 echo "GRAPHICS=$GRAPHICS"
-echo "EVALUATING EVERY $EVALUATE_N TIMES"
-
-
-# Add 10 evaluation flights:
-if [ $NUMBER_OF_FLIGHTS -gt 50 ] ; then 
-  NUMBER_OF_FLIGHTS=$((NUMBER_OF_FLIGHTS+10))
-fi
+echo "RECOVERY=$RECOVERY"
 
 RANDOM=125 #seed the random sequence
 # Change params to string in order to parse it with sed.
 PARAMS="${PARAMS[@]}"
+PARAMS="$(echo $PARAMS | sed 's/--scratch\s//')"
+# ensure continue_training is True [without assuming anything]
+PARAMS="$(echo $PARAMS | sed 's/--continue_training\s//')"
+PARAMS="$PARAMS --continue_training"
+
+if [ -z $(echo $PARAMS | grep load_config) ] ; then
+  PARAMS="$PARAMS --load_config"
+fi
 ######################################################
 # Start roscore and load general parameters
 start_ros(){
   echo "start_ros"
-  roslaunch simulation_supervised load_params.launch global_param:=turtle_param.yaml drone_config:=sim_turtle.yaml&
+  roslaunch simulation_supervised load_params.launch global_param:=online_param.yaml&
   pidros=$!
   echo "PID ROS: " $pidros
   sleep 10  
@@ -79,33 +88,21 @@ start_ros
 ######################################################
 # If graphics is false ensure showdepth is false
 if [ $GRAPHICS = false ] ; then
-  PARAMS="$PARAMS --show_depth" #default is True ==> change to False
+  PARAMS="$(echo $PARAMS | sed 's/--show_depth\s//')"
+  PARAMS="$PARAMS --dont_show_depth"
 fi  
 ######################################################
 # Start tensorflow with command defined above
-# if logdir already exists probably condor job is just restarted somewhere so use this as modeldir
-if [[ -d $HOME/tensorflow/log/$TAG && $TAG != 'test_train_online' && $(ls $HOME/tensorflow/log/$TAG/2018* | wc -l ) -gt 6 ]] ; then
-  MODELDIR=$HOME/tensorflow/log/$TAG
-  # in case scratch was True, change it to False [without assuming anything]
-  # PARAMS="$(echo $PARAMS | sed 's/--scratch\s\S+//')"
-  # PARAMS="$PARAMS --scratch False"
-  # ensure continue_training is True [without assuming anything]
-  # PARAMS="$(echo $PARAMS | sed 's/--continue_training\s\S+//')"
-  PARAMS="$(echo $PARAMS | sed 's/--continue_training//')"
-  # PARAMS="$PARAMS --continue_training True" 
-  PARAMS="$PARAMS --continue_training" 
-else
-  mkdir -p $HOME/tensorflow/log/$TAG
-fi
+mkdir -p $HOME/tensorflow/log/$TAG
 cd $HOME/tensorflow/log/$TAG
 
 start_python(){
   echo "start python"
-  LOGDIR="$TAG/$(date +%F_%H%M)_train"
+  LOGDIR="$TAG/$(date +%F_%H%M)_eval"
   LLOC="$HOME/tensorflow/log/$LOGDIR"
-  ARGUMENTS="--log_tag $LOGDIR $PARAMS"
-  if [ ! -z $MODELDIR ] ; then
-    ARGUMENTS="$ARGUMENTS --checkpoint_path $MODELDIR"
+  ARGUMENTS="--log_tag $LOGDIR --checkpoint_path $MODELDIR $PARAMS"
+  if [ $RECOVERY = true ] ; then
+    ARGUMENTS="$ARGUMENTS --recovery"
   fi
   COMMANDP="$(rospack find simulation_supervised)/scripts/$python_script $ARGUMENTS"
   echo $COMMANDP
@@ -158,21 +155,6 @@ restart(){
   crash_number=0
   #location for logging
   start_ros
-
-  if [ "$(ls $LLOC | wc -l)" -ge 7 ] ; then
-    echo "Continue training from $LLOC"
-    MODELDIR="$(dirname $LLOC)"
-    # in case scratch was True, change it to False [without assuming anything]
-    # PARAMS="$(echo $PARAMS | sed 's/--scratch \s\S+//')"
-    # PARAMS="$PARAMS --scratch False"
-    # ensure continue_training is True [without assuming anything]
-    # PARAMS="$(echo $PARAMS | sed 's/--continue_training \s\S+//')"
-    PARAMS="$(echo $PARAMS | sed 's/--continue_training//')"
-    PARAMS="$PARAMS --continue_training"  
-  else 
-    echo "Clean up $LLOC"
-    rm -r $LLOC
-  fi
   start_python
 }
 
@@ -184,16 +166,6 @@ do
   echo "run: $flight_num"
   NUM=$((flight_num%${#WORLDS[@]}))
 
-  # evaluate every EVALUATE_N runs
-  # if [[ ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) ]] ; then
-  if [[ ( ( $((flight_num%EVALUATE_N)) -eq 0 && $flight_num -ne 0 ) || ( $flight_num -gt $((NUMBER_OF_FLIGHTS-10)) ) ) && ( $NUMBER_OF_FLIGHTS -gt 50 ) ]] ; then
-    echo "EVALUATING"
-    EVALUATE=true
-  else
-    EVALUATE=false
-  fi
-
-  
   if [ -e $LLOC/tf_log ] ; then
     old_stat="$(stat -c %Y $LLOC/tf_log)"
   else
@@ -213,11 +185,16 @@ do
   echo "$(date +%F_%H-%M) -----------------------> Started with run: $flight_num crash_number: $crash_number"
   x=0
   y=0
-  Y=1.57
-  LAUNCHFILE="${WORLDS[NUM]}_turtle.launch"
+  if [ ${WORLDS[NUM]} == sandbox ] ; then
+    z=0.5
+  else 
+    z=1
+  fi
+  Y=1.57  
+  LAUNCHFILE="${WORLDS[NUM]}.launch"
   COMMANDR="roslaunch simulation_supervised_demo $LAUNCHFILE\
-   Yspawned:=$Y x:=$x y:=$y log_folder:=$LLOC\
-   $EXTRA_ARGUMENTS graphics:=$GRAPHICS evaluate:=$EVALUATE"
+   Yspawned:=$Y x:=$x y:=$y starting_height:=$z log_folder:=$LLOC\
+   evaluate:=true $EXTRA_ARGUMENTS graphics:=$GRAPHICS recovery:=$RECOVERY"
   echo $COMMANDR
   # STARTING TIME
   START=$(date +%s)
@@ -276,13 +253,13 @@ do
         new_stat="$(stat -c %Y $LLOC/tf_log)"
         cnt=$((cnt+1)) 
         if [ $cnt -gt 300 ] ; then 
-          echo "[train_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
+          echo "[evaluate_model.sh] Waited for 5minutes on tf_log restarting python and ROS."
           restart
         fi 
         sleep 1
       done
     else 
-      echo "[train_model.sh] Could not find $LLOC/tf_log"
+      echo "[evaluate_model.sh] Could not find $LLOC/tf_log"
       exit 
     fi
     flight_num=$((flight_num+1))

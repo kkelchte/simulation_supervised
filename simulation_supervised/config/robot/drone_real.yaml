@@ -6,6 +6,7 @@ control: /bebop/cmd_vel
 # ready: /bebop/ready
 # overtake: /bebop/overtake
 rgb_image: /bebop/image_raw
+gt_info: /odom
 # rec_on: /bebop/rec_on
 # rec_off: /bebop/rec_off
 # ps3_top: /bebop/ps3_vel

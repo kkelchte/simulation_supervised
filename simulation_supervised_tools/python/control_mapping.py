@@ -118,9 +118,9 @@ if __name__=="__main__":
   nn_sub = rospy.Subscriber('nn_vel', Twist, nn_cb)
   db_sub = rospy.Subscriber('db_vel', Twist, db_cb) 
 
-  # load initial configuration from rosparam control sequence
-  if rospy.has_param('control_sequence'): pilot=rospy.get_param('control_sequence')['0']
-  if rospy.has_param('supervision_sequence'): superviser = rospy.get_param('supervision_sequence')['0']
+  # load initial configuration from rosparam control sequence --> done by fsm when time > delay_evaluation 
+  # if rospy.has_param('control_sequence'): pilot=rospy.get_param('control_sequence')['0']
+  # if rospy.has_param('supervision_sequence'): superviser = rospy.get_param('supervision_sequence')['0']
 
   # spin() simply keeps python from exiting until this node is stopped  
   rospy.spin()

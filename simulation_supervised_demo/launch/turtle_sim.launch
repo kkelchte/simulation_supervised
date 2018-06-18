@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Define parameters from arguments -->
+  <arg name="log_folder" default="/tmp/log"/>
+  <param name="log_folder" value="$(arg log_folder)"/>
   <arg name="world_name" default="canyon"/>
   <param name="world_name" value="$(arg world_name)"/>
   <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the correct model is used -->
   <param name="evaluate" value="$(arg evaluate)"/>
-
+  
+  <arg name="save_images" default="false"/>
+  <param name="save_images" value="$(arg save_images)"/>
+  
   <!-- Load parameters for environment-->
   <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->
   <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
@@ -15,7 +20,7 @@
   <rosparam command="load" file="$(find simulation_supervised)/config/fsm/$(arg fsm_config).yaml"/> 
   
   <!-- Gazebo with world -->
-  <arg name="gui" default="true"/>
+  <arg name="gui" default="false"/>
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched-->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!--use line for spawning world from .dae mesh in gz model folder-->
@@ -39,28 +44,27 @@
     <arg name="joy_config" value="simple_console"/> 
   </include>
   
-  <!-- Control Mapping (should start before fsm) -->
+  <!-- Control Mapping -->
   <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
 
   <!-- FSM node -->
   <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/>
 
-  <!-- Oracle: Depth Heuristic -->
+  <!-- Oracle: Depth Heuristic (default: idle) -->
   <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/>
 
-  <!-- Drive Back Service -->
+  <!-- Drive Back Service (default: idle) -->
   <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/>
 
   <!-- Create data -->
+  <node name="create_dataset" pkg="simulation_supervised_tools" type="create_dataset.py" output="screen"/>
 
   <!-- Visualizations -->
   <!-- Show control -->
   <!-- Show depth prediction -->
   <!-- Keep trajectory -->
 
-
-
   <!-- Debugging -->
   <!-- add RQT to visualize the changes and avoid the launch to quit -->
-  <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/>
+  <!-- <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/> -->
 </launch>

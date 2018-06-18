@@ -22,6 +22,8 @@ import matplotlib.animation as animation
 # When the road is free /go is published an empty message to bring fsm in running state.
 # The service is started with an empty message on '/db_start'
 # Control is published on /db_vel
+# Node remains idle as long as drive_back_start is not called.
+# By default bar plot animation is left out.
 # 
 #--------------------------------------------------------------------------------------------------------------
 

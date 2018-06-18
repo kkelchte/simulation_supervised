@@ -47,6 +47,11 @@ control_sequence = None
 supervision_sequence = None
 current_state = None
 
+# In case of creating a dataset
+save_images = False
+start_createds_pub = None
+stop_createds_pub = None
+
 # General publishers
 state_pub = None
 control_map_pub = None
@@ -57,6 +62,7 @@ stop_nn_pub = None
 
 # dh: depth heuristic (oracle for turtlebot)
 start_dh_pub = None
+stop_dh_pub = None
 
 # db: drive back
 start_db_pub = None
@@ -74,27 +80,36 @@ positions = []
 
 shuttingdown = False
 
-def go_cb(data):
-  """Callback on /go to change from 0 or 2 to 1 state"""
-  global current_state
-  if len(state_sequence) >= 2:
-    current_state = state_sequence[1]
-    state_pub.publish(current_state)
-    control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
-  else:
-    current_state = state_sequence[0]
-    state_pub.publish(current_state)
-    control_map_pub.publish(control_sequence['0']+"_"+supervision_sequence['0'])
-  print("[fsm.py] current state: {}".format(current_state))
-
-def overtake_cb(data):
-  """Callback on /overtake to change from state 1 or 2 to state 0."""
+def init():
+  """Initialize state 0 which is IDLE or RUNNING depending on the number of states."""
+  """When current time > start time  + delay evaluation, control nodes of state '0' should start as well as control mapping."""
   global current_state
   current_state = state_sequence[0]
   state_pub.publish(current_state)
   control_map_pub.publish(control_sequence['0']+"_"+supervision_sequence['0'])
+  if "NN" in control_sequence.values() or "NN" in supervision_sequence.values(): start_nn_pub.publish(Empty())
+  if "DH" in control_sequence.values() or "DH" in supervision_sequence.values(): start_dh_pub.publish(Empty())
+  print("[fsm.py] current state: {}".format(current_state))
+  # in case there is only 1 state: save images
+  if save_images and start_createds_pub and len(state_sequence)==1: start_createds_pub.publish(Empty())
+
+
+def go_cb(data):
+  """Callback on /go to change from 0 or 2 to 1 state"""
+  global current_state
+  if len(state_sequence) >= 2: #if there is only 1 state, the 'go' signal is not used 
+    current_state = state_sequence[1]
+    state_pub.publish(current_state)
+    control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
+    if save_images and start_createds_pub: start_createds_pub.publish(Empty())
   print("[fsm.py] current state: {}".format(current_state))
 
+def overtake_cb(data):
+  """Callback on /overtake to change from state 1 or 2 to state 0."""
+  init()
+  if save_images and stop_createds_pub and len(state_sequence)>=2: stop_createds_pub.publish(Empty())
+
+  
 def shutdown():
   global shuttingdown, current_state
   """Shutdown is called from any evaluation method, bringing the fsm potentially in state 2.
@@ -105,6 +120,9 @@ def shutdown():
   finished_pub.publish(Empty()) # DEPRECATED
   if stop_nn_pub: 
     stop_nn_pub.publish(Empty()) # let NN know that there is a break.
+  # Pause the saving of images.
+  if save_images and stop_createds_pub: 
+    stop_createds_pub.publish(Empty())
 
   # Go to state 2
   if start_db_pub and len(state_sequence) > 2:
@@ -161,7 +179,6 @@ def depth_cb(msg):
 def scan_cb(data):
   """Read in depth scan and check the minimum value to detect a bump used by the turtle."""
   if shuttingdown or (rospy.get_time()-start_time < delay_evaluation): return
-
   # Preprocess depth:
   ranges=[1 if r > 1 or r==0 else r for r in data.ranges]
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
@@ -175,13 +192,14 @@ def scan_cb(data):
 
 def gt_cb(data):
   """Check the traveled distance over the maximum travelled distance before shutdown and keep track of positions for logging.
-  This callback has also the special function to start the clock (start_time) of this node. 
+  This callback has also the special function to start the clock (start_time) of this node and in the same way initialize the controlmapping for the first time. 
   If the gt_cb is not used, the other callbacks will never start as they can't check there delay evaluation."""
-  global current_pos, success, positions, start_time
+  global current_pos, success, positions, start_time, current_state
   current_pos=[data.pose.pose.position.x,
               data.pose.pose.position.y,
               data.pose.pose.position.z]
   if start_time == -1: start_time=rospy.get_time()
+  if rospy.get_time() > start_time+delay_evaluation and current_state == None: init()
   if max_duration != -1: time_check()
   positions.append(current_pos)
   if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance and not shuttingdown:
@@ -208,12 +226,15 @@ if __name__=="__main__":
     control_sequence=rospy.get_param('control_sequence')
   if rospy.has_param('supervision_sequence'):
     supervision_sequence=rospy.get_param('supervision_sequence')
+  if rospy.has_param('save_images'):
+    save_images=rospy.get_param('save_images')
 
-  print("got FSM states: {} \n".format(state_sequence))
-  print("got FSM controls: {} \n".format(control_sequence))
+  print("[fsm.py]: states: {}".format(state_sequence))
+  print("[fsm.py]: controls: {}".format(control_sequence))
+  print("[fsm.py]: saving images: {}".format(save_images))
 
   if not state_sequence or not control_sequence:
-    print("No FSM configuration found so shutting down...")
+    print("[fsm.py]: No FSM configuration found so shutting down...")
     sys.exit()
 
   # publish current state on '/fsm_state'
@@ -232,22 +253,28 @@ if __name__=="__main__":
     # subscribe to topic /go in case there is more than 1 state, to change from state 0/2 to state 1
     rospy.Subscriber('/go', Empty, go_cb)
   # NN: switch between running and idle where NN computes gradients in case of learning
-  if 'NN' in control_sequence.values():
+  if 'NN' in control_sequence.values() or 'NN' in supervision_sequence.values():
     start_nn_pub = rospy.Publisher('/nn_start', Empty, queue_size=10)
     stop_nn_pub = rospy.Publisher('/nn_stop', Empty, queue_size=10)
-    start_nn_pub.publish(Empty())
   # BA: has its own fsm that counts down, takes off, adjusts height and start OA
-  # DH: should always be running
-  # if 'DH' in control_sequence.values():
-  #   start_dh_pub = rospy.Publisher('/dh_start', Empty, queue_size=10)
+  # DH: turn on and off with publisehrs
+  if 'DH' in control_sequence.values() or 'DH' in supervision_sequence.values():
+    start_dh_pub = rospy.Publisher('/dh_start', Empty, queue_size=10)
+    stop_dh_pub = rospy.Publisher('/dh_stop', Empty, queue_size=10)
   # DB: drive back is triggered when a bump is detected in a 3 state FSM, db gives a go when the road is free
   if 'DB' in control_sequence.values():
     start_db_pub = rospy.Publisher('/db_start', Empty, queue_size=10)
+
+  # add publishers for starting and stopping the create_dataset node:
+  if save_images:
+    start_createds_pub=rospy.Publisher('/createds_start', Empty, queue_size=10)
+    stop_createds_pub=rospy.Publisher('/createds_stop', Empty, queue_size=10)
+
   
   
-  # set initial state
-  current_state = state_sequence[0]
-  state_pub.publish(current_state)
+  # set initial state --> done after time > delay_evaluation
+  # current_state = state_sequence[0]
+  # state_pub.publish(current_state)
 
   # Check out parameters for evaluation
   if rospy.has_param('delay_evaluation'): 
@@ -262,9 +289,14 @@ if __name__=="__main__":
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_cb)
   
   if rospy.has_param('log_folder'): 
-    log_folder=rospy.get_param('log_folder')
-  else:
-    log_folder = '/tmp/log'
+    loc=rospy.get_param('log_folder')
+    if loc[0]=='/':
+      log_folder=loc
+    else:
+      log_folder=os.printenv('HOME')+'/tensorflow/log/'+loc
+    if not os.path.exists(log_folder): os.makedirs(log_folder)
+  print '[fsm]: log folder: {} '.format(log_folder)
+
   if rospy.has_param('world_name') :
     world_name = os.path.basename(rospy.get_param('world_name').split('.')[0])
     if 'sandbox' in world_name: world_name='sandbox'

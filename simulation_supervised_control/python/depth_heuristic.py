@@ -21,6 +21,7 @@ import matplotlib.animation as animation
 #
 # Oracle for driving turtlebot in simulation or the real-world based on the LiDAR lazer range finder
 # Starts with start_dh topic and publishes control on dh_vel topic.
+# Bar plot is left out by default.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -31,11 +32,14 @@ bridge = CvBridge()
 
 control_pub=None
 
-fig=plt.figure(figsize=(10,5))
-plt.title('Depth_heuristic')
+ready = False # toggle on and off with start_dh and stop_dh
+finished = True 
+
+# fig=plt.figure(figsize=(10,5))
+# plt.title('Depth_heuristic')
 
 x=np.zeros((3))
-barcollection=plt.bar(range(3),[clip_distance for k in range(3)],align='center',color='blue')
+# barcollection=plt.bar(range(3),[clip_distance for k in range(3)],align='center',color='blue')
 
 def animate(n):
   for i, b in enumerate(barcollection):
@@ -43,6 +47,7 @@ def animate(n):
 
 def depth_callback(data):
   global action_pub, x
+  if not ready or finished: return
   # clip at clip_distance m and make 'broken' 0 readings also clip_distance 
   ranges=[clip_distance if r > clip_distance or r==0 else r for r in data.ranges]
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
@@ -76,7 +81,20 @@ def depth_callback(data):
   # print("[depth_heuristic]: speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
   action_pub.publish(msg)
 
+def ready_callback(msg):
+  """ callback function that makes DH starts and toggles ready"""
+  global ready, finished
+  if not ready and finished:
+    ready = True
+    finished = False
 
+def finished_callback(msg):
+  """ callback function that makes DH stop and toggles finished"""
+  global ready, finished
+  if ready and not finished:
+    ready = False
+    finished = True
+    
 if __name__=="__main__":
   rospy.init_node('depth_heuristic', anonymous=True)
   
@@ -87,7 +105,10 @@ if __name__=="__main__":
     
   action_pub = rospy.Publisher('dh_vel', Twist, queue_size=1)
 
-  anim=animation.FuncAnimation(fig,animate)
-  plt.show()
+  rospy.Subscriber('/dh_start', Empty, ready_callback)
+  rospy.Subscriber('/dh_stop', Empty, finished_callback)
+
+  # anim=animation.FuncAnimation(fig,animate)
+  # plt.show()
 
   rospy.spin()
