@@ -33,6 +33,7 @@ num_bins=36 # should be able to divide 360
 
 fig=plt.figure(figsize=(10,5))
 plt.title('Drive_back')
+anim = None
 
 x=np.zeros((num_bins))
 barcollection=plt.bar(range(num_bins),[0.5*360./num_bins for k in range(num_bins)],align='center',color='blue')
@@ -45,39 +46,43 @@ def drive_back_callback(msg):
   global state
   """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
   if state != 'driving':
-		state='driving'
-		print('[drive_back]: Driving back service started.')
+    state='driving'
+    print('[drive_back]: Driving back service started.')
 
 
 def depth_callback(data):
-	global action_pub, x, state
+  global action_pub, x, state
 
-	if state == 'idle': return
-	# 1. Process lazer range data: getting the closest octant
+  if state == 'idle': return
+  # 1. Process lazer range data: getting the closest octant
 
-	# clip at 0.5m and make 'broken' 0 readings also 0.5
-	ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
+  # clip at 0.5m and make 'broken' 0 readings also 0.5
+  ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
 
-	# discriteze in 360/num_bins octants
+  # discriteze in 360/num_bins octants
 
-	# ranges=[np.sum(ranges[10*i:10*(i+1)]) for i in range(num_bins)]
-	ranges=[np.sum(ranges[360/num_bins*i:360/num_bins*(i+1)]) for i in range(num_bins)]
-	x=np.array(ranges)
-	
-	# 2. check if current depth is indicating a free road quit driving and go to idle state
-	# print("[drive_back]: min index: {0}".format(np.argmin(ranges)))
+  # ranges=[np.sum(ranges[10*i:10*(i+1)]) for i in range(num_bins)]
+  ranges=[np.sum(ranges[360/num_bins*i:360/num_bins*(i+1)]) for i in range(num_bins)]
+  x=np.array(ranges)
+  
+  # 2. check if current depth is indicating a free road quit driving and go to idle state
+  # print("[drive_back]: min index: {0}".format(np.argmin(ranges)))
 
-	if 3./8*num_bins < np.argmin(ranges) and np.argmin(ranges) < 5./8*num_bins:
-		print("[drive_back]: Drive back to free road is done.")
-		state='idle'
-		drive_back_pub.publish(Empty())
-	else:
-		# 3. else turn so that road becomes free.
-		# print('[drive_back]: turning turning turning...')
-		msg = Twist()
-		msg.angular.z = -1
-		action_pub.publish(msg)
+  if 3./8*num_bins < np.argmin(ranges) and np.argmin(ranges) < 5./8*num_bins:
+    print("[drive_back]: Drive back to free road is done.")
+    state='idle'
+    drive_back_pub.publish(Empty())
+  else:
+    # 3. else turn so that road becomes free.
+    # print('[drive_back]: turning turning turning...')
+    msg = Twist()
+    msg.angular.z = -1
+    action_pub.publish(msg)
 
+def cleanup():
+  """Get rid of the animation on shutdown"""
+  plt.close(fig)
+  plt.close()
 
 if __name__=="__main__":
   rospy.init_node('drive_back', anonymous=True)
@@ -93,7 +98,12 @@ if __name__=="__main__":
   rospy.Subscriber('/db_start', Empty, drive_back_callback)
   drive_back_pub = rospy.Publisher('/go', Empty, queue_size=1)
   
-  # anim=animation.FuncAnimation(fig,animate)
-  # plt.show()
+  if rospy.has_param('graphics'):
+    if rospy.get_param('graphics'):
+      print("[drive_back]: showing grphics.")
+      anim=animation.FuncAnimation(fig,animate)
+      plt.show()
+
+  rospy.on_shutdown(cleanup)
 
   rospy.spin()

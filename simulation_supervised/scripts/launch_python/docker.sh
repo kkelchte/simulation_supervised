@@ -9,11 +9,14 @@ $HOME/simsup_ws/devel/lib/python2.7/dist-packages:\
 export LD_LIBRARY_PATH=$HOME/simsup_ws/devel/lib:\
 $HOME/drone_ws/devel/lib:/opt/ros/kinetic/lib:\
 /usr/local/cuda/lib64:/usr/local/cudnn/lib64:\
-/.singularity.d/libs
+/usr/local/nvidia/lib64
 
-cd $HOME/tensorflow/pilot/pilot
-python_command="python main.py --online $@"
-echo "start_python_sing.sh:"
-echo $python_command
-$python_command
+# cd $HOME/tensorflow/pilot/pilot
+# python_command="python main.py --online $@"
+# echo "start_python_docker.sh:"
+# echo $python_command
+# $python_command
 
+python $@
+
+echo 'docker: done'

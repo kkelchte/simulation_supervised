@@ -35,11 +35,11 @@ control_pub=None
 ready = False # toggle on and off with start_dh and stop_dh
 finished = True 
 
-# fig=plt.figure(figsize=(10,5))
-# plt.title('Depth_heuristic')
+fig=plt.figure(figsize=(10,5))
+plt.title('Depth_heuristic')
+barcollection=plt.bar(range(3),[clip_distance for k in range(3)],align='center',color='blue')
 
 x=np.zeros((3))
-# barcollection=plt.bar(range(3),[clip_distance for k in range(3)],align='center',color='blue')
 
 def animate(n):
   for i, b in enumerate(barcollection):
@@ -95,6 +95,11 @@ def finished_callback(msg):
     ready = False
     finished = True
     
+def cleanup():
+  """Get rid of the animation on shutdown"""
+  plt.close(fig)
+  plt.close()
+
 if __name__=="__main__":
   rospy.init_node('depth_heuristic', anonymous=True)
   
@@ -108,7 +113,11 @@ if __name__=="__main__":
   rospy.Subscriber('/dh_start', Empty, ready_callback)
   rospy.Subscriber('/dh_stop', Empty, finished_callback)
 
-  # anim=animation.FuncAnimation(fig,animate)
-  # plt.show()
+  if rospy.has_param('graphics'):
+    if rospy.get_param('graphics'):
+      print("[depth_heuristic]: showing grphics.")
+      anim=animation.FuncAnimation(fig,animate)
+      plt.show()
+  rospy.on_shutdown(cleanup)
 
   rospy.spin()

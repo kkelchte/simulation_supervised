@@ -25,7 +25,7 @@ bridge = CvBridge()
 #
 # Create dataset is a node that combines all the required steps for saving information into a dataset.
 # The function starts saving on /createds_start and stops on /createds_stop coming from fsm or console.
-# The log-information is written away for each image at the saving_location from rosparam log_folder.
+# The log-information is written away for each image at the data_location from rosparam log_folder.
 # The rgb images are saved in log_folder/RGB, while depth images are saved at log_folder/Depth.
 # The log information follows the index of the RGB and Depth image.
 # There is an index counter shared between depth and RGB that is incremented by both image inputs.
@@ -46,7 +46,7 @@ bridge = CvBridge()
 #--------------------------------------------------------------------------------------------------------------------------------
 
 
-saving_location = None
+data_location = None
 index=0
 last_supervised_control=[0,0,0,0,0,0]
 last_control=[0,0,0,0,0,0]
@@ -73,7 +73,7 @@ def process_rgb(msg, index):
     # Save your OpenCV2 image as a jpeg 
     if index > skip_first: 
       # print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.forma, index, rospy.get_time()))
-      cv2.imwrite(saving_location+"/RGB/{:010d}.jpg".format(index), rgb_image)
+      cv2.imwrite(data_location+"/RGB/{:010d}.jpg".format(index), rgb_image)
     return True
 
 def image_callback(msg):
@@ -95,7 +95,7 @@ def process_depth(msg, index):
     im=im*(1/5.*255) # scale from 0:5 to 0:255
     if index > skip_first: 
       # print('[create_dataset.py]: {2}: write Depth image {1} to {0}'.forma, index, rospy.get_time()))
-      cv2.imwrite(saving_location+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))
+      cv2.imwrite(data_location+"/Depth/{:010d}.jpg".format(index), im.astype(np.int))
     return True
 
 def depth_callback(msg):
@@ -196,17 +196,17 @@ def write_info(image_type, index):
   position=last_position[:]
   scan=last_scan[:]
   # open and append information
-  with open(saving_location+'/supervised_info.txt','a') as supervised_controlfile:
+  with open(data_location+'/supervised_info.txt','a') as supervised_controlfile:
     supervised_controlfile.write("{0:010d} {1[0]} {1[1]} {1[2]} {1[3]} {1[4]} {1[5]}\n".format(index, supervised_control))
-  with open(saving_location+'/control_info.txt','a') as controlfile:
+  with open(data_location+'/control_info.txt','a') as controlfile:
     controlfile.write("{0:010d} {1[0]} {1[1]} {1[2]} {1[3]} {1[4]} {1[5]}\n".format(index, control))
-  with open(saving_location+'/position_info.txt','a') as positionfile:
+  with open(data_location+'/position_info.txt','a') as positionfile:
     positionfile.write("{0:010d} {1}\n".format(index, str(position)))
-  with open(saving_location+'/odom_info.txt','a') as odomfile:
+  with open(data_location+'/odom_info.txt','a') as odomfile:
     odomfile.write("{0:010d} {1}\n".format(index, str(odom)))
-  with open(saving_location+'/images.txt','a') as imagesfile:
-    imagesfile.write("{3}s:{4}ns {0}/{1}/{2:010d}.jpg\n".format(saving_location, image_type, index, rospy.get_rostime().secs, rospy.get_rostime().nsecs))
-  with open(saving_location+'/scan.txt','a') as scanfile:
+  with open(data_location+'/images.txt','a') as imagesfile:
+    imagesfile.write("{3}s:{4}ns {0}/{1}/{2:010d}.jpg\n".format(data_location, image_type, index, rospy.get_rostime().secs, rospy.get_rostime().nsecs))
+  with open(data_location+'/scan.txt','a') as scanfile:
     scanfile.write("{0:010d} {1}\n".format(index, str(scan)))
 
 
@@ -217,27 +217,30 @@ if __name__=="__main__":
   rospy.Subscriber('/createds_start', Empty, ready_callback)
   rospy.Subscriber('/createds_stop', Empty, finished_callback)
 
-  # setup saving location
-  if rospy.has_param('log_folder'):
-    loc=rospy.get_param('log_folder')
+  # setup saving location in ~/pilot_data
+  if rospy.has_param('data_location'):
+    loc=rospy.get_param('data_location')
     if loc[0]=='/':
-      saving_location=loc
+      data_location=loc
     else:
-      saving_location=os.printenv('HOME')+'/tensorflow/log/'+loc
-  print '[create dataset]: saving_location: {}'.format(saving_location)
-  if not os.path.exists(saving_location+'/RGB'): os.makedirs(saving_location+'/RGB')
-  if not os.path.exists(saving_location+'/Depth'): os.makedirs(saving_location+'/Depth')
+      data_location=os.printenv('HOME')+'/pilot_data/'+loc
+  if not data_location:
+    print '[create dataset]: Found no saving location: {}'.format(data_location)
+    sys.exit(2)
+  print '[create dataset]: Saving location: {}'.format(data_location)
+  if not os.path.exists(data_location+'/RGB'): os.makedirs(data_location+'/RGB')
+  if not os.path.exists(data_location+'/Depth'): os.makedirs(data_location+'/Depth')
 
   # initialize info files with a header defining information saved
-  with open(saving_location+'/control_info.txt','w') as controlfile:
+  with open(data_location+'/control_info.txt','w') as controlfile:
     controlfile.write("Actual control \n index | linear velocity x, y, z, angular velocity x, y, z\n")
-  with open(saving_location+'/supervised_info.txt','w') as supervised_controlfile:
+  with open(data_location+'/supervised_info.txt','w') as supervised_controlfile:
     supervised_controlfile.write("Supervised control \n index | linear velocity x, y, z, angular velocity x, y, z\n")
-  with open(saving_location+'/position_info.txt','w') as positionfile:
+  with open(data_location+'/position_info.txt','w') as positionfile:
     positionfile.write("Position in global frame\n index | x | y | z | \n")
-  with open(saving_location+'/odom_info.txt','w') as odomfile:
+  with open(data_location+'/odom_info.txt','w') as odomfile:
     odomfile.write("Odometry between two frames \n index | x | y | z | roll | pitch | yaw |\n")
-  with open(saving_location+'/scan.txt','w') as scanfile:
+  with open(data_location+'/scan.txt','w') as scanfile:
     scanfile.write("Read out LiDAR scan\n index | 360 degrees scan readings clipped at 5m |\n")
   
   # initialize subscribers
@@ -258,13 +261,13 @@ if __name__=="__main__":
   #   callbacks_depth={'left':{'30':depth_callback_left_30,'60':depth_callback_left_60},'right':{'30':depth_callback_right_30,'60':depth_callback_right_60}}
   #   for d in ['left','right']:
   #     for c in ['30','60']:
-  #       rospy.Subscriber(re.sub(r"kinect","kinect_"+d+"_"+c,rospy.get_param('rgb_image')), Image, callbacks[d][c],(saving_location+'_'+d+'_'+c))
-  #       rospy.Subscriber(re.sub(r"kinect","kinect_"+d+"_"+c,rospy.get_param('depth_image')), Image, callbacks_depth[d][c],(saving_location+'_'+d+'_'+c))
+  #       rospy.Subscriber(re.sub(r"kinect","kinect_"+d+"_"+c,rospy.get_param('rgb_image')), Image, callbacks[d][c],(data_location+'_'+d+'_'+c))
+  #       rospy.Subscriber(re.sub(r"kinect","kinect_"+d+"_"+c,rospy.get_param('depth_image')), Image, callbacks_depth[d][c],(data_location+'_'+d+'_'+c))
   #       # create necessary directories
-  #       if not os.path.exists(saving_location+'_'+d+'_'+c+'/RGB'):
-  #           os.makedirs(saving_location+'_'+d+'_'+c+'/RGB')
-  #       if not os.path.exists(saving_location+'_'+d+'_'+c+'/Depth'):
-  #           os.makedirs(saving_location+'_'+d+'_'+c+'/Depth')
+  #       if not os.path.exists(data_location+'_'+d+'_'+c+'/RGB'):
+  #           os.makedirs(data_location+'_'+d+'_'+c+'/RGB')
+  #       if not os.path.exists(data_location+'_'+d+'_'+c+'/Depth'):
+  #           os.makedirs(data_location+'_'+d+'_'+c+'/Depth')
 
   # spin() simply keeps python from exiting until this node is stopped	
   rospy.spin()

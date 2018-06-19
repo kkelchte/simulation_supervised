@@ -1,0 +1,5 @@
+scratch: True
+n_fc: True
+auxiliary_depth: False
+model: depth_q_net
+output_size: [200,200]

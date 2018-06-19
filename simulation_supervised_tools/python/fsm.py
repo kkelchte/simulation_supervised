@@ -8,7 +8,7 @@ from sensor_msgs.msg import Image
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 
-from subprocess import call
+import subprocess,shlex
 
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
@@ -76,6 +76,7 @@ delay_evaluation = -1
 min_depth = -1
 world_name='unk'
 positions = []
+log_folder='~/tensorflow/log/tmp'
 
 
 shuttingdown = False
@@ -140,16 +141,13 @@ def shutdown():
   write(log_folder+'/log_positions',msg)
 
   # Kill simulator from pidfile in log folder.
-  pidfile=log_folder+'/pid'
+  pidfile=log_folder+'/.pid'
   if os.path.isfile(pidfile) and len(state_sequence) <= 2:
     with open(pidfile, 'r') as pf:
-      pid=pf.read()[:-1]
-    # gzpid = commands.getstatusoutput('ps -ef | grep gzserver | tail -1')[1].split(' ')[]
-    # print("gzserver pid: {}".format(gzpid))
-    # call("$(kill -9 "+gzpid+")", shell=True)
-    # time.sleep(5)
+      pid=pf.read()
+    print("[fsm.py]: killing pid {}".format(pid))
     time.sleep(1)
-    call("$(kill -9 "+pid+")", shell=True)
+    subprocess.Popen(shlex.split("kill "+pid)).wait()
 
 
 def time_check():
