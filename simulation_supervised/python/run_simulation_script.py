@@ -59,9 +59,9 @@ def load_param_file(location):
       yaml_str = "{0} --{1} {2}".format(yaml_str, k, yaml_dict[k])
   return yaml_str
 
-def kill_combo():
-  """kill ros, python and gazebo pids and wait for them to finish"""
-  global ros_popen, python_popen, gazebo_popen
+def kill_gazebo():
+  """gazebo popen is not enough to get gzserver to stop so wait longer..."""
+  global gazebo_popen
   if gazebo_popen and gazebo_popen.poll() == None:
     print("{0}: terminate gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     gazebo_popen.terminate()
@@ -73,6 +73,11 @@ def kill_combo():
       p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
       p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
       time.sleep(0.2)  
+  
+def kill_combo():
+  """kill ros, python and gazebo pids and wait for them to finish"""
+  global ros_popen, python_popen, gazebo_popen
+  kill_gazebo()
   if python_popen and python_popen.poll() == None:
     print("{0}: terminate python".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     python_popen.terminate()
@@ -81,6 +86,7 @@ def kill_combo():
     print("{0}: terminate ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     ros_popen.terminate()
     ros_popen.wait()
+  time.sleep(5)
 
 ##########################################################################################################################
 # STEP 1 Load Parameters
@@ -350,8 +356,7 @@ while run_number < FLAGS.number_of_runs:
       crashed=True
       crash_number+=1
       if crash_number < 3:
-        gazebo_popen.terminate()
-        gazebo_popen.wait()
+        kill_gazebo()
       else:
         print("{0}: crashed for third time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
         kill_combo()
@@ -380,7 +385,7 @@ while run_number < FLAGS.number_of_runs:
     print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
     # increment the run numbers
     run_number+=1
-
+    time.sleep(10)
 # after all required runs are finished
 kill_combo()
 print("\n{0}: done.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
