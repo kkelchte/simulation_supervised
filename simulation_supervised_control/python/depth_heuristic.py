@@ -25,7 +25,7 @@ import matplotlib.animation as animation
 #
 #--------------------------------------------------------------------------------------------------------------
 
-clip_distance = 0.8
+clip_distance = 5
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -115,7 +115,7 @@ if __name__=="__main__":
 
   if rospy.has_param('graphics'):
     if rospy.get_param('graphics'):
-      print("[depth_heuristic]: showing grphics.")
+      print("[depth_heuristic]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()
   rospy.on_shutdown(cleanup)

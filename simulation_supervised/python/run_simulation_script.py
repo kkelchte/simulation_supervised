@@ -155,10 +155,12 @@ if FLAGS.create_dataset:
   if not os.path.isdir(FLAGS.data_location):
     os.makedirs(FLAGS.data_location)
   else:
-    # in case there is already data recorded, parse the number of runs and continue from there
-    last_run=sorted([d for d in os.listdir(FLAGS.data_location) if os.path.isdir("{0}/{1}".format(FLAGS.data_location,d))])[-1]
-    run_number=int(last_run.split('_')[0]) #assuming number occurs at first 5 digits xxxxx_name_of_data
-    print("Found data from previous run so adjusted run_number to {}".format(run_number))
+    # check number of items already recorded
+    if len(os.listdir(FLAGS.data_location)) >= 1:
+      # in case there is already data recorded, parse the number of runs and continue from there
+      last_run=sorted([d for d in os.listdir(FLAGS.data_location) if os.path.isdir("{0}/{1}".format(FLAGS.data_location,d))])[-1]
+      run_number=int(last_run.split('_')[0]) #assuming number occurs at first 5 digits xxxxx_name_of_data
+      print("Found data from previous run so adjusted run_number to {}".format(run_number))
 
 # display and save all settings
 print("\nSettings:")

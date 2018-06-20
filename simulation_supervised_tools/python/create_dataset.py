@@ -110,7 +110,7 @@ def scan_callback(msg):
     global last_scan
     if (not ready) or finished: return
     # Clip at 5m and put zeros at 5m 
-    last_scan=[5 if r > 1 or r==0 else r for r in msg.ranges]
+    last_scan=[5 if r > 5 or r==0 else r for r in msg.ranges]
 
 
 def control_callback(data):
@@ -223,7 +223,7 @@ if __name__=="__main__":
     if loc[0]=='/':
       data_location=loc
     else:
-      data_location=os.printenv('HOME')+'/pilot_data/'+loc
+      data_location=os.environ['HOME']+'/pilot_data/'+loc
   if not data_location:
     print '[create dataset]: Found no saving location: {}'.format(data_location)
     sys.exit(2)

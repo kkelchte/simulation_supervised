@@ -7,9 +7,7 @@
 # drive back           | DB
 # 
 # Define names of different states for the 1, 2 or 3-state setting
-
 state_sequence: ['running']
-
 # Choose which control is commanding or supervising in the corresponding states
 control_sequence: {'0': 'CON'}
 supervision_sequence: {'0': 'NULL'}

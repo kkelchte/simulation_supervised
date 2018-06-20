@@ -7,8 +7,10 @@ import os,sys
 
 # np.random.seed(150)
 
+
 number_of_walls=150
-width = 3.0
+width = 3.0 #1
+height = 4 #2
 result_world='canyon.world'
 show_plan=False
 if len(sys.argv) >= 2:
@@ -75,7 +77,7 @@ for i,w in enumerate(walls):
     static.text='1'
     pos=ET.SubElement(model,'pose')
     yaw=-w[2]
-    pos.text= str(w[0][0])+' '+str(w[0][1])+' 2 0 0 '+str(yaw)    
+    pos.text= str(w[0][0])+' '+str(w[0][1])+' '+str(height/2)+' 0 0 '+str(yaw)    
     link=ET.SubElement(model, 'link', attrib={'name':'link'})
     collision = ET.SubElement(link, 'collision', attrib={'name':'collision'})
     visual = ET.SubElement(link, 'visual', attrib={'name':'visual'})
@@ -89,7 +91,7 @@ for i,w in enumerate(walls):
         geo = ET.SubElement(element, 'geometry')
         box = ET.SubElement(geo, 'box')
         size = ET.SubElement(box, 'size')
-        size.text='0.02 '+str(w[1])+' 4'
+        size.text='0.02 '+str(w[1])+' '+str(height)
 
 print('saved {1}{0} '.format(result_world, location))
 tree.write(os.path.join(location,result_world), encoding="us-ascii", xml_declaration=True, method="xml")

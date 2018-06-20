@@ -100,7 +100,7 @@ if __name__=="__main__":
   
   if rospy.has_param('graphics'):
     if rospy.get_param('graphics'):
-      print("[drive_back]: showing grphics.")
+      print("[drive_back]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()
 

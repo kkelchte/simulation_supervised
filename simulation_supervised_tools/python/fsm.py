@@ -52,6 +52,10 @@ save_images = False
 start_createds_pub = None
 stop_createds_pub = None
 
+# Communicate with gt_listener
+start_gt_listener_pub = None
+stop_gt_listener_pub = None
+
 # General publishers
 state_pub = None
 control_map_pub = None
@@ -91,9 +95,12 @@ def init():
   if "NN" in control_sequence.values() or "NN" in supervision_sequence.values(): start_nn_pub.publish(Empty())
   if "DH" in control_sequence.values() or "DH" in supervision_sequence.values(): start_dh_pub.publish(Empty())
   print("[fsm.py] current state: {}".format(current_state))
-  # in case there is only 1 state: save images
-  if save_images and start_createds_pub and len(state_sequence)==1: start_createds_pub.publish(Empty())
-
+  # in case there is only 1 state and save images
+  if len(state_sequence)==1: 
+    # start saving images
+    if save_images and start_createds_pub: start_createds_pub.publish(Empty())
+    # start listening to the ground truth position
+    if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
 
 def go_cb(data):
   """Callback on /go to change from 0 or 2 to 1 state"""
@@ -103,13 +110,15 @@ def go_cb(data):
     state_pub.publish(current_state)
     control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
     if save_images and start_createds_pub: start_createds_pub.publish(Empty())
+    if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
   print("[fsm.py] current state: {}".format(current_state))
 
 def overtake_cb(data):
   """Callback on /overtake to change from state 1 or 2 to state 0."""
+  if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())
+  if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
   init()
-  if save_images and stop_createds_pub and len(state_sequence)>=2: stop_createds_pub.publish(Empty())
-
+  
   
 def shutdown():
   global shuttingdown, current_state
@@ -121,9 +130,12 @@ def shutdown():
   finished_pub.publish(Empty()) # DEPRECATED
   if stop_nn_pub: 
     stop_nn_pub.publish(Empty()) # let NN know that there is a break.
+  
   # Pause the saving of images.
-  if save_images and stop_createds_pub: 
-    stop_createds_pub.publish(Empty())
+  if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())
+  
+  # Create a new image
+  if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
 
   # Go to state 2
   if start_db_pub and len(state_sequence) > 2:
@@ -268,6 +280,10 @@ if __name__=="__main__":
     start_createds_pub=rospy.Publisher('/createds_start', Empty, queue_size=10)
     stop_createds_pub=rospy.Publisher('/createds_stop', Empty, queue_size=10)
 
+  # add publishers for starting and stopping the ground_truth listener:
+  start_gt_listener_pub=rospy.Publisher('/gt_listener_start', Empty, queue_size=10)
+  stop_gt_listener_pub=rospy.Publisher('/gt_listener_stop', Empty, queue_size=10)
+
   
   
   # set initial state --> done after time > delay_evaluation
@@ -291,7 +307,7 @@ if __name__=="__main__":
     if loc[0]=='/':
       log_folder=loc
     else:
-      log_folder=os.printenv('HOME')+'/tensorflow/log/'+loc
+      log_folder=os.environ['HOME']+'/tensorflow/log/'+loc
     if not os.path.exists(log_folder): os.makedirs(log_folder)
   print '[fsm]: log folder: {} '.format(log_folder)
 
