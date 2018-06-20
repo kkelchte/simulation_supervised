@@ -66,6 +66,13 @@ def kill_combo():
     print("{0}: terminate gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     gazebo_popen.terminate()
     gazebo_popen.wait()
+    # gazebo_popen is not enough to get gzserver to stop so wait longer...
+    p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
+    p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+    while len(p_grep.communicate()[0]) != 0:
+      p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
+      p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+      time.sleep(0.2)  
   if python_popen and python_popen.poll() == None:
     print("{0}: terminate python".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     python_popen.terminate()
