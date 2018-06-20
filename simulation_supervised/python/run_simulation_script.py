@@ -382,10 +382,14 @@ while run_number < FLAGS.number_of_runs:
     print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
     # increment the run numbers
     run_number+=1
+<<<<<<< HEAD
     
     # continue with next run if gazebo if fully killed:
     wait_for_gazebo()
 
+=======
+    # time.sleep(10)
+>>>>>>> cdf107109904c6ecf955c28da8ddf54ff7442c40
 # after all required runs are finished
 kill_combo()
 print("\n{0}: done.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
