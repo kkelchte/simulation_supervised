@@ -59,33 +59,30 @@ def load_param_file(location):
       yaml_str = "{0} --{1} {2}".format(yaml_str, k, yaml_dict[k])
   return yaml_str
 
-def kill_gazebo():
+def wait_for_gazebo():
   """gazebo popen is not enough to get gzserver to stop so wait longer..."""
-  global gazebo_popen
-  if gazebo_popen and gazebo_popen.poll() == None:
-    print("{0}: terminate gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-    gazebo_popen.terminate()
-    gazebo_popen.wait()
-    # gazebo_popen is not enough to get gzserver to stop so wait longer...
+  p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
+  p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+  print("{0}: wait for gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+  while len(p_grep.communicate()[0]) != 0:
     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
     p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
-    while len(p_grep.communicate()[0]) != 0:
-      p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
-      p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
-      time.sleep(0.2)  
+    time.sleep(0.2)  
+
+def kill_popen(process_name, process_popen):
+  """Check status, terminate popen and wait for it to stop."""
+  print("{0}: terminate {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), process_name))
+  if process_popen.poll() == None:
+    process_popen.terminate()
+    process_popen.wait()
   
 def kill_combo():
   """kill ros, python and gazebo pids and wait for them to finish"""
   global ros_popen, python_popen, gazebo_popen
-  kill_gazebo()
-  if python_popen and python_popen.poll() == None:
-    print("{0}: terminate python".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-    python_popen.terminate()
-    python_popen.wait()
-  if ros_popen and ros_popen.poll() == None:
-    print("{0}: terminate ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-    ros_popen.terminate()
-    ros_popen.wait()
+  if gazebo_popen: kill_popen('gazebo', gazebo_popen)
+  wait_for_gazebo()
+  if python_popen: kill_popen('python', python_popen)
+  if ros_popen: kill_popen('ros', ros_popen)
   time.sleep(5)
 
 ##########################################################################################################################
@@ -356,7 +353,7 @@ while run_number < FLAGS.number_of_runs:
       crashed=True
       crash_number+=1
       if crash_number < 3:
-        kill_gazebo()
+        kill_popen('gazebo', gazebo_popen)
       else:
         print("{0}: crashed for third time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
         kill_combo()
@@ -385,7 +382,10 @@ while run_number < FLAGS.number_of_runs:
     print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
     # increment the run numbers
     run_number+=1
-    time.sleep(10)
+    
+    # continue with next run if gazebo if fully killed:
+    wait_for_gazebo()
+
 # after all required runs are finished
 kill_combo()
 print("\n{0}: done.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))

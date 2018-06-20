@@ -39,6 +39,7 @@ catkin_install_python(PROGRAMS
     python/control_mapping.py
     python/fsm.py
     python/visualizers/show_depth_prediction.py
+    python/visualizers/show_scan_prediction.py
     python/visualizers/monitor.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

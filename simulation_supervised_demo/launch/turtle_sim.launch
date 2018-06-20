@@ -74,6 +74,8 @@
   <!-- Visualizations -->
   <!-- Show control -->
   <!-- Show depth prediction -->
+  <!-- Show scan prediction -->
+  <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/>
   
   <!-- Debugging -->
   <!-- add RQT to visualize the changes and avoid the launch to quit -->
