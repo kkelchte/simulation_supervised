@@ -385,7 +385,7 @@ while run_number < FLAGS.number_of_runs:
     print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
     # increment the run numbers
     run_number+=1
-    time.sleep(10)
+    # time.sleep(10)
 # after all required runs are finished
 kill_combo()
 print("\n{0}: done.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
