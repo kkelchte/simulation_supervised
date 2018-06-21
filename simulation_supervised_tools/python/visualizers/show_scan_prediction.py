@@ -4,7 +4,7 @@ import rospy
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Empty
 import time
 import sys, select, tty, os, os.path
@@ -18,8 +18,8 @@ import matplotlib.animation as animation
 
 #--------------------------------------------------------------------------------------------------------------
 #
-# Show scan prediction displays the predicted and the ground truth scan information on top of the current view.
-# This node will only display if 3 sources (scan, predicted scan and rgb) is published.
+# Show scan prediction displays the predicted and the ground truth scan information.
+# This node will only display if 2 sources (scan, predicted scan) is published.
 # The node will save the images if save_images param is set true and there is a non-zero data_location.
 #
 #--------------------------------------------------------------------------------------------------------------
@@ -33,101 +33,92 @@ data_location='/tmp'
 save_images=False
 
 # Scan settings
-number_of_bins = 70
-clip_distance = 5 # don't care about everything further than 5m away.
+field_of_view = 180 # FOV in degrees
+# field_of_view = 120 # follow wide-angle camera model in klaas_robots
+clip_distance = 4 # don't care about everything further than 5m away.
+smooth_x = 1 # smooth over 4 neighboring bins
 
+# Global fields
+target_scan = None
+predicted_scan = None
 
 # Initialize plotting figure
 fig=plt.figure(figsize=(15,5))
 plt.title('Scan Predictions')
 
-barcollection=plt.bar(range(3),[clip_distance for k in range(3)],align='center',color='blue')
+# target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='blue',width=smooth_x*0.5/2)
+target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 1),[clip_distance for k in range(int(field_of_view))],align='center',color='blue',width=0.5)
+# perdicted_barcollection=plt.bar(np.arange(-field_of_view/2+1, field_of_view/2+1, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='red',width=smooth_x*0.5/2)
 
 def animate(n):
-  for i, b in enumerate(barcollection):
-    b.set_height(x[i])
-
-target_depth = np.zeros((120,240))
-predicted_depth = np.zeros((3,3*55,3*74))
-
-def combine_target_prediction():
-  big_image = np.ones((200,250+predicted_depth.shape[0]*230))  
-  
-  for i in range(predicted_depth.shape[0]):
-    d=5
-    big_image[20:20+predicted_depth.shape[1], 10+target_depth.shape[1]+(i+1)*d+i*predicted_depth.shape[2]:10+target_depth.shape[1]+(i+1)*d+(1+i)*predicted_depth.shape[2]] = predicted_depth[i,:,:]
-    
-  if target_depth.sum()!= 0:
-    big_image[35:35+target_depth.shape[0], 10:10+target_depth.shape[1]] = target_depth[:,:]
-
-  # if save_images:
-  #   cv2.imwrite(saving_location+'/'+'{0:010d}.jpg'.format(count),big_image)
-  #   count+=1
-
-  return big_image
+  # only animate if all fields are filled.
+  if target_scan: #and predicted_scan
+    # put even slots with target scan
+    for i, b in enumerate(target_barcollection):
+        b.set_height(target_scan[i])
+      # if i%2==0:
+      #   b.set_height(min(target_scan[i/2], clip_distance))
+      # else:
+      #   print 'set zero'
+      #   b.set_height=0
+    # put odd slots with predicted scan
+    # for i, b in enumerate(predicted_barcollection):
+    #   if i%2==1:
+    #     b.set_height(min(predicted_scan[i/2-1], clip_distance))
+    #   else:
+    #     b.set_height=0
 
 
-implot=plt.imshow(combine_target_prediction(),animated=True, cmap='winter')
-
-def update_im(*args):
-  image=combine_target_prediction()
-  implot.set_array(image)
-  return implot,
-
-anim=animation.FuncAnimation(fig,update_im)
-  
-def ready_callback(msg):
-  global ready, finished
-  if not ready:
-    print('[show_depth] ready')
-    ready = True
-    finished = False
-
-def finished_callback(msg):
-  global finished, ready, anim
-  if not finished:
-    print('finished')
-    finished = True
-    ready = False
-    anim.event_source.stop()
-    plt.close(fig)
-    
 def target_callback(data):
-  global target_depth
-  # if not ready: return
-  try:
-    # Convert your ROS Image message to OpenCV2
-    im = bridge.imgmsg_to_cv2(data, desired_encoding='passthrough')#gets float of 32FC1 depth image
-  except CvBridgeError as e:
-    print(e)
-  else:
-    im = im[::3,::3]
-    shp = im.shape
-    im=np.asarray([ e*1.0 if not np.isnan(e) else 0. for e in im.flatten()]).reshape(shp)
-    im = im*1/5.
-    target_depth = im[:,:]
-    # update()
+  """ Preprocess target scan (180degrees):
+  - clip values at clip_distance
+  - clip at -field_of_view/2:field_of_view
+  - set zeros to nans
+  - smooth over smooth_x neighboring range values
+  return clean scan
+  """
+  global target_scan
+  # clip left field_of_view/2 degree range from 0:field_of_view/2  reversed with right field_of_view/2 degree range from the last field_of_view/2 :
+  data.ranges=list(reversed(data.ranges[:field_of_view/2]))+list(reversed(data.ranges[-field_of_view/2:]))
+  ranges=[]
+  # clip at clip_distance m and make 'broken' 0 readings also clip_distance 
+  for r in data.ranges:
+    if r>clip_distance:
+      ranges.append(clip_distance) 
+    # elif r==0:
+    #   ranges.append(np.nan)
+    else:
+      ranges.append(r)
+  target_scan=ranges[:]
+  # smooth over smooth_x bins and save in target ranges
+  # ranges=[np.nanmean(ranges[4*i:4*i+smooth_x]) for i in range(len(ranges))]
     
 def predicted_callback(data):
   global predicted_depth
-  # if not ready: return
-  img = data.data
-  # check if the predicted depth contains probabilities instead:
-  if len(img.flatten()) < 10 and sum(img.flatten()) != 0: #in case only or less than 10 values are send these are most likely to be continuous output values.
-    for i in range(len(img.flatten())):
-      predicted_depth[i,:,:] = img.flatten()[i]*1/max(img.flatten())
-  else:
-    try:
-      img = img.reshape(-1,55,74)
-    except:
-      return
-      # img = predicted_depth.reshape(55,74)
-    img = img*1/5.
-    n=3
-    img = np.kron(img, np.ones((n,n)))
-    predicted_depth = img[:,:,:]
-  # update()
+  return
+#   # if not ready: return
+#   img = data.data
+#   # check if the predicted depth contains probabilities instead:
+#   if len(img.flatten()) < 10 and sum(img.flatten()) != 0: #in case only or less than 10 values are send these are most likely to be continuous output values.
+#     for i in range(len(img.flatten())):
+#       predicted_depth[i,:,:] = img.flatten()[i]*1/max(img.flatten())
+#   else:
+#     try:
+#       img = img.reshape(-1,55,74)
+#     except:
+#       return
+#       # img = predicted_depth.reshape(55,74)
+#     img = img*1/5.
+#     n=3
+#     img = np.kron(img, np.ones((n,n)))
+#     predicted_depth = img[:,:,:]
+#   # update()
 
+
+def cleanup():
+  """Get rid of the animation on shutdown"""
+  plt.close(fig)
+  plt.close()
 
   
 if __name__=="__main__":
@@ -135,8 +126,8 @@ if __name__=="__main__":
   
   rospy.Subscriber('/depth_prediction', numpy_msg(Floats), predicted_callback, queue_size = 1)
 
-  if rospy.has_param('depth_image'):
-    rospy.Subscriber(rospy.get_param('depth_image'), Image, target_callback, queue_size = 1)
+  if rospy.has_param('depth_image') and 'scan' in rospy.get_param('depth_image'):
+    rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, target_callback, queue_size = 1)
   
   # if rospy.has_param('saving_location'):
   #   loc=rospy.get_param('saving_location')
@@ -157,6 +148,11 @@ if __name__=="__main__":
   #     except:
   #       pass 
     
-  plt.show()
+  if rospy.has_param('graphics'):
+    if rospy.get_param('graphics'):
+      print("[show_scan_prediction]: showing graphics.")
+      anim=animation.FuncAnimation(fig,animate)
+      plt.show()
+  rospy.on_shutdown(cleanup)
 
   rospy.spin()

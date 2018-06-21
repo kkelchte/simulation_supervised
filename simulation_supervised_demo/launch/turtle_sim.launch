@@ -20,6 +20,14 @@
   
   <arg name="background" default=""/> <!-- used by create_dataset node to save all recorded data -->
   <param name="background" value="$(arg background)"/>
+
+  <arg name="full" default="false"/>
+  <group if="$(arg full)">
+    <!-- Load parameters for turtlesim as a full demonstration-->
+    <include file="$(find simulation_supervised)/launch/load_params.launch">
+      <arg name="robot_config" value="turtle_sim.yaml"/>
+    </include>
+  </group>
   
   <!-- Load parameters for environment-->
   <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->

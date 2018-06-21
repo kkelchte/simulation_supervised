@@ -1,4 +1,4 @@
 control: /cmd_vel
-rgb_image: /rp/camera/image_raw
+rgb_image: /wa/camera
 depth_image: /scan
 gt_info: /odom
