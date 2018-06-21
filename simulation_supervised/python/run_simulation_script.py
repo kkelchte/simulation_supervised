@@ -64,9 +64,11 @@ def wait_for_gazebo():
   p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
   p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
   print("{0}: wait for gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-  while len(p_grep.communicate()[0]) != 0:
+  out = p_grep.communicate()[0]
+  while "gzserver" in out:
     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
     p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+    out = p_grep.communicate()[0]
     time.sleep(0.2)  
 
 def kill_popen(process_name, process_popen):
