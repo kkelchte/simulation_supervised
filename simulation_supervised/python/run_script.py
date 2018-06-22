@@ -288,7 +288,7 @@ while run_number < FLAGS.number_of_runs:
   command="{0} world_name:={1}".format(command, world_name)
   
   print("\n{0}: started {3} run {1} of the {2} in {4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
-                                                          run_number, 
+                                                          run_number+1, 
                                                           FLAGS.number_of_runs, 
                                                           'evaluation' if evaluate else 'training',
                                                           world_name))
@@ -391,7 +391,7 @@ while run_number < FLAGS.number_of_runs:
     except:
       pass
     else:
-      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
+      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
     # increment the run numbers
     run_number+=1
     
