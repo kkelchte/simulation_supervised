@@ -173,7 +173,7 @@ if FLAGS.create_dataset:
     if len(os.listdir(FLAGS.data_location)) >= 1:
       # in case there is already data recorded, parse the number of runs and continue from there
       last_run=sorted([d for d in os.listdir(FLAGS.data_location) if os.path.isdir("{0}/{1}".format(FLAGS.data_location,d))])[-1]
-      run_number=int(last_run.split('_')[0]) #assuming number occurs at first 5 digits xxxxx_name_of_data
+      run_number=int(last_run.split('_')[0]) +1 #assuming number occurs at first 5 digits xxxxx_name_of_data
       print("Found data from previous run so adjusted run_number to {}".format(run_number))
 
 # display and save all settings
@@ -201,7 +201,7 @@ def start_ros():
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
   print("\n{0}: start_ros pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
-  time.sleep(8)  
+  time.sleep(1)  
 
 start_ros()
 
@@ -288,7 +288,7 @@ while run_number < FLAGS.number_of_runs:
   command="{0} world_name:={1}".format(command, world_name)
   
   print("\n{0}: started {3} run {1} of the {2} in {4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
-                                                          run_number, 
+                                                          run_number+1, 
                                                           FLAGS.number_of_runs, 
                                                           'evaluation' if evaluate else 'training',
                                                           world_name))
@@ -391,7 +391,7 @@ while run_number < FLAGS.number_of_runs:
     except:
       pass
     else:
-      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
+      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
     # increment the run numbers
     run_number+=1
     
