@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """ 
-Run_simulation_scripts governs the running of long gazebo_ros_tensorflow simulations.
+Run_long_script governs the running of long gazebo_ros_tensorflow simulations.
 
 The core functionality lies in: 
   1. parsing the correct arguments at different levels (tensorflow dnn, gazebo environment, ros supervision)
@@ -350,7 +350,7 @@ while run_number < FLAGS.number_of_runs:
       start_time=time.time()
     else:
       time_spend=time.time() - start_time
-    if time_spend > 300:
+    if time_spend > 300 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
       print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
@@ -363,6 +363,7 @@ while run_number < FLAGS.number_of_runs:
         start_python()
         crash_number = 0
     time.sleep(0.1)
+  print 'gazebo_popen.poll(): ', gazebo_popen.poll()
   if not crashed:
     # wait for tf_log and stop in case of no tensorflow communication
     if os.path.isfile(FLAGS.log_folder+'/tf_log'):  

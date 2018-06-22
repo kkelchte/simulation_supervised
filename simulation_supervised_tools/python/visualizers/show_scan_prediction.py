@@ -33,8 +33,7 @@ data_location='/tmp'
 save_images=False
 
 # Scan settings
-field_of_view = 180 # FOV in degrees
-# field_of_view = 120 # follow wide-angle camera model in klaas_robots
+field_of_view = 106 # FOV in degrees
 clip_distance = 4 # don't care about everything further than 5m away.
 smooth_x = 1 # smooth over 4 neighboring bins
 
@@ -46,27 +45,28 @@ predicted_scan = None
 fig=plt.figure(figsize=(15,5))
 plt.title('Scan Predictions')
 
+target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5),[clip_distance if k%2==1 else 0 for k in range(int(field_of_view/0.5)) ],align='center',color='blue',width=0.4)
+predicted_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5),[clip_distance if k%2==0 else 0 for k in range(int(field_of_view/0.5)) ],align='center',color='red',width=0.4)
 # target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='blue',width=smooth_x*0.5/2)
-target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 1),[clip_distance for k in range(int(field_of_view))],align='center',color='blue',width=0.5)
 # perdicted_barcollection=plt.bar(np.arange(-field_of_view/2+1, field_of_view/2+1, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='red',width=smooth_x*0.5/2)
 
 def animate(n):
   # only animate if all fields are filled.
-  if target_scan: #and predicted_scan
+  if target_scan:
     # put even slots with target scan
     for i, b in enumerate(target_barcollection):
-        b.set_height(target_scan[i])
-      # if i%2==0:
-      #   b.set_height(min(target_scan[i/2], clip_distance))
-      # else:
-      #   print 'set zero'
-      #   b.set_height=0
+      # b.set_height(target_scan[i])
+      if i%2==1:
+        b.set_height(min(target_scan[i/2-1], clip_distance))
+      else:
+        b.set_height=0
     # put odd slots with predicted scan
-    # for i, b in enumerate(predicted_barcollection):
-    #   if i%2==1:
-    #     b.set_height(min(predicted_scan[i/2-1], clip_distance))
-    #   else:
-    #     b.set_height=0
+  if predicted_scan:
+    for i, b in enumerate(predicted_barcollection):
+      if i%2==0:
+        b.set_height(min(predicted_scan[i/2], clip_distance))
+      else:
+        b.set_height=0
 
 
 def target_callback(data):
@@ -85,11 +85,12 @@ def target_callback(data):
   for r in data.ranges:
     if r>clip_distance:
       ranges.append(clip_distance) 
-    # elif r==0:
-    #   ranges.append(np.nan)
+    elif r==0:
+      ranges.append(np.nan)
     else:
       ranges.append(r)
   target_scan=ranges[:]
+  # print(len(target_scan))
   # smooth over smooth_x bins and save in target ranges
   # ranges=[np.nanmean(ranges[4*i:4*i+smooth_x]) for i in range(len(ranges))]
     

@@ -3,7 +3,7 @@
   <!-- Define parameters from arguments -->
   <arg name="log_folder" default="tmp"/> <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
   <param name="log_folder" value="$(arg log_folder)"/>
-  <arg name="world_name" default="canyon"/> <!-- worldname is used to load correct config, name logging and find modified logname -->
+  <arg name="world_name" default="objects"/> <!-- worldname is used to load correct config, name logging and find modified logname -->
   <param name="world_name" value="$(arg world_name)"/>
   <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> <!-- worldfile defines the actual gazebo world file loaded -->
   <param name="world_file" value="$(arg world_file)"/>
@@ -42,7 +42,8 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!--use line for spawning world from .dae mesh in gz model folder-->
     <arg name="world_name" value="$(arg world_file)"/>
-    <arg name="gui" value="$(arg graphics)"/>
+    <arg name="gui" value="false"/>
+    <!-- <arg name="gui" value="$(arg graphics)"/> -->
     <arg name="headless" default="true"/>
   </include>
 
@@ -83,7 +84,7 @@
   <!-- Show control -->
   <!-- Show depth prediction -->
   <!-- Show scan prediction -->
-  <!-- <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/> -->
+  <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/>
   
   <!-- Debugging -->
   <!-- add RQT to visualize the changes and avoid the launch to quit -->

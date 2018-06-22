@@ -9,5 +9,5 @@
 # Define names of different states for the 1, 2 or 3-state setting
 state_sequence: ['idle','running','returning']
 # Choose which control is commanding or supervising in the corresponding states
-control_sequence: {0: 'CON', 1: 'NN', 2: 'DB'}
-supervision_sequence: {0: 'NULL', 1: 'DH', 2: 'NULL'}
+control_sequence: {'0': 'CON', '1': 'NN', '2': 'DB'}
+supervision_sequence: {'0': 'NULL', '1': 'DH', '2': 'NULL'}
