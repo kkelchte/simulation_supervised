@@ -92,8 +92,10 @@ def init():
   current_state = state_sequence[0]
   state_pub.publish(current_state)
   control_map_pub.publish(control_sequence['0']+"_"+supervision_sequence['0'])
-  if "NN" in control_sequence.values() or "NN" in supervision_sequence.values(): start_nn_pub.publish(Empty())
-  if "DH" in control_sequence.values() or "DH" in supervision_sequence.values(): start_dh_pub.publish(Empty())
+
+  if "NN" in [control_sequence['0'], supervision_sequence['0']] and start_nn_pub: start_nn_pub.publish(Empty())
+  if "DH" in [control_sequence['0'], supervision_sequence['0']] and start_dh_pub: start_dh_pub.publish(Empty())
+    
   print("[fsm.py] current state: {}".format(current_state))
   # in case there is only 1 state and save images
   if len(state_sequence)==1: 
@@ -109,6 +111,8 @@ def go_cb(data):
     current_state = state_sequence[1]
     state_pub.publish(current_state)
     control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
+    if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
+    if "DH" in [control_sequence['1'], supervision_sequence['1']] and start_dh_pub: start_dh_pub.publish(Empty())
     if save_images and start_createds_pub: start_createds_pub.publish(Empty())
     if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
   print("[fsm.py] current state: {}".format(current_state))
@@ -117,6 +121,10 @@ def overtake_cb(data):
   """Callback on /overtake to change from state 1 or 2 to state 0."""
   if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())
   if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
+
+  if "NN" not in [control_sequence['0'], supervision_sequence['0']] and stop_nn_pub: stop_nn_pub.publish(Empty())
+  if "DH" not in [control_sequence['0'], supervision_sequence['0']] and stop_dh_pub: stop_dh_pub.publish(Empty())
+
   init()
   
   
@@ -128,14 +136,15 @@ def shutdown():
 
   # Warn other process transition from state 0 or 1 to shutdown or state 2
   finished_pub.publish(Empty()) # DEPRECATED
-  if stop_nn_pub: 
-    stop_nn_pub.publish(Empty()) # let NN know that there is a break.
   
   # Pause the saving of images.
   if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())
   
-  # Create a new image
+  # Create a new image with the trajectory
   if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
+
+  if "NN" not in [control_sequence['2'], supervision_sequence['2']] and stop_nn_pub: stop_nn_pub.publish(Empty())
+  if "DH" not in [control_sequence['2'], supervision_sequence['2']] and stop_dh_pub: stop_dh_pub.publish(Empty())
 
   # Go to state 2
   if start_db_pub and len(state_sequence) > 2:
