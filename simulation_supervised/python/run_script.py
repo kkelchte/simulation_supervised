@@ -173,7 +173,7 @@ if FLAGS.create_dataset:
     if len(os.listdir(FLAGS.data_location)) >= 1:
       # in case there is already data recorded, parse the number of runs and continue from there
       last_run=sorted([d for d in os.listdir(FLAGS.data_location) if os.path.isdir("{0}/{1}".format(FLAGS.data_location,d))])[-1]
-      run_number=int(last_run.split('_')[0]) #assuming number occurs at first 5 digits xxxxx_name_of_data
+      run_number=int(last_run.split('_')[0]) +1 #assuming number occurs at first 5 digits xxxxx_name_of_data
       print("Found data from previous run so adjusted run_number to {}".format(run_number))
 
 # display and save all settings
@@ -201,7 +201,7 @@ def start_ros():
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
   print("\n{0}: start_ros pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
-  time.sleep(8)  
+  time.sleep(1)  
 
 start_ros()
 
