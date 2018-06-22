@@ -160,9 +160,9 @@ def shutdown():
   # Create a new image with the trajectory
   if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
 
-  if len(state_sequence) >= 3:
-    if "NN" not in [control_sequence['2'], supervision_sequence['2']] and stop_nn_pub: stop_nn_pub.publish(Empty())
-    if "DH" not in [control_sequence['2'], supervision_sequence['2']] and stop_dh_pub: stop_dh_pub.publish(Empty())
+
+  if stop_nn_pub: stop_nn_pub.publish(Empty())
+  if stop_dh_pub: stop_dh_pub.publish(Empty())
 
   # Go to state 2
   if start_db_pub and len(state_sequence) > 2:
