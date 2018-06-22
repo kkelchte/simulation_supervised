@@ -26,6 +26,8 @@ import matplotlib.animation as animation
 #--------------------------------------------------------------------------------------------------------------
 
 clip_distance = 5
+front_width=50 #47 #define the width of free space in before drifing forward
+field_of_view=100 #90
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -34,6 +36,7 @@ control_pub=None
 
 ready = False # toggle on and off with start_dh and stop_dh
 finished = True 
+
 
 fig=plt.figure(figsize=(10,5))
 plt.title('Depth_heuristic')
@@ -48,21 +51,21 @@ def animate(n):
 def depth_callback(data):
   global action_pub, x
   if not ready or finished: return
-  # clip at clip_distance m and make 'broken' 0 readings also clip_distance 
-  ranges=[clip_distance if r > clip_distance or r==0 else r for r in data.ranges]
+  # Preprocess depth:
+  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
+
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
-  ranges=list(reversed(ranges[:45]))+list(reversed(ranges[-45:]))
+  ranges=list(reversed(ranges[:field_of_view/2]))+list(reversed(ranges[-field_of_view/2:]))
 
   # turn away from the minimum (non-zero) depth reading
   # discretize 3 bins (:-front_width/2:front_width/2:)
   # range that covers going straight.
-  front_width=47
-  x=[min(ranges[0:45-front_width/2]),min(ranges[45-front_width/2:45+front_width/2]),min(ranges[45+front_width/2:])]
+  x=[np.nanmin(ranges[0:field_of_view/2-front_width/2]),np.nanmin(ranges[field_of_view/2-front_width/2:field_of_view/2+front_width/2]),np.nanmin(ranges[field_of_view/2+front_width/2:])]
   
-  if sum(x) == 3*clip_distance: # In case all space is free, go straight. 
+  if sum(x) == 3*clip_distance: # In case all space is free, go straight. (set 1 as default as argmax takes 0 as default...)
     index=1
   else:
-    index=np.argmax(x)
+    index=np.argmax(x) # other wise go
 
   yaw_dict={0:1, # turn left
             1:0, # drive straight

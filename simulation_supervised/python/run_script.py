@@ -164,6 +164,8 @@ if not os.path.isdir("{0}/tensorflow/log/{1}".format(os.environ['HOME'], FLAGS.l
 # in case of data_creation, make data_location in ~/pilot_data
 if FLAGS.create_dataset: 
   FLAGS.data_location = "{0}/pilot_data/{1}".format(os.environ['HOME'], FLAGS.log_tag)
+  if os.path.isdir(FLAGS.data_location) and FLAGS.number_of_runs == 1:
+    shutil.rmtree(FLAGS.data_location)
   if not os.path.isdir(FLAGS.data_location):
     os.makedirs(FLAGS.data_location)
   else:
@@ -363,10 +365,14 @@ while run_number < FLAGS.number_of_runs:
         start_python()
         crash_number = 0
     time.sleep(0.1)
+  # gazebo_popen.poll() == 15 --> killed by script
+  # gazebo_popen.poll() == 0 --> killed by user 
+  # gazebo_popen.poll() == ? --> killed by fsm
+
   print 'gazebo_popen.poll(): ', gazebo_popen.poll()
-  if not crashed:
+  if not crashed :
     # wait for tf_log and stop in case of no tensorflow communication
-    if os.path.isfile(FLAGS.log_folder+'/tf_log'):  
+    if os.path.isfile(FLAGS.log_folder+'/tf_log'):
       current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
       start_time=time.time()
       while current_stat == prev_stat:
@@ -381,8 +387,12 @@ while run_number < FLAGS.number_of_runs:
       kill_combo()
       sys.exit(3)
     # check for success or failure from log file
-    success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
-    print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
+    try:
+      success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
+    except:
+      pass
+    else:
+      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
     # increment the run numbers
     run_number+=1
     

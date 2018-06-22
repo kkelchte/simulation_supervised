@@ -8,6 +8,7 @@ from sensor_msgs.msg import Image
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 
+import numpy as np
 import subprocess,shlex
 
 from cv_bridge import CvBridge, CvBridgeError
@@ -81,8 +82,11 @@ min_depth = -1
 world_name='unk'
 positions = []
 log_folder='~/tensorflow/log/tmp'
-
-
+clip_distance = 1
+field_of_view = 90
+run_number = 0 # in case a 3 or 2 fase fsm is running, this counter keeps track of the number of times /go has brought the FSM to state 1
+# value is not used for anything specific except for calling datalocation update
+data_location = ''
 shuttingdown = False
 
 def init():
@@ -104,15 +108,28 @@ def init():
     # start listening to the ground truth position
     if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
 
+def update_data_location():
+  """During a 3-state or 2-state run, create_ds node should change data_location 
+  from /path/to/location/00000_worldname to /path/to/location/00001_worldname and so on
+  """
+  global data_location
+  # parse previous run from name
+  prev_num=data_location.split('/')[-1].split('_')[0]
+  data_location=data_location.replace(prev_num,"{0:05d}".format(int(prev_num)+1))
+  rospy.set_param('data_location',data_location)
+    
 def go_cb(data):
   """Callback on /go to change from 0 or 2 to 1 state"""
-  global current_state
-  if len(state_sequence) >= 2: #if there is only 1 state, the 'go' signal is not used 
+  global current_state, shuttingdown, run_number
+  if len(state_sequence) >= 2: #if there is only 1 state, the 'go' signal is not used
+    shuttingdown = False 
+    run_number+=1
     current_state = state_sequence[1]
     state_pub.publish(current_state)
     control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
     if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
     if "DH" in [control_sequence['1'], supervision_sequence['1']] and start_dh_pub: start_dh_pub.publish(Empty())
+    if save_images and run_number > 1 and len(data_location) != 0: update_data_location() # increment data location 
     if save_images and start_createds_pub: start_createds_pub.publish(Empty())
     if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
   print("[fsm.py] current state: {}".format(current_state))
@@ -143,8 +160,9 @@ def shutdown():
   # Create a new image with the trajectory
   if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
 
-  if "NN" not in [control_sequence['2'], supervision_sequence['2']] and stop_nn_pub: stop_nn_pub.publish(Empty())
-  if "DH" not in [control_sequence['2'], supervision_sequence['2']] and stop_dh_pub: stop_dh_pub.publish(Empty())
+  if len(state_sequence) >= 3:
+    if "NN" not in [control_sequence['2'], supervision_sequence['2']] and stop_nn_pub: stop_nn_pub.publish(Empty())
+    if "DH" not in [control_sequence['2'], supervision_sequence['2']] and stop_dh_pub: stop_dh_pub.publish(Empty())
 
   # Go to state 2
   if start_db_pub and len(state_sequence) > 2:
@@ -153,6 +171,8 @@ def shutdown():
     current_state = state_sequence[2]
     state_pub.publish(current_state)
     print("[fsm.py] current state: {}".format(current_state))
+
+
 
   # Log away
   write(log_folder+'/log', '{0} \n'.format('success' if success else 'bump'))
@@ -169,6 +189,7 @@ def shutdown():
     print("[fsm.py]: killing pid {}".format(pid))
     time.sleep(1)
     subprocess.Popen(shlex.split("kill "+pid)).wait()
+
 
 
 def time_check():
@@ -199,11 +220,11 @@ def scan_cb(data):
   """Read in depth scan and check the minimum value to detect a bump used by the turtle."""
   if shuttingdown or (rospy.get_time()-start_time < delay_evaluation): return
   # Preprocess depth:
-  ranges=[1 if r > 1 or r==0 else r for r in data.ranges]
+  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
-  ranges=list(reversed(ranges[:45]))+list(reversed(ranges[-45:]))
+  ranges=list(reversed(ranges[:field_of_view/2]))+list(reversed(ranges[-field_of_view/2:]))
   # add some smoothing by averaging over 4 neighboring bins
-  ranges = [sum(ranges[i*4:i*4+4])/4 for i in range(int(len(ranges)/4))]
+  ranges = [np.nanmean(ranges[i*4:i*4+4]) for i in range(int(len(ranges)/4))]
   if min_depth != -1 and min(ranges) < min_depth and not shuttingdown:
     print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
     success=False
@@ -319,6 +340,10 @@ if __name__=="__main__":
       log_folder=os.environ['HOME']+'/tensorflow/log/'+loc
     if not os.path.exists(log_folder): os.makedirs(log_folder)
   print '[fsm]: log folder: {} '.format(log_folder)
+
+  if rospy.has_param('data_location'): # save the data location to change after each new 'go' call
+    data_location=rospy.get_param('data_location')
+  
 
   if rospy.has_param('world_name') :
     world_name = os.path.basename(rospy.get_param('world_name').split('.')[0])

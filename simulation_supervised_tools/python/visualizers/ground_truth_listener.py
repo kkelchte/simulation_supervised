@@ -18,14 +18,13 @@ from nav_msgs.msg import Odometry
 #--------------------------------------------------------------------------------------------------------------------------------
 
 turtle=False
-size = (200,200)
-img = np.zeros(size)
+size = (200,200,3)
+img = np.ones(size)
 img_type = "unknown"
-state = ''
 current_pos = []
 ready = False
 finished = True
-transformations={'unknown':(1,1,1,1),
+transformations={'unknown':(100,100,-5,100),
     'forest':(6.5, 438.0, -6.6, 418.0),
     'canyon':(15.5, 424.0, -10.6, 809),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
@@ -58,11 +57,13 @@ def draw_positions(file_name):
   plt.savefig(file_name, bbox_inches='tight')
   
 def ready_cb(data):
-  global ready, finished, run_file
+  global ready, finished, run_file, current_pos, img
   if not ready: 
     ready = True
     finished = False
     run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f ]), img_type)
+    current_pos = []
+    img = np.zeros(size)
 
 def finished_cb(data):
   global ready, finished

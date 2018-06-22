@@ -30,24 +30,39 @@ import matplotlib.animation as animation
 
 state='idle' #idle or driving back...
 num_bins=36 # should be able to divide 360
+clip_distance=1
+field_of_view=90
+min_depth = 0.0 # in case this parameter is not set, depth will always be larger than 0
+
+# do not adjust:
+drive_back_direction = np.random.choice([-1,1])
+bin_width=360./num_bins #degrees of one bin
+bins_of_view=np.ceil(field_of_view/bin_width) #bins to evaluate that road is free
+
 
 fig=plt.figure(figsize=(10,5))
 plt.title('Drive_back')
 anim = None
 
 x=np.zeros((num_bins))
-barcollection=plt.bar(range(num_bins),[0.5*360./num_bins for k in range(num_bins)],align='center',color='blue')
+barcollection=plt.bar(np.arange(0,360,int(bin_width)),[0.5*360./num_bins for k in range(num_bins)],align='center',color='blue')
 
 def animate(n):
   for i, b in enumerate(barcollection):
     b.set_height(x[i])
 
 def drive_back_callback(msg):
-  global state
+  global state, drive_back_direction
   """ callback function that makes DNN policy starts the ready flag is set on 1 (for 3s)"""
   if state != 'driving':
     state='driving'
+    drive_back_direction =np.random.choice([-1,1])
     print('[drive_back]: Driving back service started.')
+
+    # start of with driving backward for just a few milli-seconds
+    msg = Twist()
+    msg.linear.x = -1
+    action_pub.publish(msg)
 
 
 def depth_callback(data):
@@ -56,19 +71,25 @@ def depth_callback(data):
   if state == 'idle': return
   # 1. Process lazer range data: getting the closest octant
 
-  # clip at 0.5m and make 'broken' 0 readings also 0.5
-  ranges=[0.5 if r > 0.5 or r==0 else r for r in data.ranges]
+  # Preprocess depth:
+  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
 
-  # discriteze in 360/num_bins octants
-
-  # ranges=[np.sum(ranges[10*i:10*(i+1)]) for i in range(num_bins)]
-  ranges=[np.sum(ranges[360/num_bins*i:360/num_bins*(i+1)]) for i in range(num_bins)]
+  # discriteze in 360/num_bins smoothed octants
+  ranges=[np.nanmean(ranges[360/num_bins*i:360/num_bins*(i+1)]) for i in range(num_bins)]
   x=np.array(ranges)
   
   # 2. check if current depth is indicating a free road quit driving and go to idle state
+  # Ensure closest depth is at the back 2 octant [3/8,4/8]. 
+  # --> problem occurs in corner when the smallest depth over diagonal quadrants should be in the back.
+  # --> add extra evaluate forward look in order to ensure free space.
   # print("[drive_back]: min index: {0}".format(np.argmin(ranges)))
+  closest_obstacle_in_back = 3./8*num_bins < np.argmin(ranges) and np.argmin(ranges) < 5./8*num_bins
 
-  if 3./8*num_bins < np.argmin(ranges) and np.argmin(ranges) < 5./8*num_bins:
+  # 3. check if forward view is free:
+  ranges=list(reversed(ranges[:int(bins_of_view/2)]))+list(reversed(ranges[-int(bins_of_view/2):]))
+  no_obstacle_in_front = min(ranges) > min_depth
+  
+  if closest_obstacle_in_back and no_obstacle_in_front:
     print("[drive_back]: Drive back to free road is done.")
     state='idle'
     drive_back_pub.publish(Empty())
@@ -76,7 +97,7 @@ def depth_callback(data):
     # 3. else turn so that road becomes free.
     # print('[drive_back]: turning turning turning...')
     msg = Twist()
-    msg.angular.z = -1
+    msg.angular.z = drive_back_direction
     action_pub.publish(msg)
 
 def cleanup():
@@ -91,12 +112,15 @@ if __name__=="__main__":
     rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, depth_callback)
   else:
     raise IOError('[drive_back.py] did not find any depth image topic!')
+  if rospy.has_param('min_depth'): 
+    min_depth=rospy.get_param('min_depth')
     
 
   action_pub = rospy.Publisher('db_vel', Twist, queue_size=1)
 
   rospy.Subscriber('/db_start', Empty, drive_back_callback)
   drive_back_pub = rospy.Publisher('/go', Empty, queue_size=1)
+  
   
   if rospy.has_param('graphics'):
     if rospy.get_param('graphics'):

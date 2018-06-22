@@ -172,11 +172,24 @@ def gt_callback(data):
   
 def ready_callback(msg):
   """ callback function that makes create_ds start saving images and toggles ready"""
-  global ready, finished
+  global ready, finished, data_location
   if not ready and finished:
     ready=True
     finished = False
-    print('[create_dataset]: ready: {0}'.format(rospy.get_time()))
+
+    # update data_location and make dires
+    if rospy.has_param('data_location'):
+      loc=rospy.get_param('data_location')
+      if loc[0]=='/':
+        data_location=loc
+      else:
+        data_location=os.environ['HOME']+'/pilot_data/'+loc
+      if not os.path.exists(data_location+'/RGB'): os.makedirs(data_location+'/RGB')
+      if not os.path.exists(data_location+'/Depth'): os.makedirs(data_location+'/Depth')
+
+
+
+    print('[create_dataset]: ready: {0}: {1}'.format(rospy.get_time(), os.path.basename(data_location)))
 
 def finished_callback(msg):
   """ callback function that makes create_ds stop and toggles finished"""
