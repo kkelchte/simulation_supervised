@@ -365,12 +365,11 @@ while run_number < FLAGS.number_of_runs:
         start_python()
         crash_number = 0
     time.sleep(0.1)
+
   # gazebo_popen.poll() == 15 --> killed by script
   # gazebo_popen.poll() == 0 --> killed by user 
-  # gazebo_popen.poll() == ? --> killed by fsm
-
-  print 'gazebo_popen.poll(): ', gazebo_popen.poll()
-  if not crashed :
+  # gazebo_popen.poll() == 15 --> killed by fsm
+  if not crashed and gazebo_popen.poll() != 0:
     # wait for tf_log and stop in case of no tensorflow communication
     if os.path.isfile(FLAGS.log_folder+'/tf_log'):
       current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
