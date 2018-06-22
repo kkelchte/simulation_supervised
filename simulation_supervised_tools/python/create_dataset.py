@@ -284,9 +284,9 @@ if __name__=="__main__":
   if rospy.has_param('gt_info'): rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
   if rospy.has_param('rgb_image'): 
     if 'compressed' in rospy.get_param('rgb_image'): 
-      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 1)  
+      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 10)  
     else:
-      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 1)  
+      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 10)  
   if rospy.has_param('depth_image'): 
     if 'scan' in rospy.get_param('depth_image'):
       rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_callback)
