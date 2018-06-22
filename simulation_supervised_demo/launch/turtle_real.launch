@@ -13,7 +13,10 @@
   <param name="data_location" value="$(arg data_location)"/>
   <arg name="save_images" default="false"/>
   <param name="save_images" value="$(arg save_images)"/>
-  
+
+  <param name="world_name" value="$(arg world_name)"/>
+  <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> <!-- worldfile defines the actual gazebo world file loaded -->
+
   <arg name="full" default="false"/>
   <group if="$(arg full)">
     <!-- Load parameters for turtlesim as a full demonstration-->
@@ -22,6 +25,8 @@
     </include>
   </group>
   
+  <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+
   <!-- Load parameters for fsm-->
   <arg name="fsm_config" default="console_fsm"/>
   <rosparam command="load" file="$(find simulation_supervised)/config/fsm/$(arg fsm_config).yaml"/> 

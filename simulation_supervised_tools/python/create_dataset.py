@@ -5,6 +5,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
@@ -61,6 +62,27 @@ finished=True
 skip_first=8 # don't save the first images as the sensor is still starting up.
 
   
+def process_rgb_compressed(msg, index):
+  """If ready-state: go from serial to rgb image and save it."""
+  if (not ready) or finished: return False
+  try:
+    rgb_image = bridge.compressed_imgmsg_to_cv2(msg, desired_encoding='passthrough')
+  except CvBridgeError as e:
+    print(e)
+  else:
+    # Save your OpenCV2 image as a jpeg 
+    if index > skip_first: 
+      # print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.forma, index, rospy.get_time()))
+      cv2.imwrite(data_location+"/RGB/{:010d}.jpg".format(index), rgb_image)
+    return True
+
+def compressed_image_callback(msg):
+  """If saving the compressed image worked out, write the log information and increment index."""
+  global index  
+  if process_rgb_compressed(msg, index):
+    if index > skip_first: write_info('RGB', index)
+    index+=1
+
 def process_rgb(msg, index):
   """If ready-state: go from serial to rgb image and save it."""
   if (not ready) or finished: return False
@@ -170,9 +192,10 @@ def gt_callback(data):
   T_pg = copy.deepcopy(T_cg) 
 
   
+
 def ready_callback(msg):
   """ callback function that makes create_ds start saving images and toggles ready"""
-  global ready, finished, data_location
+  global ready, finished, data_location, index
   if not ready and finished:
     ready=True
     finished = False
@@ -186,8 +209,7 @@ def ready_callback(msg):
         data_location=os.environ['HOME']+'/pilot_data/'+loc
       if not os.path.exists(data_location+'/RGB'): os.makedirs(data_location+'/RGB')
       if not os.path.exists(data_location+'/Depth'): os.makedirs(data_location+'/Depth')
-
-
+      index=0
 
     print('[create_dataset]: ready: {0}: {1}'.format(rospy.get_time(), os.path.basename(data_location)))
 
@@ -259,8 +281,12 @@ if __name__=="__main__":
   # initialize subscribers
   if rospy.has_param('control'): rospy.Subscriber(rospy.get_param('control'), Twist, control_callback)
   rospy.Subscriber('/supervised_vel', Twist, supervised_control_callback)
-  if rospy.has_param('gt_info'): rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)  
-  if rospy.has_param('rgb_image'): rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 1)  
+  if rospy.has_param('gt_info'): rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
+  if rospy.has_param('rgb_image'): 
+    if 'compressed' in rospy.get_param('rgb_image'): 
+      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 1)  
+    else:
+      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 1)  
   if rospy.has_param('depth_image'): 
     if 'scan' in rospy.get_param('depth_image'):
       rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_callback)

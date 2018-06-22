@@ -225,6 +225,7 @@ def scan_cb(data):
   ranges=list(reversed(ranges[:field_of_view/2]))+list(reversed(ranges[-field_of_view/2:]))
   # add some smoothing by averaging over 4 neighboring bins
   ranges = [np.nanmean(ranges[i*4:i*4+4]) for i in range(int(len(ranges)/4))]
+  # print ranges
   if min_depth != -1 and min(ranges) < min_depth and not shuttingdown:
     print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
     success=False
@@ -331,6 +332,8 @@ if __name__=="__main__":
     max_distance=rospy.get_param('max_distance')
   if rospy.has_param('gt_info'): 
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_cb)
+    
+  print("[fsm.py]: min_depth: {}".format(min_depth))
   
   if rospy.has_param('log_folder'): 
     loc=rospy.get_param('log_folder')
