@@ -99,6 +99,7 @@ def init():
 
   if "NN" in [control_sequence['0'], supervision_sequence['0']] and start_nn_pub: start_nn_pub.publish(Empty())
   if "DH" in [control_sequence['0'], supervision_sequence['0']] and start_dh_pub: start_dh_pub.publish(Empty())
+  if "DB" in [control_sequence['0'], supervision_sequence['0']] and start_db_pub: start_db_pub.publish(Empty())
     
   print("[fsm.py] current state: {}".format(current_state))
   # in case there is only 1 state and save images
