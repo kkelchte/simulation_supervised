@@ -124,7 +124,7 @@ parser.add_argument("-pp","--python_project",default='q-learning/pilot', type=st
 parser.add_argument("--reuse_default_world", action='store_true',help="reuse the default forest/canyon/sandbox instead of generating them on the fly.")
 parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: canyon, forest, sandbox, esat_v1, esat_v2, ... .")
 parser.add_argument("-p","--paramfile",type=str, help="Add more parameters to the command loading the DNN in tensorflow.")
-parser.add_argument("--fsm",default='nn_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm")
+parser.add_argument("--fsm",default='nn_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: nn_turtle_fsm, console_fsm, console_nn_db_turtle_fsm, ...")
 
 parser.add_argument("--x_pos",default=0,type=float, help="Specify x position.")
 parser.add_argument("--x_var",default=0,type=float, help="Specify variation in x position.")
@@ -253,7 +253,7 @@ def start_python():
   start_time = time.time()
   while(not os.path.isfile(FLAGS.log_folder+'/tf_log')):
     time.sleep(1)
-    if time.time()-start_time > 2*60:
+    if time.time()-start_time > 5*60:
       print("{0}: Waited for 5minutes on tensorflow to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host))
       kill_combo()
       sys.exit(2)
