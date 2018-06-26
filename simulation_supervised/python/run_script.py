@@ -231,7 +231,7 @@ def start_python():
   # Add parameters
   FLAGS.log_folder = "{0}/tensorflow/log/{1}/{2}_{3}".format(os.environ['HOME'],FLAGS.log_tag,time.strftime("%Y-%m-%d_%I%M"),'eval' if FLAGS.evaluation else 'train')
   FLAGS.params="{0} --log_tag {1[0]}{1[1]}".format(FLAGS.params, FLAGS.log_folder.partition(FLAGS.log_tag)[1:])
-  if not 'online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
+  if not '--online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
   if FLAGS.checkpoint: FLAGS.params="{0} --checkpoint_path {1}".format(FLAGS.params, FLAGS.checkpoint)  
   if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
 
