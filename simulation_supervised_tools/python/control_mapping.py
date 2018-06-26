@@ -20,7 +20,7 @@ from std_msgs.msg import String
 # 
 # The FSM provides a configuration message {robot}_{supervision} command of type string
 # example: 
-#     "NN_BA" corresponds to neural network publishing on /cmd_vel and behavior arbitration on /sup_vel
+#     "NN_BA" corresponds to neural network publishing on /cmd_vel and behavior arbitration on /supervised_vel
 #     "CON_NULL" corresponds to only the console publishing on /cmd_vel
 #
 #--------------------------------------------------------------------------------------------------------------

@@ -33,9 +33,9 @@ data_location='/tmp'
 save_images=False
 
 # Scan settings
-field_of_view = 106 # FOV in degrees
+field_of_view = 104 # FOV in degrees
 clip_distance = 4 # don't care about everything further than 5m away.
-smooth_x = 1 # smooth over 4 neighboring bins
+smooth_x = 4 # smooth over 4 neighboring bins
 
 # Global fields
 target_scan = None
@@ -45,8 +45,9 @@ predicted_scan = None
 fig=plt.figure(figsize=(15,5))
 plt.title('Scan Predictions')
 
-target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5),[clip_distance if k%2==1 else 0 for k in range(int(field_of_view/0.5)) ],align='center',color='blue',width=0.4)
-predicted_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5),[clip_distance if k%2==0 else 0 for k in range(int(field_of_view/0.5)) ],align='center',color='red',width=0.4)
+target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==1 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='blue',width=0.4)
+predicted_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==0 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='red',width=0.4)
+
 # target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='blue',width=smooth_x*0.5/2)
 # perdicted_barcollection=plt.bar(np.arange(-field_of_view/2+1, field_of_view/2+1, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='red',width=smooth_x*0.5/2)
 
@@ -55,16 +56,15 @@ def animate(n):
   if target_scan:
     # put even slots with target scan
     for i, b in enumerate(target_barcollection):
-      # b.set_height(target_scan[i])
       if i%2==1:
-        b.set_height(min(target_scan[i/2-1], clip_distance))
+        b.set_height(min(target_scan[int(i/2)], clip_distance))
       else:
         b.set_height=0
     # put odd slots with predicted scan
   if predicted_scan:
     for i, b in enumerate(predicted_barcollection):
       if i%2==0:
-        b.set_height(min(predicted_scan[i/2], clip_distance))
+        b.set_height(min(predicted_scan[int(i/2)], clip_distance))
       else:
         b.set_height=0
 
@@ -80,22 +80,14 @@ def target_callback(data):
   global target_scan
   # clip left field_of_view/2 degree range from 0:field_of_view/2  reversed with right field_of_view/2 degree range from the last field_of_view/2 :
   data.ranges=list(reversed(data.ranges[:field_of_view/2]))+list(reversed(data.ranges[-field_of_view/2:]))
-  ranges=[]
   # clip at clip_distance m and make 'broken' 0 readings also clip_distance 
-  for r in data.ranges:
-    if r>clip_distance:
-      ranges.append(clip_distance) 
-    elif r==0:
-      ranges.append(np.nan)
-    else:
-      ranges.append(r)
-  target_scan=ranges[:]
-  # print(len(target_scan))
+  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
   # smooth over smooth_x bins and save in target ranges
-  # ranges=[np.nanmean(ranges[4*i:4*i+smooth_x]) for i in range(len(ranges))]
+  target_scan = [np.nanmean(ranges[i*smooth_x:i*smooth_x+smooth_x]) for i in range(int(len(ranges)/smooth_x))]
     
 def predicted_callback(data):
-  global predicted_depth
+  global predicted_scan
+  predicted_scan=list(data.data[:])
   return
 #   # if not ready: return
 #   img = data.data

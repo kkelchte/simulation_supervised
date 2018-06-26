@@ -126,7 +126,7 @@ parser.add_argument("-pp","--python_project",default='q-learning/pilot', type=st
 parser.add_argument("--reuse_default_world", action='store_true',help="reuse the default forest/canyon/sandbox instead of generating them on the fly.")
 parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: canyon, forest, sandbox, esat_v1, esat_v2, ... .")
 parser.add_argument("-p","--paramfile",type=str, help="Add more parameters to the command loading the DNN in tensorflow.")
-parser.add_argument("--fsm",default='console_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm")
+parser.add_argument("--fsm",default='console_nn_db_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: console_fsm")
 
 
 FLAGS=parser.parse_args()

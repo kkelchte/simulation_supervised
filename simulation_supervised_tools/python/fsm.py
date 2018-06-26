@@ -84,6 +84,7 @@ positions = []
 log_folder='~/tensorflow/log/tmp'
 clip_distance = 1
 field_of_view = 90
+smooth_x = 4
 run_number = 0 # in case a 3 or 2 fase fsm is running, this counter keeps track of the number of times /go has brought the FSM to state 1
 # value is not used for anything specific except for calling datalocation update
 data_location = ''
@@ -225,7 +226,7 @@ def scan_cb(data):
   # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
   ranges=list(reversed(ranges[:field_of_view/2]))+list(reversed(ranges[-field_of_view/2:]))
   # add some smoothing by averaging over 4 neighboring bins
-  ranges = [np.nanmean(ranges[i*4:i*4+4]) for i in range(int(len(ranges)/4))]
+  ranges = [np.nanmean(ranges[i*smooth_x:i*smooth_x+smooth_x]) for i in range(int(len(ranges)/smooth_x))]
   # print ranges
   if min_depth != -1 and min(ranges) < min_depth and not shuttingdown:
     print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
