@@ -98,7 +98,7 @@ parser = argparse.ArgumentParser(description="""Run_simulation_scripts governs t
 # ==========================
 #   General Settings
 # ==========================
-parser.add_argument("-t", "--log_tag", type=str, help="LOGTAG: tag used to name logfolder.")
+parser.add_argument("-t", "--log_tag", default='testing', type=str, help="LOGTAG: tag used to name logfolder.")
 parser.add_argument("-n", "--number_of_runs", type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
@@ -136,9 +136,9 @@ parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orient
 parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
 
 FLAGS=parser.parse_args()
-
+if FLAGS.log_tag == 'testing':
+  shutil.rmtree(os.environ['HOME']+'/tensorflow/log/testing')
 # add default values to be able to operate
-if FLAGS.log_tag == None : FLAGS.log_tag='test_run_simulation_script'
 if FLAGS.number_of_runs == None : FLAGS.number_of_runs=2
 if FLAGS.worlds == None : FLAGS.worlds=['canyon']
 else: #worlds are appended in a nested list... so get them out.
