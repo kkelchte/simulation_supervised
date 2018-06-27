@@ -17,6 +17,7 @@ Exit code:
 0) normal exit code
 2) tensorflow stopped working
 3) communication with logfolder (Opal) is blocked
+4) config file is missing
 
 Author: Klaas Kelchtermans
 
@@ -131,13 +132,25 @@ parser.add_argument("--fsm",default='console_nn_db_turtle_fsm',type=str, help="D
 
 FLAGS=parser.parse_args()
 
+# get simulation_supervised dir
+simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
+
+if FLAGS.log_tag == 'testing':
+  shutil.rmtree(os.environ['HOME']+'/tensorflow/log/testing')
+
 # add default values to be able to operate
 if FLAGS.log_tag == None : FLAGS.log_tag='test_run_simulation_script'
 if FLAGS.number_of_runs == None : FLAGS.number_of_runs=2
 if FLAGS.worlds == None : FLAGS.worlds=['real_maze']
 else: #worlds are appended in a nested list... so get them out.
   worlds=[]
-  for w in FLAGS.worlds: worlds.append(w[0])
+  for w in FLAGS.worlds: 
+    if os.path.isfile(simulation_supervised_dir+'/config/environment/'+w[0]+'.yaml'):
+      worlds.append(w[0])
+    else:
+      print("Could not find environment configuration for {}".format(w[0]))
+      sys.exit(4)
+
   FLAGS.worlds = worlds[:]
 if FLAGS.seed: np.random.seed(FLAGS.seed)
 FLAGS.params=load_param_file(FLAGS.paramfile) if FLAGS.paramfile else ""
@@ -230,7 +243,6 @@ def start_python():
   if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
 
   # Create command
-  simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
   command="{0}/scripts/launch_python/{1}.sh {2}/tensorflow/{3}/main.py {4}".format(simulation_supervised_dir,
                                                                                 FLAGS.python_environment,
                                                                                 os.environ['HOME'],
@@ -363,37 +375,37 @@ while run_number < FLAGS.number_of_runs:
         crash_number = 0
     time.sleep(0.1)
 
-  # gazebo_popen.poll() == 15 --> killed by script
-  # gazebo_popen.poll() == 0 --> killed by user 
-  # gazebo_popen.poll() == 15 --> killed by fsm
-  if not crashed and gazebo_popen.poll() != 0:
-    # wait for tf_log and stop in case of no tensorflow communication
-    if os.path.isfile(FLAGS.log_folder+'/tf_log'):
-      current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
-      start_time=time.time()
-      while current_stat == prev_stat:
-        current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
-        time.sleep(1)
-        if time.time()-start_time > 5*60:
-          print("{0}: waited for 5minutes on tf_log to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
-          kill_combo()
-          sys.exit(2)
-    else:
-      print("{2}: we have last communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
-      kill_combo()
-      sys.exit(3)
-    # check for success or failure from log file
-    try:
-      success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
-    except:
-      pass
-    else:
-      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
-    # increment the run numbers
-    run_number+=1
-    
-    # continue with next run if gazebo if fully killed:
-    wait_for_gazebo()
+  # # gazebo_popen.poll() == 15 --> killed by script
+  # # gazebo_popen.poll() == 0 --> killed by user 
+  # # gazebo_popen.poll() == 15 --> killed by fsm
+  # if not crashed and gazebo_popen.poll() != 0:
+  #   # wait for tf_log and stop in case of no tensorflow communication
+  #   if os.path.isfile(FLAGS.log_folder+'/tf_log'):
+  #     current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
+  #     start_time=time.time()
+  #     while current_stat == prev_stat:
+  #       current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
+  #       time.sleep(1)
+  #       if time.time()-start_time > 5*60:
+  #         print("{0}: waited for 5minutes on tf_log to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
+  #         kill_combo()
+  #         sys.exit(2)
+  #   else:
+  #     print("{2}: we have last communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
+  #     kill_combo()
+  #     sys.exit(3)
+  # check for success or failure from log file
+  try:
+    success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
+  except:
+    pass
+  else:
+    print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
+  # increment the run numbers
+  run_number+=1
+  
+  # continue with next run if gazebo if fully killed:
+  wait_for_gazebo()
 
 # after all required runs are finished
 kill_combo()

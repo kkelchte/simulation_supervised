@@ -59,7 +59,7 @@ T_pg=[] # transformation of previous pose in global coordinates
 ready=False
 finished=True
 
-skip_first=8 # don't save the first images as the sensor is still starting up.
+skip_first=4 # don't save the first images as the sensor is still starting up.
 
   
 def process_rgb_compressed(msg, index):

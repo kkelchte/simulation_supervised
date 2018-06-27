@@ -381,8 +381,8 @@ while run_number < FLAGS.number_of_runs:
       while current_stat == prev_stat:
         current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
         time.sleep(1)
-        if time.time()-start_time > 5*60:
-          print("{0}: waited for 5minutes on tf_log to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
+        if time.time()-start_time > 8*60:
+          print("{0}: waited for 8minutes on tf_log to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
           kill_combo()
           sys.exit(2)
     else:
