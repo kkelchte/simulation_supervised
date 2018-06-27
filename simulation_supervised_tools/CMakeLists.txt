@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 	cv_bridge
 	image_transport
   gazebo_ros
-  bebop_msgs
 )
+#  bebop_msgs
 
 find_package(Boost REQUIRED COMPONENTS system signals thread)
 

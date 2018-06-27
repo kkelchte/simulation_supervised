@@ -23,7 +23,7 @@
   <run_depend>std_msgs</run_depend>
 	<run_depend>cv_bridge</run_depend>
   <run_depend>image_transport</run_depend>
-  <run_depend>bebop_msgs</run_depend>
+  <!-- <run_depend>bebop_msgs</run_depend> -->
   
 
 

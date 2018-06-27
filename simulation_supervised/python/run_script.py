@@ -136,7 +136,7 @@ parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orient
 parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
 
 FLAGS=parser.parse_args()
-if FLAGS.log_tag == 'testing':
+if FLAGS.log_tag == 'testing' and os.path.isdir(os.environ['HOME']+'/tensorflow/log/testing'):
   shutil.rmtree(os.environ['HOME']+'/tensorflow/log/testing')
 # add default values to be able to operate
 if FLAGS.number_of_runs == None : FLAGS.number_of_runs=2
@@ -309,6 +309,10 @@ while run_number < FLAGS.number_of_runs:
   if world_name in ['canyon', 'forest', 'sandbox'] and not FLAGS.reuse_default_world:
     generator_file="{0}/python/generators/{1}_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1],world_name)
     subprocess.Popen(shlex.split("python "+generator_file+" "+FLAGS.log_folder)).wait()
+    command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
+  elif world_name == 'canyon':
+    # reuse default 20 evaluation canyons
+    # simulation_supervised_dir
     command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
 
   # clean up gazebo ros folder every now and then
