@@ -39,35 +39,48 @@ smooth_x = 4 # smooth over 4 neighboring bins
 
 # Global fields
 target_scan = None
-predicted_scan = None
+# predicted_scan = None
+predicted_scans = {}
+prediction_barcollections={}
+
+action=0
 
 # Initialize plotting figure
-fig=plt.figure(figsize=(15,5))
-plt.title('Scan Predictions')
-
-target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==1 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='blue',width=0.4)
-predicted_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==0 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='red',width=0.4)
-
-# target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='blue',width=smooth_x*0.5/2)
-# perdicted_barcollection=plt.bar(np.arange(-field_of_view/2+1, field_of_view/2+1, smooth_x*0.5),[clip_distance for k in range(int(2*field_of_view/smooth_x))],align='center',color='red',width=smooth_x*0.5/2)
+# fig=plt.figure(figsize=(15,5))
+# plt.title('Scan Predictions')
+# target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==1 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='blue',width=0.4)
+# predicted_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==0 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='red',width=0.4)
+fig,ax = plt.subplots(4,1,sharex=True, sharey=True, figsize=(20,10))
+target_barcollection = ax[0].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='red',width=0.5)
+ax[0].set_title('SCAN')
+prediction_barcollections[1] = ax[1].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='blue',width=0.5)
+ax[1].set_title('LEFT (action: 1)')
+prediction_barcollections[0] = ax[2].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='blue',width=0.5)
+ax[2].set_title('STRAIGHT (action: 0)')
+prediction_barcollections[-1] = ax[3].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='blue',width=0.5)
+ax[3].set_title('RIGHT. (action: -1)')
 
 def animate(n):
   # only animate if all fields are filled.
+  # ax[0].set_title("Action: {} \n SCAN".format(action))
+
   if target_scan:
     # put even slots with target scan
-    for i, b in enumerate(target_barcollection):
-      if i%2==1:
-        b.set_height(min(target_scan[int(i/2)], clip_distance))
-      else:
-        b.set_height=0
+    for i, b in enumerate(target_barcollection): b.set_height(min(target_scan[i], clip_distance))
+      # if i%2==1:
+      #   b.set_height(min(target_scan[int(i/2)], clip_distance))
+      # else:
+      #   b.set_height=0
     # put odd slots with predicted scan
-  if predicted_scan:
-    for i, b in enumerate(predicted_barcollection):
-      if i%2==0:
-        b.set_height(min(predicted_scan[int(i/2)], clip_distance))
-      else:
-        b.set_height=0
-
+  # if predicted_scan:
+  #   for i, b in enumerate(predicted_barcollection):
+  #     if i%2==0:
+  #       b.set_height(min(predicted_scan[int(i/2)], clip_distance))
+  #     else:
+  #       b.set_height=0
+  if len(predicted_scans)==3:
+    for a in [1,0,-1]:
+      for i, b in enumerate(prediction_barcollections[a]): b.set_height(min(predicted_scans[a][i], clip_distance))
 
 def target_callback(data):
   """ Preprocess target scan (180degrees):
@@ -86,11 +99,19 @@ def target_callback(data):
   target_scan = [np.nanmean(ranges[i*smooth_x:i*smooth_x+smooth_x]) for i in range(int(len(ranges)/smooth_x))]
     
 def predicted_callback(data):
-  global predicted_scan
-  predicted_scan=list(data.data[:])
+  global predicted_scans,action
+  # action=data.data[0]
+  # scans=data.data[1:]
+  scans=data.data[:]
+
+  if len(scans) != 3*field_of_view/smooth_x:
+    print "[show_scan_prediction]: length of scan is not 3 so don't show depth prediction."
+  else:
+    for i, a in enumerate([-1,0,1]):
+      predicted_scans[a]=list(scans[i*int(field_of_view/smooth_x):i*int(field_of_view/smooth_x)+int(field_of_view/smooth_x)])
   return
 #   # if not ready: return
-#   img = data.data
+#   img = scans
 #   # check if the predicted depth contains probabilities instead:
 #   if len(img.flatten()) < 10 and sum(img.flatten()) != 0: #in case only or less than 10 values are send these are most likely to be continuous output values.
 #     for i in range(len(img.flatten())):
