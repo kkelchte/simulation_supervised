@@ -228,7 +228,7 @@ def scan_cb(data):
   # add some smoothing by averaging over 4 neighboring bins
   ranges = [np.nanmean(ranges[i*smooth_x:i*smooth_x+smooth_x]) for i in range(int(len(ranges)/smooth_x))]
   # print ranges
-  if min_depth != -1 and min(ranges) < min_depth and not shuttingdown:
+  if min_depth != -1 and min(ranges) < min_depth and not shuttingdown and current_state != 'idle':
     print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
     success=False
     shutdown()
