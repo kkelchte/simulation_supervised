@@ -294,7 +294,7 @@ while run_number < FLAGS.number_of_runs:
   command="{0} log_folder:={1}".format(command, FLAGS.log_folder)
   
   # check if this is an evaluation run and in which environment (world_name):
-  evaluate=(run_number%FLAGS.evaluate_every) == 0 or FLAGS.evaluation
+  evaluate=(run_number%FLAGS.evaluate_every) == 1 or FLAGS.evaluation
   command="{0} evaluate:={1}".format(command, 'true' if evaluate else 'false')
   
   world_name=FLAGS.worlds[run_number%len(FLAGS.worlds)]

@@ -34,7 +34,7 @@ save_images=False
 
 # Scan settings
 field_of_view = 104 # FOV in degrees
-clip_distance = 4 # don't care about everything further than 5m away.
+clip_distance = 2 # don't care about everything further than 5m away.
 smooth_x = 4 # smooth over 4 neighboring bins
 
 # Global fields
@@ -50,7 +50,8 @@ action=0
 # plt.title('Scan Predictions')
 # target_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==1 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='blue',width=0.4)
 # predicted_barcollection=plt.bar(np.arange(-field_of_view/2, field_of_view/2, 0.5*smooth_x),[clip_distance if k%2==0 else 0 for k in range(int(field_of_view/(0.5*smooth_x))) ],align='center',color='red',width=0.4)
-fig,ax = plt.subplots(4,1,sharex=True, sharey=True, figsize=(20,10))
+fig,ax = plt.subplots(5,1,sharex=True, sharey=False, figsize=(20,10))
+# fig,ax = plt.subplots(4,1,sharex=True, sharey=True, figsize=(20,10))
 target_barcollection = ax[0].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='red',width=0.5)
 ax[0].set_title('SCAN')
 prediction_barcollections[1] = ax[1].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='blue',width=0.5)
@@ -59,6 +60,8 @@ prediction_barcollections[0] = ax[2].bar(np.arange(-field_of_view/2, field_of_vi
 ax[2].set_title('STRAIGHT (action: 0)')
 prediction_barcollections[-1] = ax[3].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[clip_distance for k in range(int(field_of_view/(smooth_x))) ],align='center',color='blue',width=0.5)
 ax[3].set_title('RIGHT. (action: -1)')
+diff_barcollections = ax[4].bar(np.arange(-field_of_view/2, field_of_view/2, smooth_x),[0 for k in range(int(field_of_view/(smooth_x))) ],align='center',color='blue',width=0.5)
+ax[4].set_title('LEFT - RIGHT')
 
 def animate(n):
   # only animate if all fields are filled.
@@ -80,7 +83,14 @@ def animate(n):
   #       b.set_height=0
   if len(predicted_scans)==3:
     for a in [1,0,-1]:
-      for i, b in enumerate(prediction_barcollections[a]): b.set_height(min(predicted_scans[a][i], clip_distance))
+      for i, b in enumerate(prediction_barcollections[a]): 
+        if action == a: 
+          b.set_color('green')
+        else:
+          b.set_color('blue')
+        b.set_height(min(predicted_scans[a][i], clip_distance))
+  if len(predicted_scans)==3:
+    for i, b in enumerate(diff_barcollections): b.set_height(predicted_scans[1][i]-predicted_scans[-1][i]) 
 
 def target_callback(data):
   """ Preprocess target scan (180degrees):
@@ -100,15 +110,21 @@ def target_callback(data):
     
 def predicted_callback(data):
   global predicted_scans,action
-  # action=data.data[0]
-  # scans=data.data[1:]
-  scans=data.data[:]
+  action=data.data[0]
+  scans=data.data[1:]
+  # scans=data.data[:]
 
   if len(scans) != 3*field_of_view/smooth_x:
     print "[show_scan_prediction]: length of scan is not 3 so don't show depth prediction."
   else:
+    min_scans=[]
     for i, a in enumerate([-1,0,1]):
       predicted_scans[a]=list(scans[i*int(field_of_view/smooth_x):i*int(field_of_view/smooth_x)+int(field_of_view/smooth_x)])
+      min_scans.append(min(predicted_scans[a]))
+    
+    # action=-(np.argmax(min_scans)-1)
+    # min_scans=[min(predicted_scans[1]), min(predicted_scans[-1])]
+    # action=2*np.argmax(min_scans)-1
   return
 #   # if not ready: return
 #   img = scans
