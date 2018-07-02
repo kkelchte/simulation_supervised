@@ -136,6 +136,9 @@ parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orient
 parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
 
 FLAGS=parser.parse_args()
+
+simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
+
 if FLAGS.log_tag == 'testing' and os.path.isdir(os.environ['HOME']+'/tensorflow/log/testing'):
   shutil.rmtree(os.environ['HOME']+'/tensorflow/log/testing')
 # add default values to be able to operate
@@ -236,7 +239,6 @@ def start_python():
   if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
 
   # Create command
-  simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
   command="{0}/scripts/launch_python/{1}.sh {2}/tensorflow/{3}/main.py {4}".format(simulation_supervised_dir,
                                                                                 FLAGS.python_environment,
                                                                                 os.environ['HOME'],
@@ -312,8 +314,9 @@ while run_number < FLAGS.number_of_runs:
     command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
   elif world_name == 'canyon':
     # reuse default 20 evaluation canyons
-    # simulation_supervised_dir
-    command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
+    world_file='{0}/../simulation_supervised_demo/worlds/canyon_evaluation/{1:05d}_canyon.world'.format(simulation_supervised_dir,run_number%20)
+    world_image='{0}/../simulation_supervised_demo/worlds/canyon_evaluation/{1:05d}_canyon.png'.format(simulation_supervised_dir,run_number%20)
+    command="{0} background:={1} world_file:={2}".format(command, world_image, world_file)
 
   # clean up gazebo ros folder every now and then
   if run_number%50 == 0 : shutil.rmtree("{0}/.gazebo/log".format(os.environ['HOME']),ignore_errors=True)

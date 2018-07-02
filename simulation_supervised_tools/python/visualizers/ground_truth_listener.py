@@ -26,11 +26,12 @@ ready = False
 finished = True
 transformations={'unknown':(100,100,-5,100),
     'forest':(6.5, 438.0, -6.6, 418.0),
-    'canyon':(15.5, 424.0, -10.6, 809),
+    'canyon':(15.5, 424.0, -10.6, 780),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
     'esat_v1':(16.947783251231524, 63.724137931034484, -16.548448275862071, 590.18620689655177),
     'esat_v2':(17.22058089465456, 1065.4257425742574, -17.138477795147935, 843.90099009900985),
     'forest_real':(17.2170726,785,-17.07010944,487)}
+    # 'canyon':(15.5, 424.0, -10.6, 809),
     # 'esat_v2':(16.321360645256139, 1006.9433962264151, -16.180586914582452, 789.40251572327043)}
 
 log_folder = '/tmp/log'
@@ -63,7 +64,7 @@ def ready_cb(data):
     finished = False
     run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f ]), img_type)
     current_pos = []
-    img = np.zeros(size)
+    # img = np.zeros(size)
 
 def finished_cb(data):
   global ready, finished
@@ -78,8 +79,8 @@ def finished_cb(data):
 def gt_callback(data):
   global current_pos
   if not ready: return
-  if not turtle: current_pos.append(transform(data.pose.pose.position.x,data.pose.pose.position.y))
-  else: current_pos.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
+  current_pos.append(transform(data.pose.pose.position.x,data.pose.pose.position.y))
+  # else: current_pos.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
 
 
 if __name__=="__main__":
@@ -91,6 +92,8 @@ if __name__=="__main__":
       img_type = img_file.split("/")[-1].split(".")[0]
       if 'sandbox' in img_type:
         img_type = 'sandbox'
+      if 'canyon' in img_type:
+        img_type = 'canyon'
       print("[gt_listener]: img_type: {}".format(img_type))
     except Exception as e:
       print('[gt_listener]: failed to load background image: '+img_file+'. '+str(e))
