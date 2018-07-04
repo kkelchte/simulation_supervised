@@ -110,9 +110,9 @@ def target_callback(data):
     
 def predicted_callback(data):
   global predicted_scans,action
-  action=data.data[0]
-  scans=data.data[1:]
-  # scans=data.data[:]
+  # action=data.data[0]
+  # scans=data.data[1:]
+  scans=data.data[:]
 
   if len(scans) != 3*field_of_view/smooth_x:
     print "[show_scan_prediction]: length of scan is not 3 so don't show depth prediction."
@@ -122,7 +122,7 @@ def predicted_callback(data):
       predicted_scans[a]=list(scans[i*int(field_of_view/smooth_x):i*int(field_of_view/smooth_x)+int(field_of_view/smooth_x)])
       min_scans.append(min(predicted_scans[a]))
     
-    # action=-(np.argmax(min_scans)-1)
+    action=(np.argmax(min_scans)-1)
     # min_scans=[min(predicted_scans[1]), min(predicted_scans[-1])]
     # action=2*np.argmax(min_scans)-1
   return
