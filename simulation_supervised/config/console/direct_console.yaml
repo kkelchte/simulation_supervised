@@ -1,0 +1,86 @@
+#------------------------------------------------------------------------------------
+# 
+# This is a simple definition of only navigation with the two continuous joysticks
+# and /overtake as well as /go functionality.
+#
+#------------------------------------------------------------------------------------
+
+
+#define PS3_BUTTON_SELECT            0
+#define PS3_BUTTON_STICK_LEFT        1
+#define PS3_BUTTON_STICK_RIGHT       2
+#define PS3_BUTTON_START             3
+#define PS3_BUTTON_CROSS_UP          4
+#define PS3_BUTTON_CROSS_RIGHT       5
+#define PS3_BUTTON_CROSS_DOWN        6
+#define PS3_BUTTON_CROSS_LEFT        7
+#define PS3_BUTTON_REAR_LEFT_2       8
+#define PS3_BUTTON_REAR_RIGHT_2      9
+#define PS3_BUTTON_REAR_LEFT_1       10
+#define PS3_BUTTON_REAR_RIGHT_1      11
+#define PS3_BUTTON_ACTION_TRIANGLE   12
+#define PS3_BUTTON_ACTION_CIRCLE     13
+#define PS3_BUTTON_ACTION_CROSS      14
+#define PS3_BUTTON_ACTION_SQUARE     15
+#define PS3_BUTTON_PAIRING           16
+
+#define PS3_AXIS_STICK_LEFT_LEFTWARDS    0
+#define PS3_AXIS_STICK_LEFT_UPWARDS      1
+#define PS3_AXIS_STICK_RIGHT_LEFTWARDS   2
+#define PS3_AXIS_STICK_RIGHT_UPWARDS     3
+#define PS3_AXIS_BUTTON_CROSS_UP         4
+#define PS3_AXIS_BUTTON_CROSS_RIGHT      5
+#define PS3_AXIS_BUTTON_CROSS_DOWN       6
+#define PS3_AXIS_BUTTON_CROSS_LEFT       7
+#define PS3_AXIS_BUTTON_REAR_LEFT_2      8
+#define PS3_AXIS_BUTTON_REAR_RIGHT_2     9
+#define PS3_AXIS_BUTTON_REAR_LEFT_1      10
+#define PS3_AXIS_BUTTON_REAR_RIGHT_1     11
+#define PS3_AXIS_BUTTON_ACTION_TRIANGLE  12
+#define PS3_AXIS_BUTTON_ACTION_CIRCLE    13
+#define PS3_AXIS_BUTTON_ACTION_CROSS     14
+#define PS3_AXIS_BUTTON_ACTION_SQUARE    15
+#define PS3_AXIS_ACCELEROMETER_LEFT      16
+#define PS3_AXIS_ACCELEROMETER_FORWARD   17
+#define PS3_AXIS_ACCELEROMETER_UP        18
+#define PS3_AXIS_GYRO_YAW                19
+
+teleop:
+  piloting:
+    type: topic
+    message_type: "geometry_msgs/Twist"
+    topic_name: /cmd_vel
+    axis_mappings:
+      -
+        axis: 3  # Right thumb stick (up/down)
+        target: linear.x
+        scale: 0.5
+        offset: 0.0
+      -
+        axis: 2  # Right thumb stick (left/right)
+        target: linear.y
+        scale: 0.5
+        offset: 0.0
+      -
+        axis: 1  # Left thumb stick (up/down)
+        target: linear.z
+        scale: 1
+        offset: 0.0
+      -
+        axis: 0  # Left thumb stick (left/right)
+        target: angular.z
+        scale: 1
+        offset: 0.0
+  overtake:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: overtake
+    deadman_buttons: [1] #cross
+    axis_mappings: []
+  go:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: go
+    deadman_buttons: [3] #Triangle
+    axis_mappings: []
+  

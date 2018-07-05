@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Define parameters from arguments -->
+  <arg name="log_folder" default="tmp"/> <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
+  <param name="log_folder" value="$(arg log_folder)"/>
+  <arg name="world_name" default="objects"/> <!-- worldname is used to load correct config, name logging and find modified logname -->
+  <param name="world_name" value="$(arg world_name)"/>
+  <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> <!-- worldfile defines the actual gazebo world file loaded -->
+  <param name="world_file" value="$(arg world_file)"/>
+  
+  <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
+  <param name="evaluate" value="$(arg evaluate)"/>
+  <arg name="graphics" default="false"/> 
+  <param name="graphics" value="$(arg graphics)"/>
+  
+  <arg name="data_location" default="tmp"/> <!-- used by create_dataset node to save all recorded data -->
+  <param name="data_location" value="$(arg data_location)"/>
+  <arg name="save_images" default="false"/>
+  <param name="save_images" value="$(arg save_images)"/>
+  
+  <arg name="background" default=""/> <!-- used by create_dataset node to save all recorded data -->
+  <param name="background" value="$(arg background)"/>
+
+  <arg name="full" default="false"/>
+  <group if="$(arg full)">
+    <!-- Load parameters for turtlesim as a full demonstration-->
+    <include file="$(find simulation_supervised)/launch/load_params.launch">
+      <arg name="robot_config" value="turtle_sim.yaml"/>
+    </include>
+  </group>
+  
+  <!-- Load parameters for environment-->
+  <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->
+  <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+
+  <!-- Load parameters for fsm-->
+  <arg name="fsm_config" default="console_fsm"/>
+  <rosparam command="load" file="$(find simulation_supervised)/config/fsm/$(arg fsm_config).yaml"/> 
+  
+  <!-- Gazebo with world -->
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched-->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!--use line for spawning world from .dae mesh in gz model folder-->
+    <arg name="world_name" value="$(arg world_file)"/>
+    <arg name="gui" value="false"/>
+    <!-- <arg name="gui" value="$(arg graphics)"/> -->
+    <arg name="headless" default="true"/>
+  </include>
+
+  <!-- Turtle robot  -->
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="Yspawned" default="1.57"/>
+  <include file="$(find klaas_robots)/launch/spawn_turtlebot.launch">
+    <arg name="x_pos" value="$(arg x)"/>
+    <arg name="y_pos" value="$(arg y)"/>
+    <arg name="Y_pos" default="$(arg Yspawned)"/>
+  </include>
+  
+  <!-- Console: simple (only overtake and go) -->
+  <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
+    <arg name="joy_config" value="simple_console"/> 
+  </include>
+  
+  <!-- Control Mapping -->
+  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+
+  <!-- FSM node -->
+  <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/>
+
+  <!-- Oracle: Depth Heuristic (default: idle) -->
+  <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/>
+
+  <!-- Drive Back Service (default: idle) -->
+  <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/>
+
+  <!-- Create data -->
+  <node name="create_dataset" pkg="simulation_supervised_tools" type="create_dataset.py" output="screen"/>
+
+  <!-- Keep position by listening to gt_info-topic -->
+  <node name="ground_truth_listener" pkg="simulation_supervised_tools" type="ground_truth_listener.py" output="screen"/>
+
+  <!-- Visualizations -->
+  <!-- Show control -->
+  <!-- Show depth prediction -->
+  <!-- Show scan prediction -->
+  <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/>
+  
+  <!-- Debugging -->
+  <!-- add RQT to visualize the changes and avoid the launch to quit -->
+  <!-- <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/> -->
+</launch>

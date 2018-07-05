@@ -1,0 +1,13 @@
+# control sequence follows naming convention of control_mapping
+#
+# console              | CON
+# behavior arbitration | BA
+# depth heuristic      | DH
+# neural network       | NN
+# drive back           | DB
+# 
+# Define names of different states for the 1, 2 or 3-state setting
+state_sequence: ['idle','running','returning']
+# Choose which control is commanding or supervising in the corresponding states
+control_sequence: {'0': 'CON', '1': 'NN', '2': 'DB'}
+supervision_sequence: {'0': 'NN', '1': 'DH', '2': 'NULL'}

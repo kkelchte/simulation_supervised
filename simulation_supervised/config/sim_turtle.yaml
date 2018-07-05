@@ -1,8 +1,0 @@
-control: /cmd_vel_mux/input/teleop
-ready: /ready
-finished: /finished
-rgb_image: /camera/camera/rgb/image_raw
-depth_image: /camera/camera/depth/image_raw
-gt_info: /odom
-ps3_top: /ps3_vel
-overtake: /overtake

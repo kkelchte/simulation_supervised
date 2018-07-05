@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-	<!--Read data parameters from yaml file-->
-	<arg name="global_param" default="debug_param.yaml"/>
-  	<rosparam command="load" file="$(find simulation_supervised)/config/$(arg global_param)" />
-  	<!-- Load the topics for control and camera input -->
-  	<arg name="drone_config" default="sim_drone.yaml"/>
-  	<rosparam command="load" file="$(find simulation_supervised)/config/$(arg drone_config)" />  
+ 	<!-- Load the correct topics names dependent on the robot -->
+ 	<!-- {drone/turtle}_{real/sim}.yaml -->
+	<arg name="robot_config" default="turtle_sim.yaml"/>
+	<rosparam command="load" file="$(find simulation_supervised)/config/robot/$(arg robot_config)" />  
 </launch>

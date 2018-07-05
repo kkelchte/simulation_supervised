@@ -1,0 +1,5 @@
+delay_evaluation: 1
+max_duration: 15
+min_depth: 0.2
+starting_height: 0.5
+max_distance: 50

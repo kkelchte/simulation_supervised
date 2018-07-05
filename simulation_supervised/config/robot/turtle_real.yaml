@@ -1,0 +1,4 @@
+control: /cmd_vel
+rgb_image: /raspicam_node/image/compressed
+depth_image: /scan
+gt_info: /odom

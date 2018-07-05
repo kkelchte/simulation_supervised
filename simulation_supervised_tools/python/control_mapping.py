@@ -1,91 +1,127 @@
 #!/usr/bin/env python
 import rospy
-import numpy as np
-# OpenCV2 for saving an image
-from cv_bridge import CvBridge, CvBridgeError
-import cv2
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Empty
 from std_msgs.msg import String
-import copy
+
+#--------------------------------------------------------------------------------------------------------------
+# Control mapping is a node that defines which control topic is forwarded to the robot
+# according to the control mapping dictionary:
 #
-# This node is a filter on the control that is send to the robot. Initially the control is given to the joystick: connecting /ps3_vel to /cmd_vel
-# If the joystick gives a 'go' signal the control is given to /tf_vel which is normally the tensorflow control comming from the neural network
-# but this is also the drive_back service or the depth heuristic. With X the user can overtake the control giving the control back to the joystick while rest continues publishing on tf_vel.
+# inputs               | TAG 
+# -----------------------------------------
+# console              | CON
+# behavior arbitration | BA
+# depth heuristic      | DH
+# neural network       | NN
+# drive back           | DB
 #
-cmd_pub = None # control publisher
+# outputs: robot command, supervised command
+# 
+# The FSM provides a configuration message {robot}_{supervision} command of type string
+# example: 
+#     "NN_BA" corresponds to neural network publishing on /cmd_vel and behavior arbitration on /supervised_vel
+#     "CON_NULL" corresponds to only the console publishing on /cmd_vel
+#
+#--------------------------------------------------------------------------------------------------------------
+
+superviser = "NULL"
+pilot = "NULL"
+conf_sub = None
+
+# define variables for publishing on robots command and supervision topic
+cmd_pub = None # robot command publisher
 sup_pub = None # supervision publisher
-state_pub = None
-state = ""
-estimated_yaw = 0
-tweak_roll = False
-estimated_control=None
 
-# def tweak_roll_on_cb(msg):
-# 	global tweak_roll
-# 	if not tweak_roll: 
-# 		print 'tweak roll on'
-# 		tweak_roll=True 
+# define variables for subscriber to different controls
+con_sub = None # console subscriber
+ba_sub = None # behavior arbitration subscriber
+dh_sub = None # depth heuristic subscriber
+nn_sub = None # neural network subscriber
+db_sub = None # drive back subscriber
 
-# def tweak_roll_off_cb(msg):
-# 	global tweak_roll
-# 	if tweak_roll:
-# 		print 'tweak roll off' 
-# 		tweak_roll=False
 
-def overtake_cb(msg):
-	global state
-	if state!="user":
-		print('[cmd_control] state set to user control.')
-		state="user"
-		state_pub.publish(state)
 
-def go_cb(msg):
-	global state
-	if state!="autopilot":
-		state="autopilot"
-		print('[cmd_control] state set to autopilot.')
-		state_pub.publish(state)
+def con_cb(data):
+  """Callback on the control coming from console."""
+  # check if currently the console can define the robots command
+  if pilot=="CON":
+    cmd_pub.publish(data)
+  # check if currently the console can define the supervision command
+  if superviser=="CON":
+    sup_pub.publish(data)
 
-def pilot_cb(data):
-	global estimated_yaw, estimated_control
-	estimated_yaw = data.angular.z
-	estimated_control = copy.deepcopy(data)
-	# print('pilot control: {}'.format(data.angular))
-	# pass
 
-def ps3_cb(data):
-	# print('ps3 control: {}'.format(data.angular.z))
-	if state=="autopilot" and estimated_control:
-		# data.angular.z = 0.5*estimated_yaw
-		# data.linear.x = 0.05
-		data=copy.deepcopy(estimated_control)
-	# compensate yaw with roll:
-	# if rospy.has_param('tweak_roll') and tweak_roll:
-	# 	data.angular.x = np.tanh(rospy.get_param('tweak_roll')*data.linear.x*data.angular.z/10.)
-	# print 'change for yaw: ',str(data.angular.z),' is in roll: ',data.angular.x
-	cmd_pub.publish(data)
-	# print data
-	# pass
+def ba_cb(data):
+  """Callback on the control coming from behavior_arbitration."""
+  # check if currently the behavior_arbitration can define the robots command
+  if pilot=="BA":
+    cmd_pub.publish(data)
+  # check if currently the behavior_arbitration can define the supervision command
+  if superviser=="BA":
+    sup_pub.publish(data)
+
+
+def dh_cb(data):
+  """Callback on the control coming from depth_heuristic."""
+  # check if currently the depth_heuristic can define the robots command
+  if pilot=="DH":
+    cmd_pub.publish(data)
+  # check if currently the depth_heuristic can define the supervision command
+  if superviser=="DH":
+    sup_pub.publish(data)
+
+
+def nn_cb(data):
+  """Callback on the control coming from neural_network."""
+  # check if currently the neural_network can define the robots command
+  if pilot=="NN":
+    cmd_pub.publish(data)
+  # check if currently the neural_network can define the supervision command
+  if superviser=="NN":
+    sup_pub.publish(data)
+
+
+def db_cb(data):
+  """Callback on the control coming from drive_back."""
+  # check if currently the drive_back can define the robots command
+  if pilot=="DB":
+    cmd_pub.publish(data)
+  # check if currently the drive_back can define the supervision command
+  if superviser=="DB":
+    sup_pub.publish(data)
+
+
+def fsm_cb(data):
+  """Callback on the control configuration coming from FSM."""
+  global superviser, pilot
+  # parse the new configuration
+  print("[control_mapping.py]: received setting: {}".format(data.data))
+  pilot = data.data.split('_')[0]
+  superviser = data.data.split('_')[1]
+
 
 if __name__=="__main__":
-  	rospy.init_node('control_mapping', anonymous=True)
-  	state_pub = rospy.Publisher('control_state', String, queue_size=10)
-	# publish supervised velocity
-	sup_pub = rospy.Publisher('/supervised_vel', Twist, queue_size=10)
-	
-	if rospy.has_param('overtake'): 
-		overtake_sub = rospy.Subscriber(rospy.get_param('overtake'), Empty, overtake_cb)
-	if rospy.has_param('go'): 
-		go_sub = rospy.Subscriber(rospy.get_param('go'), Empty, go_cb)
-	
-	if rospy.has_param('control'):
-		pilot_sub = rospy.Subscriber(rospy.get_param('control'), Twist, pilot_cb)
-	else:
-		raise IOError('[cmd control.py] did not find any control topic!')
-	ps3_sub = rospy.Subscriber(rospy.get_param('ps3_top'), Twist, ps3_cb)
-	cmd_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-		
-	# spin() simply keeps python from exiting until this node is stopped	
-	rospy.spin()
+  rospy.init_node('control_mapping', anonymous=True)
+
+  # initialize fsm subscriber
+  fsm_sub = rospy.Subscriber('control_config', String, fsm_cb)
+
+  # initialize publishers
+  sup_pub = rospy.Publisher('/supervised_vel', Twist, queue_size=10)
+  cmd_pub = rospy.Publisher(rospy.get_param('control'), Twist, queue_size=10)
+  
+  # initialize control subscribers
+  con_sub = rospy.Subscriber('con_vel', Twist, con_cb)
+  ba_sub = rospy.Subscriber('ba_vel', Twist, ba_cb)
+  dh_sub = rospy.Subscriber('dh_vel', Twist, dh_cb)
+  nn_sub = rospy.Subscriber('nn_vel', Twist, nn_cb)
+  db_sub = rospy.Subscriber('db_vel', Twist, db_cb) 
+
+  # load initial configuration from rosparam control sequence --> done by fsm when time > delay_evaluation 
+  # if rospy.has_param('control_sequence'): pilot=rospy.get_param('control_sequence')['0']
+  # if rospy.has_param('supervision_sequence'): superviser = rospy.get_param('supervision_sequence')['0']
+
+  # spin() simply keeps python from exiting until this node is stopped  
+  rospy.spin()
 

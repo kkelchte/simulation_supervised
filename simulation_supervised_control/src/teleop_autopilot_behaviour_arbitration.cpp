@@ -43,6 +43,7 @@ std::string type_of_noise="none";
 float speed = 1.3;
 BehaviourArbitration * BAController = 0; // Will be initialized in main
 ros::Publisher debugPub;
+ros::Publisher goPub;
 
 OUNoise * ounoise_Y = 0;
 // OUNoise * ounoise_x = 0;
@@ -212,7 +213,11 @@ geometry_msgs::Twist get_twist() {
 	    twist.angular.x = 0.0;
 	    twist.angular.y = 0.0;
 	    twist.angular.z = 0.0;
-	    if(adjust_height <= 0) fsm_state = 2;
+	    if(adjust_height <= 0){
+	    	fsm_state = 2;
+	    	std_msgs::Empty msg; //Send go signal to fsm to switch to state 2 and adjust control connections if necessary.
+	    	goPub.publish(msg);
+	    }
 	    return twist;
 	  case 2: //Do obstacle avoidance
 	  	if(type_of_noise.compare("ou") == 0 ){
@@ -276,8 +281,7 @@ int main(int argc, char** argv)
 	
 	std::string topic_depth = "/ardrone/kinect/depth/image_raw";
 	nh.getParam("depth_image", topic_depth);
-	std::string topic_control = "/cmd_vel";
-	nh.getParam("control", topic_control);
+	std::string topic_control = "/ba_vel";
 	
 	// std::string topic_depth = "/kinect/depth/image_raw";
 	std::string topic_estim_depth = "/autopilot/depth_estim";
@@ -307,29 +311,15 @@ int main(int argc, char** argv)
 
 	// Make subscriber to cmd_vel in order to set the name.
 	ros::Publisher pubControl;
-	ros::Publisher pubTakeoffControl;
-	
-	bool supervision = false;
-	nh.getParam("supervision", supervision);
-	if (!supervision) {
-		pubControl = nh.advertise<geometry_msgs::Twist>(topic_control, 1000);
-		cout << "Behaviour Arbitration is controlling the drone" << endl;
-	}
-	else {
-		pubControl = nh.advertise<geometry_msgs::Twist>("/supervised_vel", 1000);
-		cout << "Behaviour Arbitration is publishing on /supervised_vel" << endl;
-		pubTakeoffControl = nh.advertise<geometry_msgs::Twist>(topic_control, 1000);
-	}
+	pubControl = nh.advertise<geometry_msgs::Twist>(topic_control, 1000);
+
 	// Make Publisher to cmd_vel in order to set the velocity.
 	std::string topic_takeoff= "none";
 	nh.getParam("takeoff", topic_takeoff);
 	ros::Publisher pubTakeoff = nh.advertise<std_msgs::Empty>(topic_takeoff, 1);	
 	
-  	nh.getParam("speed", speed);
+	nh.getParam("speed", speed);
 	nh.getParam("noise", type_of_noise);
-  	if (supervision) { //use no noise in the online supervised setting
-  		type_of_noise = "none";
-  	}
 	if(type_of_noise.compare("ou") == 0 ){
 		ounoise_Y = new OUNoise();
 		// ounoise_x = new OUNoise();
@@ -338,6 +328,7 @@ int main(int argc, char** argv)
 	}
 	
 	debugPub = nh.advertise<std_msgs::Float32>("debug_autopilot", 1000);
+	goPub = nh.advertise<std_msgs::Empty>("go", 1000);
 
 	geometry_msgs::Twist twist;
 
@@ -351,41 +342,29 @@ int main(int argc, char** argv)
 	}
 	// cout << "Goal angle: " << GOAL_ANGLE << endl;
 
-	nh.getParam("discretized_twist", discretized_twist);
+	// nh.getParam("discretized_twist", discretized_twist);
 
-	cout << "Behaviour Arbitration takeoff: "<< topic_takeoff << endl;
-	cout << "Behaviour Arbitration speed: "<< speed << endl;
-	cout << "Behaviour Arbitration supervision: "<< supervision << endl;
-	cout << "Behaviour Arbitration default angle: " << GOAL_ANGLE << endl;
-	cout << "Behaviour Arbitration starting_height: " << starting_height << endl;
-	cout << "Behaviour Arbitration type_of_noise: " << type_of_noise << endl;
-	cout << "Behaviour Arbitration using parameters: "<< BA_parameters_path << endl;
+	// cout << "Behaviour Arbitration takeoff: "<< topic_takeoff << endl;
+	// cout << "Behaviour Arbitration speed: "<< speed << endl;
+	// cout << "Behaviour Arbitration supervision: "<< supervision << endl;
+	// cout << "Behaviour Arbitration default angle: " << GOAL_ANGLE << endl;
+	// cout << "Behaviour Arbitration starting_height: " << starting_height << endl;
+	// cout << "Behaviour Arbitration type_of_noise: " << type_of_noise << endl;
+	// cout << "Behaviour Arbitration using parameters: "<< BA_parameters_path << endl;
 	ros::Rate loop_rate(20);
-	//ros::Rate loop_rate(10);
 
 	while(ros::ok()){
 		twist = get_twist();
 		cout << "BA state: " << fsm_state << ", "<< twist<< endl;
 		pubControl.publish(twist);
-		//Supervisor let drone take off
-		if(fsm_state == 1){
-	      std_msgs::Empty msg;
-          if (supervision){
-          	pubTakeoffControl.publish(twist);
-          }else{
-          	if(topic_takeoff.compare("none")!=0){
-	      		pubTakeoff.publish(msg);
-	      	}
-          }
+		if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
+      std_msgs::Empty msg;
+      pubControl.publish(twist);
+  		pubTakeoff.publish(msg);
 		}
-		if(fsm_state == 2){
-          //the first time fsm reaches state 2 it should publish supervision one more time.
-          if( twist.linear.x == 0 && supervision ){
-            pubTakeoffControl.publish(twist);
-          }
-	      //std_msgs::Empty msg;
-	      //pubReady.publish(msg);
-		}
+		if(fsm_state == 2){ //drone is at proper height ==> start OA
+			pubControl.publish(twist);
+    }
 		loop_rate.sleep();
 		ros::spinOnce();
 	}
