@@ -126,8 +126,8 @@ parser.add_argument("-pp","--python_project",default='q-learning/pilot', type=st
 # ==========================
 parser.add_argument("--reuse_default_world", action='store_true',help="reuse the default forest/canyon/sandbox instead of generating them on the fly.")
 parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: canyon, forest, sandbox, esat_v1, esat_v2, ... .")
-parser.add_argument("-p","--paramfile",type=str, help="Add more parameters to the command loading the DNN in tensorflow.")
-parser.add_argument("--fsm",default='console_nn_db_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: console_fsm")
+parser.add_argument("-p","--paramfile",default='cont_slow.yaml', type=str, help="Add more parameters to the command loading the DNN in tensorflow.")
+parser.add_argument("--fsm",default='console_nn_db_interactive_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: console_fsm")
 
 
 FLAGS=parser.parse_args()
@@ -269,10 +269,10 @@ start_python()
 print("Start turtlebot with following command in new shell window and press enter")
 print("ssh turtlebot@10.42.0.1")
 print("roslaunch turtlebot3_bringup turtlebot3_klaas.launch")
-try:
-  text = input("press enter")
-except:
-  pass
+# try:
+#   text = input("press enter")
+# except:
+#   pass
 ##########################################################################################################################
 # STEP 5 Start simulation supervised tools
 

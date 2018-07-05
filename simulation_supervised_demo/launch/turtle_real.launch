@@ -64,4 +64,9 @@
   <!-- Debugging -->
   <!-- add RQT to visualize the changes and avoid the launch to quit -->
   <!-- <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/> -->
+<!--   <node pkg="image_view" type="image_view" name="image_view">
+    <arg name"image" value="/raspicam_node/image/"/>
+    <arg name"_image_transport" value="compressed"/>
+  </node>
+   -->
 </launch>

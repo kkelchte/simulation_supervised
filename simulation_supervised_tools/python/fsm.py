@@ -83,7 +83,7 @@ world_name='unk'
 positions = []
 log_folder='~/tensorflow/log/tmp'
 clip_distance = 1
-field_of_view = 80 #90
+field_of_view = 90
 smooth_x = 4
 run_number = 0 # in case a 3 or 2 fase fsm is running, this counter keeps track of the number of times /go has brought the FSM to state 1
 # value is not used for anything specific except for calling datalocation update
