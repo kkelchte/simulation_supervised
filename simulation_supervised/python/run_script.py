@@ -17,6 +17,7 @@ Exit code:
 0) normal exit code
 2) tensorflow stopped working
 3) communication with logfolder (Opal) is blocked
+4) config file is missing
 
 Author: Klaas Kelchtermans
 
@@ -98,8 +99,11 @@ parser = argparse.ArgumentParser(description="""Run_simulation_scripts governs t
 # ==========================
 #   General Settings
 # ==========================
+parser.add_argument("--summary_dir", default='tensorflow/log/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
+parser.add_argument("--data_root", default='pilot_data/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
+parser.add_argument("--code_root", default='~', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("-t", "--log_tag", default='testing', type=str, help="LOGTAG: tag used to name logfolder.")
-parser.add_argument("-n", "--number_of_runs", type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
+parser.add_argument("-n", "--number_of_runs", default=2, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
 parser.add_argument("--evaluate_every", default=20, type=int, help="Evaluate every N runs when training.")
@@ -123,7 +127,7 @@ parser.add_argument("-pp","--python_project",default='q-learning/pilot', type=st
 # ==========================
 parser.add_argument("--reuse_default_world", action='store_true',help="reuse the default forest/canyon/sandbox instead of generating them on the fly.")
 parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: canyon, forest, sandbox, esat_v1, esat_v2, ... .")
-parser.add_argument("-p","--paramfile",type=str, help="Add more parameters to the command loading the DNN in tensorflow.")
+parser.add_argument("-p","--paramfile",default='eva_params.yaml',type=str, help="Add more parameters to the command loading the DNN in tensorflow.")
 parser.add_argument("--fsm",default='nn_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: nn_turtle_fsm, console_fsm, console_nn_db_turtle_fsm, ...")
 
 parser.add_argument("--x_pos",default=0,type=float, help="Specify x position.")
@@ -137,16 +141,34 @@ parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in
 
 FLAGS=parser.parse_args()
 
+# get simulation_supervised dir
 simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
 
-if FLAGS.log_tag == 'testing' and os.path.isdir(os.environ['HOME']+'/tensorflow/log/testing'):
-  shutil.rmtree(os.environ['HOME']+'/tensorflow/log/testing')
+# 3 main directories have to be defined in order to make it also runnable from a read-only system-installed singularity image.
+if FLAGS.summary_dir[0] != '/':  # 1. Tensorflow log directory for saving tensorflow logs and xterm logs
+  FLAGS.summary_dir=os.environ['HOME']+'/'+FLAGS.summary_dir
+if FLAGS.data_root[0] != '/':  # 2. Pilot_data directory for saving data
+  FLAGS.data_root=os.environ['HOME']+'/'+FLAGS.data_root
+if FLAGS.code_root == '~': # 3. location for tensorflow code (and also catkin workspace though they are found with rospack)
+  #no explicit directory for code is set so try to parse first from environment
+  try:
+    FLAGS.code_root = os.environ['CODE']
+  except KeyError: # in case environment variable is not set, take home dir
+    FLAGS.code_root = os.environ['HOME']
+
+if FLAGS.log_tag == 'testing' and os.path.isdir(FLAGS.summary_dir+'testing'):
+  shutil.rmtree(FLAGS.summary_dir+'testing')
 # add default values to be able to operate
-if FLAGS.number_of_runs == None : FLAGS.number_of_runs=2
 if FLAGS.worlds == None : FLAGS.worlds=['canyon']
 else: #worlds are appended in a nested list... so get them out.
   worlds=[]
-  for w in FLAGS.worlds: worlds.append(w[0])
+  for w in FLAGS.worlds: 
+    if os.path.isfile(simulation_supervised_dir+'/config/environment/'+w[0]+'.yaml'):
+      worlds.append(w[0])
+    else:
+      print("Could not find environment configuration for {}".format(w[0]))
+      sys.exit(4)
+
   FLAGS.worlds = worlds[:]
 if FLAGS.seed: np.random.seed(FLAGS.seed)
 FLAGS.params=load_param_file(FLAGS.paramfile) if FLAGS.paramfile else ""
@@ -158,15 +180,15 @@ except:
   FLAGS.condor_host='unknown_host'
 
 # delete default log folder
-if FLAGS.log_tag == 'test_run_simulation_script' and os.path.isdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag):
-    shutil.rmtree(os.path.isdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag))
+if FLAGS.log_tag == 'test_run_simulation_script' and os.path.isdir(FLAGS.summary_dir+FLAGS.log_tag):
+    shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag)
 # Create main log folder
-if not os.path.isdir("{0}/tensorflow/log/{1}".format(os.environ['HOME'], FLAGS.log_tag)):
-  os.makedirs("{0}/tensorflow/log/{1}".format(os.environ['HOME'], FLAGS.log_tag))
+if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
+  os.makedirs("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag))
 
 # in case of data_creation, make data_location in ~/pilot_data
 if FLAGS.create_dataset: 
-  FLAGS.data_location = "{0}/pilot_data/{1}".format(os.environ['HOME'], FLAGS.log_tag)
+  FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.log_tag)
   if os.path.isdir(FLAGS.data_location) and FLAGS.number_of_runs == 1:
     shutil.rmtree(FLAGS.data_location)
   if not os.path.isdir(FLAGS.data_location):
@@ -183,7 +205,7 @@ if FLAGS.create_dataset:
 print("\nSettings:")
 for f in FLAGS.__dict__: print("{0}: {1}".format( f, FLAGS.__dict__[f]))
 
-with open("{0}/tensorflow/log/{1}/conf".format(os.environ['HOME'], FLAGS.log_tag),'w') as c:
+with open("{0}{1}/conf".format(FLAGS.summary_dir, FLAGS.log_tag),'w') as c:
   c.write("Settings of Run_simulation_scripts:\n\n")
   for f in FLAGS.__dict__: c.write("{0}: {1}\n".format(f, FLAGS.__dict__[f]))
 
@@ -192,7 +214,7 @@ with open("{0}/tensorflow/log/{1}/conf".format(os.environ['HOME'], FLAGS.log_tag
 # STEP 2 Start ROS with ROBOT specific parameters
 
 # ensure location for logging the xterm outputs exists.
-ros_xterm_log_dir="{0}/tensorflow/log/{1}/xterm_ros".format(os.environ['HOME'],FLAGS.log_tag)
+ros_xterm_log_dir="{0}{1}/xterm_ros".format(FLAGS.summary_dir,FLAGS.log_tag)
 if not os.path.isdir(ros_xterm_log_dir): os.makedirs(ros_xterm_log_dir)
 
 def start_ros():
@@ -211,7 +233,7 @@ start_ros()
 ##########################################################################################################################
 # STEP 3 Start tensorflow
 
-python_xterm_log_dir="{0}/tensorflow/log/{1}/xterm_python".format(os.environ['HOME'],FLAGS.log_tag)
+python_xterm_log_dir="{0}{1}/xterm_python".format(FLAGS.summary_dir,FLAGS.log_tag)
 if not os.path.isdir(python_xterm_log_dir): os.makedirs(python_xterm_log_dir)
   
 def start_python():
@@ -220,19 +242,19 @@ def start_python():
   # if logdir already exists probably condor job is just restarted somewhere so use last saved checkpoint in case of training
   global python_popen
   if not FLAGS.evaluation:
-    for f in os.listdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag):
+    for f in os.listdir(FLAGS.summary_dir+FLAGS.log_tag):
       if fnmatch.fnmatch(f,"2018*"): # take only the tensorflow folders, indicated with a date tag
-        if len(os.listdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag+'/'+f)) > 6 :
-          FLAGS.checkpoint=os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag
+        if len(os.listdir(FLAGS.summary_dir+FLAGS.log_tag+'/'+f)) > 6 :
+          FLAGS.checkpoint=FLAGS.summary_dir+FLAGS.log_tag
           FLAGS.params.replace('scratch','')
           if 'continue_training' not in FLAGS.params: FLAGS.params="{0} --continue_training".format(FLAGS.params)
           break
         else:
           # in case python crashed during that run and left no more than 6 items, clean up logfolder
-          shutil.rmtree(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag+'/'+f)
+          shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag+'/'+f)
   
   # Add parameters
-  FLAGS.log_folder = "{0}/tensorflow/log/{1}/{2}_{3}".format(os.environ['HOME'],FLAGS.log_tag,time.strftime("%Y-%m-%d_%I%M"),'eval' if FLAGS.evaluation else 'train')
+  FLAGS.log_folder = "{0}{1}/{2}_{3}".format(FLAGS.summary_dir,FLAGS.log_tag,time.strftime("%Y-%m-%d_%I%M"),'eval' if FLAGS.evaluation else 'train')
   FLAGS.params="{0} --log_tag {1[0]}{1[1]}".format(FLAGS.params, FLAGS.log_folder.partition(FLAGS.log_tag)[1:])
   if not '--online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
   if FLAGS.checkpoint: FLAGS.params="{0} --checkpoint_path {1}".format(FLAGS.params, FLAGS.checkpoint)  
@@ -241,7 +263,7 @@ def start_python():
   # Create command
   command="{0}/scripts/launch_python/{1}.sh {2}/tensorflow/{3}/main.py {4}".format(simulation_supervised_dir,
                                                                                 FLAGS.python_environment,
-                                                                                os.environ['HOME'],
+                                                                                FLAGS.code_root,
                                                                                 FLAGS.python_project,
                                                                                 FLAGS.params)
   print("Tensorflow command: \n {}".format(command))
@@ -266,7 +288,7 @@ start_python()
 # STEP 4 Start gazebo environment
 
 # ensure location for logging the xterm outputs exists.
-gazebo_xterm_log_dir="{0}/tensorflow/log/{1}/xterm_gazebo".format(os.environ['HOME'],FLAGS.log_tag)
+gazebo_xterm_log_dir="{0}{1}/xterm_gazebo".format(FLAGS.summary_dir,FLAGS.log_tag)
 if not os.path.isdir(gazebo_xterm_log_dir): os.makedirs(gazebo_xterm_log_dir)
 
 
@@ -393,17 +415,17 @@ while run_number < FLAGS.number_of_runs:
       kill_combo()
       sys.exit(3)
     # check for success or failure from log file
-    try:
-      success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
-    except:
-      pass
-    else:
-      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
-    # increment the run numbers
-    run_number+=1
-    
-    # continue with next run if gazebo if fully killed:
-    wait_for_gazebo()
+  try:
+    success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
+  except:
+    pass
+  else:
+    print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
+  # increment the run numbers
+  run_number+=1
+  
+  # continue with next run if gazebo if fully killed:
+  wait_for_gazebo()
 
 # after all required runs are finished
 kill_combo()

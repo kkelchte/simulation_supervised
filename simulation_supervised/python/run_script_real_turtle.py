@@ -38,7 +38,6 @@ import numpy as np
 ros_popen = None
 python_popen = None
 gazebo_popen = None
-turtle_popen = None
 
 crash_number = 0
 run_number = 0
@@ -87,7 +86,6 @@ def kill_combo():
   wait_for_gazebo()
   if python_popen: kill_popen('python', python_popen)
   if ros_popen: kill_popen('ros', ros_popen)
-  if turtle_popen: kill_popen('turtle', turtle_popen)
   time.sleep(5)
 
 ##########################################################################################################################
@@ -101,6 +99,9 @@ parser = argparse.ArgumentParser(description="""Run_simulation_scripts governs t
 # ==========================
 #   General Settings
 # ==========================
+parser.add_argument("--summary_dir", default='tensorflow/log/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
+parser.add_argument("--data_root", default='pilot_data/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
+parser.add_argument("--code_root", default='~', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("-t", "--log_tag", default='testing', type=str, help="LOGTAG: tag used to name logfolder.")
 parser.add_argument("-n", "--number_of_runs", default=1, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
@@ -135,9 +136,20 @@ FLAGS=parser.parse_args()
 # get simulation_supervised dir
 simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
 
-if FLAGS.log_tag == 'testing' and os.path.isdir(os.environ['HOME']+'/tensorflow/log/testing'):
-  shutil.rmtree(os.environ['HOME']+'/tensorflow/log/testing')
+# 3 main directories have to be defined in order to make it also runnable from a read-only system-installed singularity image.
+if FLAGS.summary_dir[0] != '/':  # 1. Tensorflow log directory for saving tensorflow logs and xterm logs
+  FLAGS.summary_dir=os.environ['HOME']+'/'+FLAGS.summary_dir
+if FLAGS.data_root[0] != '/':  # 2. Pilot_data directory for saving data
+  FLAGS.data_root=os.environ['HOME']+'/'+FLAGS.data_root
+if FLAGS.code_root == '~': # 3. location for tensorflow code (and also catkin workspace though they are found with rospack)
+  #no explicit directory for code is set so try to parse first from environment
+  try:
+    FLAGS.code_root = os.environ['CODE']
+  except KeyError: # in case environment variable is not set, take home dir
+    FLAGS.code_root = os.environ['HOME']
 
+if FLAGS.log_tag == 'testing' and os.path.isdir(FLAGS.summary_dir+'testing'):
+  shutil.rmtree(FLAGS.summary_dir+'testing')
 # add default values to be able to operate
 if FLAGS.worlds == None : FLAGS.worlds=['real_maze']
 else: #worlds are appended in a nested list... so get them out.
@@ -160,15 +172,15 @@ except:
   FLAGS.condor_host='unknown_host'
 
 # delete default log folder
-if FLAGS.log_tag == 'test_run_simulation_script' and os.path.isdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag):
-    shutil.rmtree(os.path.isdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag))
+if FLAGS.log_tag == 'test_run_simulation_script' and os.path.isdir(FLAGS.summary_dir+FLAGS.log_tag):
+    shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag)
 # Create main log folder
-if not os.path.isdir("{0}/tensorflow/log/{1}".format(os.environ['HOME'], FLAGS.log_tag)):
-  os.makedirs("{0}/tensorflow/log/{1}".format(os.environ['HOME'], FLAGS.log_tag))
+if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
+  os.makedirs("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag))
 
 # in case of data_creation, make data_location in ~/pilot_data
 if FLAGS.create_dataset: 
-  FLAGS.data_location = "{0}/pilot_data/{1}".format(os.environ['HOME'], FLAGS.log_tag)
+  FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.log_tag)
   if os.path.isdir(FLAGS.data_location) and FLAGS.number_of_runs == 1:
     shutil.rmtree(FLAGS.data_location)
   if not os.path.isdir(FLAGS.data_location):
@@ -178,14 +190,14 @@ if FLAGS.create_dataset:
     if len(os.listdir(FLAGS.data_location)) >= 1:
       # in case there is already data recorded, parse the number of runs and continue from there
       last_run=sorted([d for d in os.listdir(FLAGS.data_location) if os.path.isdir("{0}/{1}".format(FLAGS.data_location,d))])[-1]
-      run_number=int(last_run.split('_')[0]) #assuming number occurs at first 5 digits xxxxx_name_of_data
+      run_number=int(last_run.split('_')[0]) +1 #assuming number occurs at first 5 digits xxxxx_name_of_data
       print("Found data from previous run so adjusted run_number to {}".format(run_number))
 
 # display and save all settings
 print("\nSettings:")
 for f in FLAGS.__dict__: print("{0}: {1}".format( f, FLAGS.__dict__[f]))
 
-with open("{0}/tensorflow/log/{1}/conf".format(os.environ['HOME'], FLAGS.log_tag),'w') as c:
+with open("{0}{1}/conf".format(FLAGS.summary_dir, FLAGS.log_tag),'w') as c:
   c.write("Settings of Run_simulation_scripts:\n\n")
   for f in FLAGS.__dict__: c.write("{0}: {1}\n".format(f, FLAGS.__dict__[f]))
 
@@ -194,7 +206,7 @@ with open("{0}/tensorflow/log/{1}/conf".format(os.environ['HOME'], FLAGS.log_tag
 # STEP 2 Start ROS with ROBOT specific parameters
 
 # ensure location for logging the xterm outputs exists.
-ros_xterm_log_dir="{0}/tensorflow/log/{1}/xterm_ros".format(os.environ['HOME'],FLAGS.log_tag)
+ros_xterm_log_dir="{0}{1}/xterm_ros".format(FLAGS.summary_dir,FLAGS.log_tag)
 if not os.path.isdir(ros_xterm_log_dir): os.makedirs(ros_xterm_log_dir)
 
 def start_ros():
@@ -206,14 +218,14 @@ def start_ros():
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
   print("\n{0}: start_ros pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
-  time.sleep(8)  
+  time.sleep(1)  
 
 start_ros()
 
 ##########################################################################################################################
 # STEP 3 Start tensorflow
 
-python_xterm_log_dir="{0}/tensorflow/log/{1}/xterm_python".format(os.environ['HOME'],FLAGS.log_tag)
+python_xterm_log_dir="{0}{1}/xterm_python".format(FLAGS.summary_dir,FLAGS.log_tag)
 if not os.path.isdir(python_xterm_log_dir): os.makedirs(python_xterm_log_dir)
   
 def start_python():
@@ -222,28 +234,28 @@ def start_python():
   # if logdir already exists probably condor job is just restarted somewhere so use last saved checkpoint in case of training
   global python_popen
   if not FLAGS.evaluation:
-    for f in os.listdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag):
+    for f in os.listdir(FLAGS.summary_dir+FLAGS.log_tag):
       if fnmatch.fnmatch(f,"2018*"): # take only the tensorflow folders, indicated with a date tag
-        if len(os.listdir(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag+'/'+f)) > 6 :
-          FLAGS.checkpoint=os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag
+        if len(os.listdir(FLAGS.summary_dir+FLAGS.log_tag+'/'+f)) > 6 :
+          FLAGS.checkpoint=FLAGS.summary_dir+FLAGS.log_tag
           FLAGS.params.replace('scratch','')
           if 'continue_training' not in FLAGS.params: FLAGS.params="{0} --continue_training".format(FLAGS.params)
           break
         else:
           # in case python crashed during that run and left no more than 6 items, clean up logfolder
-          shutil.rmtree(os.environ['HOME']+'/tensorflow/log/'+FLAGS.log_tag+'/'+f)
+          shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag+'/'+f)
   
   # Add parameters
-  FLAGS.log_folder = "{0}/tensorflow/log/{1}/{2}_{3}".format(os.environ['HOME'],FLAGS.log_tag,time.strftime("%Y-%m-%d_%I%M"),'eval' if FLAGS.evaluation else 'train')
+  FLAGS.log_folder = "{0}{1}/{2}_{3}".format(FLAGS.summary_dir,FLAGS.log_tag,time.strftime("%Y-%m-%d_%I%M"),'eval' if FLAGS.evaluation else 'train')
   FLAGS.params="{0} --log_tag {1[0]}{1[1]}".format(FLAGS.params, FLAGS.log_folder.partition(FLAGS.log_tag)[1:])
-  if not 'online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
+  if not '--online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
   if FLAGS.checkpoint: FLAGS.params="{0} --checkpoint_path {1}".format(FLAGS.params, FLAGS.checkpoint)  
   if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
 
   # Create command
   command="{0}/scripts/launch_python/{1}.sh {2}/tensorflow/{3}/main.py {4}".format(simulation_supervised_dir,
                                                                                 FLAGS.python_environment,
-                                                                                os.environ['HOME'],
+                                                                                FLAGS.code_root,
                                                                                 FLAGS.python_project,
                                                                                 FLAGS.params)
   print("Tensorflow command: \n {}".format(command))
@@ -257,7 +269,7 @@ def start_python():
   start_time = time.time()
   while(not os.path.isfile(FLAGS.log_folder+'/tf_log')):
     time.sleep(1)
-    if time.time()-start_time > 2*60:
+    if time.time()-start_time > 5*60:
       print("{0}: Waited for 5minutes on tensorflow to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host))
       kill_combo()
       sys.exit(2)
@@ -277,7 +289,7 @@ print("roslaunch turtlebot3_bringup turtlebot3_klaas.launch")
 # STEP 5 Start simulation supervised tools
 
 # ensure location for logging the xterm outputs exists.
-gazebo_xterm_log_dir="{0}/tensorflow/log/{1}/xterm_gazebo".format(os.environ['HOME'],FLAGS.log_tag)
+gazebo_xterm_log_dir="{0}{1}/xterm_gazebo".format(FLAGS.summary_dir,FLAGS.log_tag)
 if not os.path.isdir(gazebo_xterm_log_dir): os.makedirs(gazebo_xterm_log_dir)
 
 
@@ -301,7 +313,7 @@ while run_number < FLAGS.number_of_runs:
   command="{0} world_name:={1}".format(command, world_name)
   
   print("\n{0}: started {3} run {1} of the {2} in {4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
-                                                          run_number, 
+                                                          run_number+1, 
                                                           FLAGS.number_of_runs, 
                                                           'evaluation' if evaluate else 'training',
                                                           world_name))
@@ -317,12 +329,6 @@ while run_number < FLAGS.number_of_runs:
     print("{2}: last communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
     kill_combo()
     sys.exit(3)
-
-  # generate world if it is possible and allowed, this also changes the loaded world file location from the default simsup_demo/worlds to log_folder
-  if world_name in ['canyon', 'forest', 'sandbox'] and not FLAGS.reuse_default_world:
-    generator_file="{0}/python/generators/{1}_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1],world_name)
-    subprocess.Popen(shlex.split("python "+generator_file+" "+FLAGS.log_folder)).wait()
-    command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
 
   # clean up gazebo ros folder every now and then
   if run_number%50 == 0 : shutil.rmtree("{0}/.gazebo/log".format(os.environ['HOME']),ignore_errors=True)
@@ -373,32 +379,13 @@ while run_number < FLAGS.number_of_runs:
         crash_number = 0
     time.sleep(0.1)
 
-  # # gazebo_popen.poll() == 15 --> killed by script
-  # # gazebo_popen.poll() == 0 --> killed by user 
-  # # gazebo_popen.poll() == 15 --> killed by fsm
-  # if not crashed and gazebo_popen.poll() != 0:
-  #   # wait for tf_log and stop in case of no tensorflow communication
-  #   if os.path.isfile(FLAGS.log_folder+'/tf_log'):
-  #     current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
-  #     start_time=time.time()
-  #     while current_stat == prev_stat:
-  #       current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
-  #       time.sleep(1)
-  #       if time.time()-start_time > 5*60:
-  #         print("{0}: waited for 5minutes on tf_log to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
-  #         kill_combo()
-  #         sys.exit(2)
-  #   else:
-  #     print("{2}: we have last communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
-  #     kill_combo()
-  #     sys.exit(3)
   # check for success or failure from log file
   try:
     success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
   except:
     pass
   else:
-    print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number, success))
+    print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
   # increment the run numbers
   run_number+=1
   
