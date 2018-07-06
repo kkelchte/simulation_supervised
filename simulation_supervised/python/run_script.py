@@ -278,7 +278,7 @@ def start_python():
   while(not os.path.isfile(FLAGS.log_folder+'/tf_log')):
     time.sleep(1)
     if time.time()-start_time > 5*60:
-      print("{0}: Waited for 5minutes on tensorflow to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host))
+      print("{0}: Waited for 5minutes on tf_log in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder))
       kill_combo()
       sys.exit(2)
 

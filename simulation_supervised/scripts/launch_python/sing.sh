@@ -6,7 +6,7 @@
 # /usr/lib/python2.7/dist-packages:\
 # /usr/local/lib/python2.7/dist-packages
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/.singularity.d/libs/:/usr/local/cuda/lib64:/usr/local/cudnn/lib64:
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/.singularity.d/libs/:/usr/local/cuda/lib64:/usr/local/cudnn/lib64
 
 python $@
 
