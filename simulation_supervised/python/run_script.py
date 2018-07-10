@@ -118,7 +118,7 @@ parser.add_argument("--robot",default='turtle_sim', type=str, help="Specify the 
 # ==========================
 #   Tensorflow Settings
 # ==========================
-parser.add_argument("-m","--checkpoint", type=str, help="Specify the directory of the checkpoint of the earlier trained model.")
+parser.add_argument("-m","--checkpoint_path", type=str, help="Specify the directory of the checkpoint of the earlier trained model.")
 parser.add_argument("-pe","--python_environment",default='sing', type=str, help="Define which environment should be loaded in shell when launching tensorlfow. Possibilities: sing, docker, virtualenv.")
 parser.add_argument("-pp","--python_project",default='q-learning/pilot', type=str, help="Define which python module should be started with ~/tenorflow/PROJECT_NAME/main.py: q-learning/pilot, pilot/pilot, ddpg, ....")
 
@@ -239,13 +239,13 @@ if not os.path.isdir(python_xterm_log_dir): os.makedirs(python_xterm_log_dir)
 def start_python():
   """Function that initializes python code."""
   # delete default test folder
-  # if logdir already exists probably condor job is just restarted somewhere so use last saved checkpoint in case of training
+  # if logdir already exists probably condor job is just restarted somewhere so use last saved q in case of training
   global python_popen
   if not FLAGS.evaluation:
     for f in os.listdir(FLAGS.summary_dir+FLAGS.log_tag):
       if fnmatch.fnmatch(f,"2018*"): # take only the tensorflow folders, indicated with a date tag
         if len(os.listdir(FLAGS.summary_dir+FLAGS.log_tag+'/'+f)) > 6 :
-          FLAGS.checkpoint=FLAGS.summary_dir+FLAGS.log_tag
+          FLAGS.checkpoint_path=FLAGS.summary_dir+FLAGS.log_tag
           FLAGS.params.replace('scratch','')
           if 'continue_training' not in FLAGS.params: FLAGS.params="{0} --continue_training".format(FLAGS.params)
           break
@@ -257,7 +257,7 @@ def start_python():
   FLAGS.log_folder = "{0}{1}/{2}_{3}".format(FLAGS.summary_dir,FLAGS.log_tag,time.strftime("%Y-%m-%d_%I%M"),'eval' if FLAGS.evaluation else 'train')
   FLAGS.params="{0} --log_tag {1[0]}{1[1]}".format(FLAGS.params, FLAGS.log_folder.partition(FLAGS.log_tag)[1:])
   if not '--online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
-  if FLAGS.checkpoint: FLAGS.params="{0} --checkpoint_path {1}".format(FLAGS.params, FLAGS.checkpoint)  
+  if FLAGS.checkpoint_path: FLAGS.params="{0} --checkpoint_path {1}".format(FLAGS.params, FLAGS.checkpoint_path)  
   if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
 
   # Create command
