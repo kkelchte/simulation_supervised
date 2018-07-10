@@ -17,8 +17,9 @@
 
 #include <std_msgs/Empty.h>
 
-#include <stdlib.h>     /* srand, rand */
+#include <stdlib.h>     /* srand, rand, getenv */
 #include <time.h>       /* time used for seeding rand*/
+
 
 using namespace std;
 
@@ -34,7 +35,7 @@ int counter = 0;
 float NOISE_AMP = 0.1;
 float ADJUST_HEIGHT_MAX = 2.0; 
 float ADJUST_HEIGHT_MIN = 0.5; // This is for the corridor world
-double starting_height = 0.4;
+double starting_height = 0.5;
 float adjust_height = 0;
 float CURRENT_YAW = 0;
 double GOAL_ANGLE = 3*CV_PI/2;
@@ -166,7 +167,7 @@ void callbackGt(const geometry_msgs::PoseStamped& msg)
 	}else{
 		adjust_height=0;
 	}
-	cout << "adjust_height: " << adjust_height <<"; current height: " << msg.pose.position.z << " starting_height: "<< starting_height<< endl;
+	// cout << "adjust_height: " << adjust_height <<"; current height: " << msg.pose.position.z << " starting_height: "<< starting_height<< endl;
 	CURRENT_YAW = getYaw(msg.pose.orientation) + CV_PI;
 }
 
@@ -302,6 +303,8 @@ int main(int argc, char** argv)
 	// Get the goal angle from the launch file
 	nh.getParam("goal_angle", GOAL_ANGLE);
 	nh.getParam("starting_height", starting_height);
+
+	cout << "[BA]: starting_height: "<< starting_height << endl; 
   	// Make subscriber to ground_truth in order to get the position.
 	//ros::Subscriber subControl = nh.subscribe("/ground_truth/state/pose/pose/position",1,&Callbacks::callbackGt, &callbacks);
 	ros::Subscriber subControl = nh.subscribe("/ground_truth_to_tf/pose",1,callbackGt);
@@ -332,15 +335,17 @@ int main(int argc, char** argv)
 
 	geometry_msgs::Twist twist;
 
-	std::string BA_parameters_path;
-	if(nh.getParam("ba_parameters_path", BA_parameters_path)) {
+	std::string ba_params;
+	if(nh.getParam("ba_params", ba_params)) {
+		std::string pHome;
+	  pHome = getenv ("HOME");
+		std::string BA_parameters_path = pHome+"/simsup_ws/src/simulation_supervised/simulation_supervised_control/parameters/" + ba_params ;
 		BAController = new BehaviourArbitration(BA_parameters_path);
+
 	}
 	else {
-		// cout << "Using default BA paremeters" << endl;
 		BAController = new BehaviourArbitration();
 	}
-	// cout << "Goal angle: " << GOAL_ANGLE << endl;
 
 	// nh.getParam("discretized_twist", discretized_twist);
 
@@ -355,7 +360,7 @@ int main(int argc, char** argv)
 
 	while(ros::ok()){
 		twist = get_twist();
-		cout << "BA state: " << fsm_state << ", "<< twist<< endl;
+		// cout << "BA state: " << fsm_state << ", "<< twist<< endl;
 		pubControl.publish(twist);
 		if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
       std_msgs::Empty msg;

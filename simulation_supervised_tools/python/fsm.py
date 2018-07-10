@@ -12,6 +12,8 @@ import numpy as np
 import subprocess,shlex
 
 from cv_bridge import CvBridge, CvBridgeError
+bridge = CvBridge()
+
 import cv2
 
 #--------------------------------------------------------------------------------------------------------------------------------

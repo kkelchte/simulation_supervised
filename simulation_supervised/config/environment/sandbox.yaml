@@ -3,3 +3,4 @@ max_duration: 15
 min_depth: 0.2
 starting_height: 0.5
 max_distance: 50
+ba_params: behavior_arbitration_sandbox.xml

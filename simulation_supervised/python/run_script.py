@@ -398,11 +398,12 @@ while run_number < FLAGS.number_of_runs:
   # gazebo_popen.poll() == 15 --> killed by script
   # gazebo_popen.poll() == 0 --> killed by user 
   # gazebo_popen.poll() == 15 --> killed by fsm
-  if not crashed and gazebo_popen.poll() != 0:
+  if not crashed and gazebo_popen.poll() != 0 and 'nn' in FLAGS.fsm:
     # wait for tf_log and stop in case of no tensorflow communication
     if os.path.isfile(FLAGS.log_folder+'/tf_log'):
       current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
       start_time=time.time()
+      print("{0}: waiting for tf_log.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       while current_stat == prev_stat:
         current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
         time.sleep(1)
@@ -411,7 +412,7 @@ while run_number < FLAGS.number_of_runs:
           kill_combo()
           sys.exit(2)
     else:
-      print("{2}: we have last communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
+      print("{2}: we have lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
       kill_combo()
       sys.exit(3)
     # check for success or failure from log file

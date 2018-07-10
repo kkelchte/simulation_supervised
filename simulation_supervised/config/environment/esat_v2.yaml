@@ -1,5 +1,6 @@
 delay_evaluation: 1
 max_duration: 500
 min_depth: 0.5
-starting_height: 0.5
+starting_height: 1
 max_distance: 4200
+ba_params: behavior_arbitration_no_goal.xml
