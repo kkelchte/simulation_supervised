@@ -108,6 +108,7 @@ parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nod
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
 parser.add_argument("--evaluate_every", default=20, type=int, help="Evaluate every N runs when training.")
 parser.add_argument("-ds", "--create_dataset", action='store_true',help="In case of True, sensor data is saved.")
+parser.add_argument("--save_only_success", action='store_true',help="In case of True, sensor data is saved.")
 parser.add_argument("--seed", type=float, help="In case of True, sensor data is saved.")
 
 # ==========================
@@ -156,8 +157,10 @@ if FLAGS.code_root == '~': # 3. location for tensorflow code (and also catkin wo
   except KeyError: # in case environment variable is not set, take home dir
     FLAGS.code_root = os.environ['HOME']
 
-if FLAGS.log_tag == 'testing' and os.path.isdir(FLAGS.summary_dir+'testing'):
-  shutil.rmtree(FLAGS.summary_dir+'testing')
+if FLAGS.log_tag == 'testing':
+  if os.path.isdir(FLAGS.summary_dir+FLAGS.log_tag): shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag)    
+  if os.path.isdir(FLAGS.data_root+FLAGS.log_tag): shutil.rmtree(FLAGS.data_root+FLAGS.log_tag)
+
 # add default values to be able to operate
 if FLAGS.worlds == None : FLAGS.worlds=['canyon']
 else: #worlds are appended in a nested list... so get them out.
@@ -179,9 +182,7 @@ try:
 except:
   FLAGS.condor_host='unknown_host'
 
-# delete default log folder
-if FLAGS.log_tag == 'test_run_simulation_script' and os.path.isdir(FLAGS.summary_dir+FLAGS.log_tag):
-    shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag)
+
 # Create main log folder
 if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
   os.makedirs("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag))
@@ -320,7 +321,7 @@ while run_number < FLAGS.number_of_runs:
   # in case of saving data, increment data location in ~/pilot_data
   if FLAGS.create_dataset:
     # remove if saving location already exists (probably due to crash previously)
-    shutil.rmtree("{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name))
+    if os.path.isdir("{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name)): shutil.rmtree("{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name))
     command="{0} data_location:={1}/{2:05d}_{3} save_images:=true".format(command, FLAGS.data_location,run_number,world_name)
 
   # save current status of tensorflow log to compare afterwards
@@ -420,16 +421,19 @@ while run_number < FLAGS.number_of_runs:
     # check for success or failure from log file
   if not crashed:
     # increment the run numbers in case of no gazebo crash.
-    run_number+=1
-   
-  try:
-    success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
-  except:
-    pass
-  else:
-    print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
+    success=''
+    try:
+      success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
+    except:
+      pass
+    else:
+      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
+    if FLAGS.save_only_success and FLAGS.create_dataset and success in ['', 'bump']:
+      print("no success, so retry.")
+      # data folder will be removed when starting up new gazebo simulation.
+    else:
+        run_number+=1
   
-
   # continue with next run if gazebo if fully killed:
   wait_for_gazebo()
 
