@@ -319,6 +319,8 @@ while run_number < FLAGS.number_of_runs:
 
   # in case of saving data, increment data location in ~/pilot_data
   if FLAGS.create_dataset:
+    # remove if saving location already exists (probably due to crash previously)
+    shutil.rmtree("{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name))
     command="{0} data_location:={1}/{2:05d}_{3} save_images:=true".format(command, FLAGS.data_location,run_number,world_name)
 
   # save current status of tensorflow log to compare afterwards
@@ -416,15 +418,18 @@ while run_number < FLAGS.number_of_runs:
       kill_combo()
       sys.exit(3)
     # check for success or failure from log file
+  if not crashed:
+    # increment the run numbers in case of no gazebo crash.
+    run_number+=1
+   
   try:
     success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
   except:
     pass
   else:
     print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
-  # increment the run numbers
-  run_number+=1
   
+
   # continue with next run if gazebo if fully killed:
   wait_for_gazebo()
 
