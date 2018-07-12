@@ -59,6 +59,13 @@ T_pg=[] # transformation of previous pose in global coordinates
 ready=False
 finished=True
 
+# keep track of how fast images arrive (first thing at callback)
+# and how fast they are written away
+rgb_cb_rate=[]
+rgb_cb_ts=0
+rgb_write_rate=[]
+rgb_write_ts=0
+
 skip_first=4 # don't save the first images as the sensor is still starting up.
 
   
@@ -78,10 +85,14 @@ def process_rgb_compressed(msg, index):
 
 def compressed_image_callback(msg):
   """If saving the compressed image worked out, write the log information and increment index."""
-  global index  
+  global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate
+  if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
+  rgb_cb_ts = time.time()
   if process_rgb_compressed(msg, index):
     if index > skip_first: write_info('RGB', index)
     index+=1
+    if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
+    rgb_write_ts=time.time()
 
 def process_rgb(msg, index):
   """If ready-state: go from serial to rgb image and save it."""
@@ -100,10 +111,14 @@ def process_rgb(msg, index):
 
 def image_callback(msg):
   """If saving the image worked out, write the log information and increment index."""
-  global index  
+  global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate
+  if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
+  rgb_cb_ts = time.time()
   if process_rgb(msg, index):
     if index > skip_first: write_info('RGB', index)
     index+=1
+    if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
+    rgb_write_ts=time.time()
 
 def process_depth(msg, index):
   """If ready-state: go from serial to depth image and save it."""
@@ -219,7 +234,11 @@ def finished_callback(msg):
   if ready and not finished:
     ready=False
     finished = True
-    print('[create_dataset]: finished: {0}'.format(rospy.get_time()))
+    print('[create_dataset]: finished: {0}. RGB callback rate: {1:0.3f}({2:0.2f}) and RGB write rate: {3:0.3f}({4:0.2f})'.format(rospy.get_time(), 
+                                                                                                              np.mean(rgb_cb_rate),
+                                                                                                              np.var(rgb_cb_rate),
+                                                                                                              np.mean(rgb_write_rate),
+                                                                                                              np.var(rgb_write_rate)))
 
 def write_info(image_type, index):
   """For each image (lowest rate) save information regarding the position, control or scan readings."""
@@ -284,9 +303,9 @@ if __name__=="__main__":
   if rospy.has_param('gt_info'): rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
   if rospy.has_param('rgb_image'): 
     if 'compressed' in rospy.get_param('rgb_image'): 
-      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 10)  
+      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 20)  
     else:
-      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 10)  
+      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 20)  
   if rospy.has_param('depth_image'): 
     if 'scan' in rospy.get_param('depth_image'):
       rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_callback)

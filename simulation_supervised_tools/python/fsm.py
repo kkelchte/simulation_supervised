@@ -191,7 +191,7 @@ def shutdown():
     with open(pidfile, 'r') as pf:
       pid=pf.read()
     print("[fsm.py]: killing pid {}".format(pid))
-    time.sleep(1)
+    time.sleep(3) #changed from 1
     subprocess.Popen(shlex.split("kill "+pid)).wait()
 
 
