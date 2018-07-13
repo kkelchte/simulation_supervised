@@ -29,7 +29,7 @@ using namespace std;
 bool discretized_twist = false;
 
 int fsm_state = 0; //switch between 3 states [0: wait before take off, 1: takeoff and start positioning, 2: publish ready and start obstacle avoidance]
-int FSM_COUNTER_THRESH=100;//wait for some time before taking off
+int FSM_COUNTER_THRESH=100;//100;//wait for some time before taking off
 int counter = 0;
 
 float NOISE_AMP = 0.1;
@@ -205,7 +205,9 @@ geometry_msgs::Twist get_twist() {
 	    twist.angular.y = 0.0;
 	    twist.angular.z = 0.0;
 	    counter=counter+1;
-	    if(counter > FSM_COUNTER_THRESH) fsm_state = 1;
+	    if(counter > FSM_COUNTER_THRESH)
+	    	fsm_state = 1;
+			cout << "BA state: " << fsm_state << ", "<< twist<< endl;
 	    return twist;
 	  case 1: //position drone on certain height set by rosparam
 	    twist.linear.x = 0.0;
@@ -218,6 +220,7 @@ geometry_msgs::Twist get_twist() {
 	    	fsm_state = 2;
 	    	std_msgs::Empty msg; //Send go signal to fsm to switch to state 2 and adjust control connections if necessary.
 	    	goPub.publish(msg);
+			cout << "BA state: " << fsm_state << ", "<< twist<< endl;
 	    }
 	    return twist;
 	  case 2: //Do obstacle avoidance
@@ -338,10 +341,9 @@ int main(int argc, char** argv)
 	std::string ba_params;
 	if(nh.getParam("ba_params", ba_params)) {
 		std::string pHome;
-	  pHome = getenv ("HOME");
+	    pHome = getenv ("HOME");
 		std::string BA_parameters_path = pHome+"/simsup_ws/src/simulation_supervised/simulation_supervised_control/parameters/" + ba_params ;
 		BAController = new BehaviourArbitration(BA_parameters_path);
-
 	}
 	else {
 		BAController = new BehaviourArbitration();
@@ -363,9 +365,9 @@ int main(int argc, char** argv)
 		// cout << "BA state: " << fsm_state << ", "<< twist<< endl;
 		pubControl.publish(twist);
 		if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
-      std_msgs::Empty msg;
-      pubControl.publish(twist);
-  		pubTakeoff.publish(msg);
+  	      std_msgs::Empty msg;
+    	  pubControl.publish(twist);
+  		  pubTakeoff.publish(msg);
 		}
 		if(fsm_state == 2){ //drone is at proper height ==> start OA
 			pubControl.publish(twist);

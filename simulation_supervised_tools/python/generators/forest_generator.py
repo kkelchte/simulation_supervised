@@ -3,9 +3,10 @@ import xml.etree.ElementTree as ET
 # import xml.dom.minidom
 import numpy as np
 import matplotlib.pyplot as plt
-import os,sys
+import os,sys, time
 
-#np.random.seed(100)
+np.random.seed(int(time.time()))
+
 
 result_world='forest.world'
 worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'

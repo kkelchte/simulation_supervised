@@ -72,6 +72,19 @@ def wait_for_gazebo():
     out = p_grep.communicate()[0]
     time.sleep(0.2)  
 
+def wait_for_create_dataset():
+  """gazebo popen is not enough to get gzserver to stop so wait longer..."""
+  p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
+  p_grep = subprocess.Popen(["grep","create_dataset"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+  print("{0}: wait for create_dataset".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+  out = p_grep.communicate()[0]
+  while "create_dataset" in out:
+    p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
+    p_grep = subprocess.Popen(["grep","create_dataset"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+    out = p_grep.communicate()[0]
+    time.sleep(0.2)  
+
+
 def kill_popen(process_name, process_popen):
   """Check status, terminate popen and wait for it to stop."""
   print("{0}: terminate {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), process_name))
@@ -245,7 +258,7 @@ def start_python():
   if not FLAGS.evaluation:
     for f in os.listdir(FLAGS.summary_dir+FLAGS.log_tag):
       if fnmatch.fnmatch(f,"2018*"): # take only the tensorflow folders, indicated with a date tag
-        if len(os.listdir(FLAGS.summary_dir+FLAGS.log_tag+'/'+f)) > 6 :
+        if len([d for d in os.listdir(FLAGS.summary_dir+FLAGS.log_tag+'/'+f) if "checkpoint" in d]) > 0 :
           FLAGS.checkpoint_path=FLAGS.summary_dir+FLAGS.log_tag
           FLAGS.params.replace('scratch','')
           if 'continue_training' not in FLAGS.params: FLAGS.params="{0} --continue_training".format(FLAGS.params)
@@ -436,6 +449,7 @@ while run_number < FLAGS.number_of_runs:
   
   # continue with next run if gazebo if fully killed:
   wait_for_gazebo()
+  wait_for_create_dataset()
 
 # after all required runs are finished
 kill_combo()

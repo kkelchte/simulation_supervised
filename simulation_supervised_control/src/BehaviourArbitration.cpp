@@ -44,7 +44,7 @@ BehaviourArbitration::BehaviourArbitration() {
 }
 
 BehaviourArbitration::BehaviourArbitration(std::string xmlPath) {
-	cout << "Reading behaviour arbitration parameters from " << xmlPath << endl;
+	cout << "[BA] 	Reading behaviour arbitration parameters from " << xmlPath << endl;
 	FileStorage fs;//(filename, FileStorage::READ);
 	fs.open(xmlPath, FileStorage::READ);
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import xml.etree.ElementTree as ET
 #from lxml import etree as ET
-import os,  re, sys, shutil
+import os,  re, sys, shutil, time
 from copy import deepcopy
 import random
 # from matplotlib.patches import Circle
@@ -12,8 +12,8 @@ import numpy as np
 # else:
 result_world='sandbox.world'
 
-#np.random.seed(150)
-#random.seed(100)
+np.random.seed(int(time.time()))
+random.seed(int(time.time()))
 
 # example file that is adapted:
 template_world='template.world'

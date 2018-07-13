@@ -3,9 +3,9 @@ from ou_noise import OUNoise
 import xml.etree.ElementTree as ET
 import numpy as np
 import matplotlib.pyplot as plt
-import os,sys
+import os,sys, time
 
-# np.random.seed(150)
+np.random.seed(int(time.time()))
 
 
 number_of_walls=150
