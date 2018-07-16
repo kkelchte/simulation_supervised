@@ -29,7 +29,8 @@ using namespace std;
 bool discretized_twist = false;
 
 int fsm_state = 0; //switch between 3 states [0: wait before take off, 1: takeoff and start positioning, 2: publish ready and start obstacle avoidance]
-int FSM_COUNTER_THRESH=100;//100;//wait for some time before taking off
+int FSM_COUNTER_THRESH=100;//wait for some time before taking off 5s
+int GO_COUNTER_THRESH=20;//wait for some time before taking off 1s
 int counter = 0;
 
 float NOISE_AMP = 0.1;
@@ -205,9 +206,10 @@ geometry_msgs::Twist get_twist() {
 	    twist.angular.y = 0.0;
 	    twist.angular.z = 0.0;
 	    counter=counter+1;
-	    if(counter > FSM_COUNTER_THRESH)
+	    if(counter > FSM_COUNTER_THRESH){	
 	    	fsm_state = 1;
-			cout << "BA state: " << fsm_state << ", "<< twist<< endl;
+	    	cout << "BA state: Takeoff: " << fsm_state << ", "<< twist<< endl;
+	    }
 	    return twist;
 	  case 1: //position drone on certain height set by rosparam
 	    twist.linear.x = 0.0;
@@ -218,15 +220,27 @@ geometry_msgs::Twist get_twist() {
 	    twist.angular.z = 0.0;
 	    if(adjust_height <= 0){
 	    	fsm_state = 2;
-	    	std_msgs::Empty msg; //Send go signal to fsm to switch to state 2 and adjust control connections if necessary.
-	    	goPub.publish(msg);
-			cout << "BA state: " << fsm_state << ", "<< twist<< endl;
+	    	counter=0;
+	    	cout << "BA state: Go signal:" << fsm_state << ", "<< twist<< endl;
 	    }
 	    return twist;
-	  case 2: //Do obstacle avoidance
+	  case 2: //wait before running
+	    twist.linear.x = 0.0;
+	    twist.linear.y = 0.0;
+	    twist.linear.z = 0.0;
+	    twist.angular.x = 0.0;
+	    twist.angular.y = 0.0;
+	    twist.angular.z = 0.0;
+	    counter=counter+1;
+	    if(counter > GO_COUNTER_THRESH){
+	    	fsm_state = 3;
+	    	cout << "BA state: Running: " << fsm_state << ", "<< twist<< endl;
+	    	counter=0;
+	    }	    	
+	    return twist;
+	  case 3: //Do obstacle avoidance
 	  	if(type_of_noise.compare("ou") == 0 ){
-
-				DYAW = DYAW + NOISE_AMP*ounoise_Y->noise(); 
+			DYAW = DYAW + NOISE_AMP*ounoise_Y->noise(); 
 		  	// DYAW = +1;
 		  	twist.linear.x = speed; //speed
 		    twist.linear.y = NOISE_AMP*ounoise_y->noise(); 
@@ -368,10 +382,16 @@ int main(int argc, char** argv)
   	      std_msgs::Empty msg;
     	  pubControl.publish(twist);
   		  pubTakeoff.publish(msg);
-		}
+    	}
 		if(fsm_state == 2){ //drone is at proper height ==> start OA
-			pubControl.publish(twist);
-    }
+		  std_msgs::Empty msg;
+    	  pubControl.publish(twist);
+  		  goPub.publish(msg);
+    	}
+    	if(fsm_state==3){
+     	  pubControl.publish(twist);
+		  
+    	}
 		loop_rate.sleep();
 		ros::spinOnce();
 	}

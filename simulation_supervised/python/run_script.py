@@ -70,7 +70,8 @@ def wait_for_gazebo():
     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
     p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
     out = p_grep.communicate()[0]
-    time.sleep(0.2)  
+    time.sleep(0.2)
+  time.sleep(1)  
 
 def wait_for_create_dataset():
   """gazebo popen is not enough to get gzserver to stop so wait longer..."""
@@ -219,7 +220,7 @@ if FLAGS.create_dataset:
 print("\nSettings:")
 for f in FLAGS.__dict__: print("{0}: {1}".format( f, FLAGS.__dict__[f]))
 
-with open("{0}{1}/conf".format(FLAGS.summary_dir, FLAGS.log_tag),'w') as c:
+with open("{0}{1}/run_conf".format(FLAGS.summary_dir, FLAGS.log_tag),'w') as c:
   c.write("Settings of Run_simulation_scripts:\n\n")
   for f in FLAGS.__dict__: c.write("{0}: {1}\n".format(f, FLAGS.__dict__[f]))
 
@@ -397,8 +398,8 @@ while run_number < FLAGS.number_of_runs:
       start_time=time.time()
     else:
       time_spend=time.time() - start_time
-    if time_spend > 300 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
-      print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+    if time_spend > 60*8 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
+      print("{0}: running more than 8minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
       if crash_number < 3:
@@ -436,20 +437,20 @@ while run_number < FLAGS.number_of_runs:
     # increment the run numbers in case of no gazebo crash.
     success=''
     try:
-      success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
+      success = open("{0}/log".format(FLAGS.log_folder),'r').readlines()[-1][:-1]
+      # success = subprocess.check_output(shlex.split("tail -1 {0}/log".format(FLAGS.log_folder)))
     except:
       pass
     else:
       print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
-    if FLAGS.save_only_success and FLAGS.create_dataset and success in ['', 'bump']:
+    if FLAGS.save_only_success and FLAGS.create_dataset and 'success' not in success:
       print("no success, so retry.")
       # data folder will be removed when starting up new gazebo simulation.
     else:
-        run_number+=1
-  
+      run_number+=1
   # continue with next run if gazebo if fully killed:
   wait_for_gazebo()
-  wait_for_create_dataset()
+  # wait_for_create_dataset()
 
 # after all required runs are finished
 kill_combo()
