@@ -2,6 +2,7 @@
 import rospy
 import sys, os, time
 from geometry_msgs.msg import Twist
+from geometry_msgs.msg import WrenchStamped
 from std_msgs.msg import Empty
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Image
@@ -248,8 +249,20 @@ def gt_cb(data):
   if max_duration != -1: time_check()
   positions.append(current_pos)
   if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance and not shuttingdown:
-    print '[fsm]: dis > max distance-----------success!'
+    print('[fsm.py]: {0}: dis > max distance-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
     success = True
+    shutdown()
+
+def wrench_cb(data):
+  """
+  Check if the force from the motors of the drone is still giving a minimum z-force.
+  If there is no drag force the engines are shut down due to flip over.
+  """
+  global success
+  if shuttingdown or (rospy.get_time()-start_time < delay_evaluation) or current_state != 'running': return
+  if data.wrench.force.z < 3:
+    print('[fsm.py]: {0}: {2} drag force detected after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time), data.wrench.force.z)
+    success = False
     shutdown()
 
 def write(filename, message):
@@ -336,7 +349,10 @@ if __name__=="__main__":
     max_distance=rospy.get_param('max_distance')
   if rospy.has_param('gt_info'): 
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_cb)
-    
+  
+  # used to detect whether motors are still running as they shutdown on flipover.
+  rospy.Subscriber("/command/wrench", WrenchStamped, wrench_cb)
+
   print("[fsm.py]: min_depth: {}".format(min_depth))
   
   if rospy.has_param('log_folder'): 

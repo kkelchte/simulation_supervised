@@ -449,7 +449,7 @@ while run_number < FLAGS.number_of_runs:
   
   # continue with next run if gazebo if fully killed:
   wait_for_gazebo()
-  wait_for_create_dataset()
+  # wait_for_create_dataset()
 
 # after all required runs are finished
 kill_combo()
