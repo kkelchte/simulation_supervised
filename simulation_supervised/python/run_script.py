@@ -117,6 +117,7 @@ parser.add_argument("--summary_dir", default='tensorflow/log/', type=str, help="
 parser.add_argument("--data_root", default='pilot_data/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("--code_root", default='~', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("-t", "--log_tag", default='testing', type=str, help="LOGTAG: tag used to name logfolder.")
+parser.add_argument("--data_location", default='', type=str, help="Datalocation is by default the log_tag but than in data_root instead of summary_dir, otherwise FLAG should indicate relative path to data_root.")
 parser.add_argument("-n", "--number_of_runs", default=2, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
@@ -135,7 +136,7 @@ parser.add_argument("--robot",default='turtle_sim', type=str, help="Specify the 
 # ==========================
 parser.add_argument("-m","--checkpoint_path", type=str, help="Specify the directory of the checkpoint of the earlier trained model.")
 parser.add_argument("-pe","--python_environment",default='sing', type=str, help="Define which environment should be loaded in shell when launching tensorlfow. Possibilities: sing, docker, virtualenv.")
-parser.add_argument("-pp","--python_project",default='q-learning/pilot', type=str, help="Define which python module should be started with ~/tenorflow/PROJECT_NAME/main.py: q-learning/pilot, pilot/pilot, ddpg, ....")
+parser.add_argument("-pp","--python_project",default='pilot/pilot', type=str, help="Define which python module should be started with ~/tenorflow/PROJECT_NAME/main.py: q-learning/pilot, pilot/pilot, ddpg, ....")
 
 # ==========================
 #   Environment Settings
@@ -154,7 +155,8 @@ parser.add_argument("--z_var",default=0,type=float, help="Specify variation z po
 parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orientation.")
 parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
 
-FLAGS=parser.parse_args()
+FLAGS, others = parser.parse_known_args()
+# FLAGS=parser.parse_args()
 
 # get simulation_supervised dir
 simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
@@ -203,7 +205,10 @@ if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
 
 # in case of data_creation, make data_location in ~/pilot_data
 if FLAGS.create_dataset: 
-  FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.log_tag)
+  if FLAGS.data_location == "":
+    FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.log_tag)
+  else:
+    FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.data_location)
   if os.path.isdir(FLAGS.data_location) and FLAGS.number_of_runs == 1:
     shutil.rmtree(FLAGS.data_location)
   if not os.path.isdir(FLAGS.data_location):

@@ -105,13 +105,14 @@ def process_rgb(msg, index):
   else:
     # Save your OpenCV2 image as a jpeg 
     if index > skip_first: 
-      # print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.forma, index, rospy.get_time()))
+      # print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.format(data_location, index, rospy.get_time()))
       cv2.imwrite(data_location+"/RGB/{:010d}.jpg".format(index), rgb_image)
     return True
 
 def image_callback(msg):
   """If saving the image worked out, write the log information and increment index."""
   global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate
+  # print "[create_dataset]: {2} : received image. index: {0} skip_first: {1}".format(index, skip_first, rospy.get_time())
   if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
   rgb_cb_ts = time.time()
   if process_rgb(msg, index):
@@ -226,7 +227,7 @@ def ready_callback(msg):
       if not os.path.exists(data_location+'/Depth'): os.makedirs(data_location+'/Depth')
       index=0
 
-    print('[create_dataset]: ready: {0}: {1}'.format(rospy.get_time(), os.path.basename(data_location)))
+    print('[create_dataset]: ready: {0}: {1}'.format(rospy.get_time(), data_location))
 
 def finished_callback(msg):
   """ callback function that makes create_ds stop and toggles finished"""
@@ -303,9 +304,9 @@ if __name__=="__main__":
   if rospy.has_param('gt_info'): rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
   if rospy.has_param('rgb_image'): 
     if 'compressed' in rospy.get_param('rgb_image'): 
-      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 10)  
+      rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 20)  
     else:
-      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 10)  
+      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback, queue_size = 20)  
   if rospy.has_param('depth_image'): 
     if 'scan' in rospy.get_param('depth_image'):
       rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_callback)

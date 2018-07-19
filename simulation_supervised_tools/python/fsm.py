@@ -261,7 +261,7 @@ def wrench_cb(data):
   global success
   if shuttingdown or (rospy.get_time()-start_time < delay_evaluation) or current_state != 'running': return
   if data.wrench.force.z < 3:
-    print('[fsm.py]: {0}: {2} drag force detected after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time), data.wrench.force.z)
+    print('[fsm.py]: {0}: {2} drag force detected after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, data.wrench.force.z))
     success = False
     shutdown()
 

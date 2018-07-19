@@ -71,7 +71,8 @@ def depth_callback(data):
             1:0, # drive straight
             2:-1} # turn right
 
-  speed_dict={0:0.1, 1:0.3, 2:0.1}  
+  # speed_dict={0:0.1, 1:0.3, 2:0.1}  
+  speed_dict={0:0.4, 1:1.3, 2:0.4}  
 
   # print("[depth_heuristic]: min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
   msg = Twist()

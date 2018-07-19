@@ -30,7 +30,7 @@ bool discretized_twist = false;
 
 int fsm_state = 0; //switch between 3 states [0: wait before take off, 1: takeoff and start positioning, 2: publish ready and start obstacle avoidance]
 int FSM_COUNTER_THRESH=100;//wait for some time before taking off 5s
-int GO_COUNTER_THRESH=20;//wait for some time before taking off 1s
+int GO_COUNTER_THRESH=20;//wait for some time while sending 'go'
 int counter = 0;
 
 float NOISE_AMP = 0.1;
@@ -46,6 +46,8 @@ float speed = 1.3;
 BehaviourArbitration * BAController = 0; // Will be initialized in main
 ros::Publisher debugPub;
 ros::Publisher goPub;
+ros::Publisher pubControl;
+ros::Publisher pubTakeoff;
 
 OUNoise * ounoise_Y = 0;
 // OUNoise * ounoise_x = 0;
@@ -287,6 +289,27 @@ geometry_msgs::Twist get_twist() {
 	    break;
 	}
 }
+void callbackRGB(const sensor_msgs::ImageConstPtr& original_image){
+	/*Use image frame rate to update and publish twist*/
+	geometry_msgs::Twist twist;
+
+	twist = get_twist();
+	// cout << "BA state: " << fsm_state << ", "<< twist<< endl;
+	pubControl.publish(twist);
+	if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
+    std_msgs::Empty msg;
+	  pubControl.publish(twist);
+	  pubTakeoff.publish(msg);
+	}
+	if(fsm_state == 2){ //drone is at proper height ==> start OA
+  	std_msgs::Empty msg;
+	  pubControl.publish(twist);
+	  goPub.publish(msg);
+	}
+	if(fsm_state==3){
+ 	  pubControl.publish(twist);
+  }
+}
 
 int main(int argc, char** argv)
 {
@@ -330,13 +353,12 @@ int main(int argc, char** argv)
 
 
 	// Make subscriber to cmd_vel in order to set the name.
-	ros::Publisher pubControl;
 	pubControl = nh.advertise<geometry_msgs::Twist>(topic_control, 1000);
 
 	// Make Publisher to cmd_vel in order to set the velocity.
 	std::string topic_takeoff= "none";
 	nh.getParam("takeoff", topic_takeoff);
-	ros::Publisher pubTakeoff = nh.advertise<std_msgs::Empty>(topic_takeoff, 1);	
+	pubTakeoff = nh.advertise<std_msgs::Empty>(topic_takeoff, 1);	
 	
 	nh.getParam("speed", speed);
 	nh.getParam("noise", type_of_noise);
@@ -350,7 +372,6 @@ int main(int argc, char** argv)
 	debugPub = nh.advertise<std_msgs::Float32>("debug_autopilot", 1000);
 	goPub = nh.advertise<std_msgs::Empty>("go", 1000);
 
-	geometry_msgs::Twist twist;
 
 	std::string ba_params;
 	if(nh.getParam("ba_params", ba_params)) {
@@ -372,26 +393,38 @@ int main(int argc, char** argv)
 	// cout << "Behaviour Arbitration starting_height: " << starting_height << endl;
 	// cout << "Behaviour Arbitration type_of_noise: " << type_of_noise << endl;
 	// cout << "Behaviour Arbitration using parameters: "<< BA_parameters_path << endl;
+
+	// Use the rgb frame rate to navigate so the delay of rendering is floating over to the oracle
+	// otherwise oracle takes decisions without waiting for the images to be rendered.
+	std::string rgb_image;
+	image_transport::Subscriber sub_rgb_image ;
+	if(nh.getParam("rgb_image", rgb_image)) {
+		sub_rgb_image = it.subscribe(rgb_image,20,callbackRGB);
+	}
+	else {
+		sub_rgb_image = it.subscribe("/ardrone/kinect/depth/image_raw",20,callbackRGB);
+	}
+
 	ros::Rate loop_rate(20);
 
 	while(ros::ok()){
-		twist = get_twist();
-		// cout << "BA state: " << fsm_state << ", "<< twist<< endl;
-		pubControl.publish(twist);
-		if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
-  	      std_msgs::Empty msg;
-    	  pubControl.publish(twist);
-  		  pubTakeoff.publish(msg);
-    	}
-		if(fsm_state == 2){ //drone is at proper height ==> start OA
-		  std_msgs::Empty msg;
-    	  pubControl.publish(twist);
-  		  goPub.publish(msg);
-    	}
-    	if(fsm_state==3){
-     	  pubControl.publish(twist);
+		// twist = get_twist();
+		// // cout << "BA state: " << fsm_state << ", "<< twist<< endl;
+		// pubControl.publish(twist);
+		// if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
+  // 	      std_msgs::Empty msg;
+  //   	  pubControl.publish(twist);
+  // 		  pubTakeoff.publish(msg);
+  //   	}
+		// if(fsm_state == 2){ //drone is at proper height ==> start OA
+		//   std_msgs::Empty msg;
+  //   	  pubControl.publish(twist);
+  // 		  goPub.publish(msg);
+  //   	}
+  //   	if(fsm_state==3){
+  //    	  pubControl.publish(twist);
 		  
-    	}
+  //   	}
 		loop_rate.sleep();
 		ros::spinOnce();
 	}
