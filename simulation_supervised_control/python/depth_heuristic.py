@@ -25,9 +25,12 @@ import matplotlib.animation as animation
 #
 #--------------------------------------------------------------------------------------------------------------
 
-clip_distance = 5
-front_width=50 #47 #define the width of free space in before drifing forward
-field_of_view=100 #90
+clip_distance = 1 #5 tweak for doshico
+front_width=40 #50 # define the width of free space in before driving forward
+field_of_view=80 #90 #100
+scale_yaw=0.4 #1 
+turn_speed=0.8 #0.1
+speed=1.3 #0.3
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -72,7 +75,7 @@ def depth_callback(data):
             2:-1} # turn right
 
   # speed_dict={0:0.1, 1:0.3, 2:0.1}  
-  speed_dict={0:0.4, 1:1.3, 2:0.4}  
+  speed_dict={0:turn_speed, 1:speed, 2:turn_speed}  
 
   # print("[depth_heuristic]: min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
   msg = Twist()
@@ -80,7 +83,7 @@ def depth_callback(data):
   msg.linear.x = speed_dict[index]
   msg.linear.y = 0
   msg.linear.z = 0
-  msg.angular.z = yaw_dict[index]
+  msg.angular.z = scale_yaw*yaw_dict[index] #added for doshico environments
 
   # print("[depth_heuristic]: speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
   action_pub.publish(msg)
@@ -117,6 +120,11 @@ if __name__=="__main__":
   rospy.Subscriber('/dh_start', Empty, ready_callback)
   rospy.Subscriber('/dh_stop', Empty, finished_callback)
 
+  for p in 'clip_distance', 'front_width', 'field_of_view', 'scale_yaw','turn_speed', 'speed':
+    if rospy.has_param(p): 
+      exec(p + "= rospy.get_param('"+p+"')")
+      # print("set {0} to {1}".format(p, rospy.get_param(p)))
+  
   if rospy.has_param('graphics'):
     if rospy.get_param('graphics'):
       print("[depth_heuristic]: showing graphics.")

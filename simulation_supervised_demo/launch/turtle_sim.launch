@@ -32,6 +32,7 @@
   <!-- Load parameters for environment-->
   <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->
   <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+  <rosparam command="load" file="$(find simulation_supervised_control)/parameters/turtle_$(arg world_name).yaml"/> 
 
   <!-- Load parameters for fsm-->
   <arg name="fsm_config" default="console_fsm"/>

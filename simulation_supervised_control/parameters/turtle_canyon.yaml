@@ -1,0 +1,6 @@
+clip_distance: 3
+front_width: 40
+field_of_view: 80
+scale_yaw: 0.4
+turn_speed: 0.8
+speed: 1.3
