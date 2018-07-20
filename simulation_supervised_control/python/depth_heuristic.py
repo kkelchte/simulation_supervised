@@ -84,7 +84,7 @@ def depth_callback(data):
   msg.linear.z = 0
   msg.angular.z = scale_yaw*yaw_dict[index] #added for doshico environments
 
-  print("[depth_heuristic]: speed: {0} angle: {1} index: {2}".format(msg.linear.x, msg.angular.z, index))
+  # print("[depth_heuristic]: speed: {0} angle: {1} index: {2}".format(msg.linear.x, msg.angular.z, index))
   action_pub.publish(msg)
 
 def ready_callback(msg):
