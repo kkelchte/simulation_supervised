@@ -198,7 +198,6 @@ try:
 except:
   FLAGS.condor_host='unknown_host'
 
-
 # Create main log folder
 if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
   os.makedirs("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag))

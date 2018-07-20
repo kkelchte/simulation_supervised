@@ -64,15 +64,14 @@ def depth_callback(data):
   # discretize 3 bins (:-front_width/2:front_width/2:)
   # range that covers going straight.
   x=[np.nanmin(ranges[0:field_of_view/2-front_width/2]),np.nanmin(ranges[field_of_view/2-front_width/2:field_of_view/2+front_width/2]),np.nanmin(ranges[field_of_view/2+front_width/2:])]
-  
   if sum(x) == 3*clip_distance: # In case all space is free, go straight. (set 1 as default as argmax takes 0 as default...)
     index=1
   else:
     index=np.argmax(x) # other wise go
 
-  yaw_dict={0:1, # turn left
-            1:0, # drive straight
-            2:-1} # turn right
+  yaw_dict={0:1., # turn left
+            1:0., # drive straight
+            2:-1.} # turn right
 
   # speed_dict={0:0.1, 1:0.3, 2:0.1}  
   speed_dict={0:turn_speed, 1:speed, 2:turn_speed}  
@@ -85,7 +84,7 @@ def depth_callback(data):
   msg.linear.z = 0
   msg.angular.z = scale_yaw*yaw_dict[index] #added for doshico environments
 
-  # print("[depth_heuristic]: speed: {0} angle: {1} maxbin: {2}".format(speed_dict[max_dis_bin], yaw_dict[max_dis_bin],max_dis_bin))
+  print("[depth_heuristic]: speed: {0} angle: {1} index: {2}".format(speed_dict[index], yaw_dict[index], index))
   action_pub.publish(msg)
 
 def ready_callback(msg):
@@ -123,8 +122,8 @@ if __name__=="__main__":
   for p in 'clip_distance', 'front_width', 'field_of_view', 'scale_yaw','turn_speed', 'speed':
     if rospy.has_param(p): 
       exec(p + "= rospy.get_param('"+p+"')")
-      # print("set {0} to {1}".format(p, rospy.get_param(p)))
-  
+      print("[depth_heuristic]: set {0} to {1}".format(p, rospy.get_param(p)))
+
   if rospy.has_param('graphics'):
     if rospy.get_param('graphics'):
       print("[depth_heuristic]: showing graphics.")
