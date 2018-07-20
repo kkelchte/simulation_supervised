@@ -32,7 +32,7 @@
   <!-- Load parameters for environment-->
   <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->
   <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
-  <rosparam command="load" file="$(find simulation_supervised_control)/parameters/turtle_$(arg world_name).yaml"/> 
+  <!-- <rosparam command="load" file="$(find simulation_supervised_control)/parameters/turtle_$(arg world_name).yaml"/>  -->
 
   <!-- Load parameters for fsm-->
   <arg name="fsm_config" default="console_fsm"/>
@@ -43,8 +43,8 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!--use line for spawning world from .dae mesh in gz model folder-->
     <arg name="world_name" value="$(arg world_file)"/>
-    <arg name="gui" value="false"/>
-    <!-- <arg name="gui" value="$(arg graphics)"/> -->
+    <!-- <arg name="gui" value="false"/> -->
+    <arg name="gui" value="$(arg graphics)"/>
     <arg name="headless" default="true"/>
   </include>
 
@@ -73,7 +73,7 @@
   <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/>
 
   <!-- Drive Back Service (default: idle) -->
-  <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/>
+  <!-- <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/> -->
 
   <!-- Create data -->
   <node name="create_dataset" pkg="simulation_supervised_tools" type="create_dataset.py" output="screen"/>
@@ -85,7 +85,7 @@
   <!-- Show control -->
   <!-- Show depth prediction -->
   <!-- Show scan prediction -->
-  <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/>
+  <!-- <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/> -->
   
   <!-- Debugging -->
   <!-- add RQT to visualize the changes and avoid the launch to quit -->

@@ -241,6 +241,7 @@ def start_ros():
   global ros_popen
   command="roslaunch simulation_supervised load_params.launch robot_config:={}.yaml".format(FLAGS.robot)
   xterm_log_file='{0}/xterm_ros_{1}.txt'.format(ros_xterm_log_dir,time.strftime("%Y-%m-%d_%I%M"))
+  if os.path.isfile(xterm_log_file): os.remove(xterm_log_file)
   args = shlex.split("xterm -iconic -l -lf {0} -hold -e {1}".format(xterm_log_file,command))
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
