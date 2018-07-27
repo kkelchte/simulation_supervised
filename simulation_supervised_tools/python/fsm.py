@@ -84,6 +84,8 @@ delay_evaluation = -1
 min_depth = -1
 world_name='unk'
 positions = []
+travelled_distance=0
+current_pos=[0,0] #! NOTE: assumption robots spawns at (0,0)
 log_folder='~/tensorflow/log/tmp'
 clip_distance = 1
 field_of_view = 90
@@ -247,16 +249,19 @@ def gt_cb(data):
   """Check the traveled distance over the maximum travelled distance before shutdown and keep track of positions for logging.
   This callback has also the special function to start the clock (start_time) of this node and in the same way initialize the controlmapping for the first time. 
   If the gt_cb is not used, the other callbacks will never start as they can't check there delay evaluation."""
-  global current_pos, success, positions, start_time, current_state
-  current_pos=[data.pose.pose.position.x,
-              data.pose.pose.position.y,
-              data.pose.pose.position.z]
+  global current_pos, success, positions, start_time, current_state, travelled_distance
   if start_time == -1: start_time=rospy.get_time()
   if rospy.get_time() > start_time+delay_evaluation and current_state == None: init()
   if max_duration != -1: time_check()
+  travelled_distance+=np.sqrt((current_pos[0]-data.pose.pose.position.x)**2+(current_pos[1]-data.pose.pose.position.y)**2)
+  # print('[fsm.py]: {0}: travelled: {1} <--> pos: {2}  =: {3}.'.format(rospy.get_time(), travelled_distance, np.sqrt(data.pose.pose.position.x**2+data.pose.pose.position.y**2), np.abs(np.sqrt(data.pose.pose.position.x**2+data.pose.pose.position.y**2)-travelled_distance)))
+  current_pos=[data.pose.pose.position.x,
+              data.pose.pose.position.y,
+              data.pose.pose.position.z]
   positions.append(current_pos)
-  if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance and not shuttingdown:
-    print('[fsm.py]: {0}: dis > max distance-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
+  # if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance and not shuttingdown:
+  if max_distance != -1 and travelled_distance > max_distance and not shuttingdown:
+    print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, travelled_distance, max_distance))
     success = True
     shutdown()
 

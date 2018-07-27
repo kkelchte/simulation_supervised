@@ -193,10 +193,10 @@ if FLAGS.seed: np.random.seed(FLAGS.seed)
 FLAGS.params=load_param_file(FLAGS.paramfile) if FLAGS.paramfile else ""
 
 # try to extract condor host
-try:
-  FLAGS.condor_host=subprocess.check_output(shlex.split("cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1)"))  
-except:
-  FLAGS.condor_host='unknown_host'
+# try:
+#   FLAGS.condor_host=subprocess.check_output(shlex.split("cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1)"))  
+# except:
+FLAGS.condor_host='unknown_host'
 
 # Create main log folder
 if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
@@ -349,7 +349,7 @@ while run_number < FLAGS.number_of_runs:
   if os.path.isfile(FLAGS.log_folder+'/tf_log'):
     prev_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
   else: # we have last communication with our log folder so exit with code 2
-    print("{2}: last communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
+    print("{2}: lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
     kill_combo()
     sys.exit(3)
 
@@ -405,8 +405,8 @@ while run_number < FLAGS.number_of_runs:
       start_time=time.time()
     else:
       time_spend=time.time() - start_time
-    if time_spend > 60*8 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
-      print("{0}: running more than 8minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+    if time_spend > 60*5 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
+      print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
       if crash_number < 3:
