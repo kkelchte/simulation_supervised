@@ -73,7 +73,7 @@
   <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/>
 
   <!-- Drive Back Service (default: idle) -->
-  <!-- <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/> -->
+  <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/>
 
   <!-- Create data -->
   <node name="create_dataset" pkg="simulation_supervised_tools" type="create_dataset.py" output="screen"/>

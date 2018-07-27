@@ -23,7 +23,7 @@ Author: Klaas Kelchtermans
 
 Dependecies: simulation_supervised, pilot, klaas_robots
 """
-
+import rospy
 import sys, os, os.path
 import subprocess, shlex
 import shutil
@@ -246,7 +246,8 @@ def start_ros():
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
   print("\n{0}: start_ros pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
-  time.sleep(1)  
+  time.sleep(1)
+  rospy.set_param('evaluate_every',FLAGS.evaluate_every if not FLAGS.evaluation else 1)  
 
 start_ros()
 
@@ -288,6 +289,7 @@ def start_python():
                                                                                 FLAGS.params)
   print("Tensorflow command: \n {}".format(command))
   xterm_log_file='{0}/xterm_python_{1}.txt'.format(python_xterm_log_dir,time.strftime("%Y-%m-%d_%I%M"))
+  if os.path.isfile(xterm_log_file): os.remove(xterm_log_file)
   args = shlex.split("xterm -l -lf {0} -hold -e {1}".format(xterm_log_file, command))
   # Execute command
   python_popen = subprocess.Popen(args)

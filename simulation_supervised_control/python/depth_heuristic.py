@@ -29,8 +29,8 @@ clip_distance = 3 #5 tweak for doshico
 front_width=40 #50 # define the width of free space in before driving forward
 field_of_view=80 #90 #100
 scale_yaw=0.4 #1 
-turn_speed=0.6 #0.1
-speed=0.8 #1.3
+turn_speed=0.3 #0.6 #0.1
+speed=0.3 #0.8 #1.3
 
 # Instantiate CvBridge
 bridge = CvBridge()
