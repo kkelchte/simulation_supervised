@@ -91,7 +91,9 @@ clip_distance = 1
 field_of_view = 90
 smooth_x = 4
 run_number = 0 # in case a 3 or 2 fase fsm is running, this counter keeps track of the number of times /go has brought the FSM to state 1
-# value is not used for anything specific except for calling datalocation update
+# value is used for calling datalocation update
+# value is used to evaluate from time-to-time
+evaluate_every=20
 data_location = ''
 shuttingdown = False
 
@@ -134,6 +136,11 @@ def go_cb(data):
     current_state = state_sequence[1]
     state_pub.publish(current_state)
     control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
+    if (run_number%evaluate_every)== 0:
+      print("[fsm.py]: EVALUATE")
+      rospy.set_param('evaluate',True)
+    else:
+      rospy.set_param('evaluate',False)
     if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
     if "DH" in [control_sequence['1'], supervision_sequence['1']] and start_dh_pub: start_dh_pub.publish(Empty())
     if save_images and run_number > 1 and len(data_location) != 0: update_data_location() # increment data location 
@@ -354,7 +361,8 @@ if __name__=="__main__":
     max_distance=rospy.get_param('max_distance')
   if rospy.has_param('gt_info'): 
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_cb)
-  
+  if rospy.has_param('evaluate_every'):
+    evaluate_every=rospy.get_param('evaluate_every')
   # used to detect whether motors are still running as they shutdown on flipover.
   rospy.Subscriber("/command/wrench", WrenchStamped, wrench_cb)
 
