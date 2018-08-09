@@ -116,7 +116,7 @@ parser = argparse.ArgumentParser(description="""Run_simulation_scripts governs t
 parser.add_argument("--summary_dir", default='tensorflow/log/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("--data_root", default='pilot_data/', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("--code_root", default='~', type=str, help="Choose the directory to which tensorflow should save the summaries.")
-parser.add_argument("-t", "--log_tag", default='testing', type=str, help="LOGTAG: tag used to name logfolder.")
+parser.add_argument("-t", "--log_tag", default='testing_online', type=str, help="LOGTAG: tag used to name logfolder.")
 parser.add_argument("--data_location", default='', type=str, help="Datalocation is by default the log_tag but than in data_root instead of summary_dir, otherwise FLAG should indicate relative path to data_root.")
 parser.add_argument("-n", "--number_of_runs", default=2, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
@@ -173,7 +173,7 @@ if FLAGS.code_root == '~': # 3. location for tensorflow code (and also catkin wo
   except KeyError: # in case environment variable is not set, take home dir
     FLAGS.code_root = os.environ['HOME']
 
-if FLAGS.log_tag == 'testing':
+if FLAGS.log_tag == 'testing_online':
   if os.path.isdir(FLAGS.summary_dir+FLAGS.log_tag): shutil.rmtree(FLAGS.summary_dir+FLAGS.log_tag)    
   if os.path.isdir(FLAGS.data_root+FLAGS.log_tag): shutil.rmtree(FLAGS.data_root+FLAGS.log_tag)
 
