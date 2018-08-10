@@ -46,7 +46,7 @@ for l in range(number_of_lights):
   constant=ET.SubElement(attenuation,'constant')
   constant.text='0.7'
   linear=ET.SubElement(attenuation,'linear')
-  linear.text='0.01'
+  linear.text='0.5'
   quadratic=ET.SubElement(attenuation,'quadratic')
   quadratic.text='0.001'
   direction=ET.SubElement(light,'direction')
