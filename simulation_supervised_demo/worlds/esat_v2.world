@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <sdf version='1.4'>
   <world name='default'>
-      <light name='sun' type='directional'>
+    <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -22,9 +22,9 @@
       <gravity>0 0 -9.8</gravity>
     </physics>
     <scene>
-      <ambient>0.4 0.4 0.4 1</ambient>
-      <background>0.7 0.7 0.7 1</background>
-      <shadows>1</shadows>
+      <ambient>0.1 0.1 0.1 1</ambient>
+      <background>0.1 0.1 0.1 1</background>
+      <shadows>0</shadows>
     </scene>
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
@@ -36,7 +36,7 @@
     <light name='lightball' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -49,7 +49,7 @@
     <light name='lightball2' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -62,7 +62,7 @@
     <light name='lightball2b' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -75,7 +75,7 @@
     <light name='lightball2a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -88,7 +88,7 @@
     <light name='lightball3' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -101,7 +101,7 @@
     <light name='lightball3a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -114,7 +114,7 @@
     <light name='lightball3b' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -127,7 +127,7 @@
     <light name='lightball3c' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -140,7 +140,7 @@
     <light name='lightball3d' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -153,7 +153,7 @@
     <light name='lightball4' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -166,7 +166,7 @@
     <light name='lightball4a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -179,7 +179,7 @@
     <light name='lightball4b' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
@@ -192,7 +192,7 @@
     <light name='lightball5' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>
@@ -205,7 +205,7 @@
     <light name='lightball5a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>
@@ -218,7 +218,7 @@
     <light name='lightball5b' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>

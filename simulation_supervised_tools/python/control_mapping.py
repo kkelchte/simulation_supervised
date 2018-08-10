@@ -43,7 +43,7 @@ db_sub = None # drive back subscriber
 
 # define variables for keeping the start time and current time
 # in order to stop control after maximum time
-max_time = 1/10. # max time should be around the rgb frame rate (10FPS)
+max_time = 1/5. # max time should be around the 1/(rgb frame rate) (1/10FPS) (set dynamically depending on the control rate)
 current_time = 0. # last time step got from gazebo or time
 control_time = 0. # time in seconds of moment of last send control
 clk_sub = None
@@ -51,10 +51,11 @@ clk_sub = None
 def con_cb(data):
   """Callback on the control coming from console."""
   # check if currently the console can define the robots command
-  global control_time
+  global control_time, max_time
   if pilot=="CON":
     cmd_pub.publish(data)
     control_time=current_time
+    max_time = 1/20. # works at 20FPS < /joy
   # check if currently the console can define the supervision command
   if superviser=="CON":
     sup_pub.publish(data)
@@ -63,10 +64,11 @@ def con_cb(data):
 def ba_cb(data):
   """Callback on the control coming from behavior_arbitration."""
   # check if currently the behavior_arbitration can define the robots command
-  global control_time
+  global control_time, max_time
   if pilot=="BA":
     cmd_pub.publish(data)
     control_time=current_time
+    max_time = 1/10. # 10FPS < /kinect
   # check if currently the behavior_arbitration can define the supervision command
   if superviser=="BA":
     sup_pub.publish(data)
@@ -75,10 +77,11 @@ def ba_cb(data):
 def dh_cb(data):
   """Callback on the control coming from depth_heuristic."""
   # check if currently the depth_heuristic can define the robots command
-  global control_time
+  global control_time, max_time
   if pilot=="DH":
     cmd_pub.publish(data)
     control_time=current_time
+    max_time=1/5. # 5FPS < /scan
   # check if currently the depth_heuristic can define the supervision command
   if superviser=="DH":
     sup_pub.publish(data)
@@ -87,10 +90,11 @@ def dh_cb(data):
 def nn_cb(data):
   """Callback on the control coming from neural_network."""
   # check if currently the neural_network can define the robots command
-  global control_time
+  global control_time, max_time
   if pilot=="NN":
     cmd_pub.publish(data)
     control_time=current_time
+    max_time=1/10. # 10FPS < /kinect
   # check if currently the neural_network can define the supervision command
   if superviser=="NN":
     sup_pub.publish(data)
@@ -99,10 +103,11 @@ def nn_cb(data):
 def db_cb(data):
   """Callback on the control coming from drive_back."""
   # check if currently the drive_back can define the robots command
-  global control_time
+  global control_time, max_time
   if pilot=="DB":
     cmd_pub.publish(data)
     control_time=current_time
+    max_time=1/5. # 5FPS < /scan
   # check if currently the drive_back can define the supervision command
   if superviser=="DB":
     sup_pub.publish(data)
@@ -119,9 +124,8 @@ def fsm_cb(data):
 def clock_cb(data):
   """Callback on the clock of gazebo in order to enforce max 0.1s of action."""
   global current_time
-  print("[control_mapping.py]: received clock: {}".format(data.clock))
   current_time=int(data.clock.secs)+int(data.clock.nsecs)*10**(-9)
-
+  
 if __name__=="__main__":
   rospy.init_node('control_mapping', anonymous=True)
 
@@ -129,8 +133,8 @@ if __name__=="__main__":
   fsm_sub = rospy.Subscriber('control_config', String, fsm_cb)
 
   # initialize publishers
-  sup_pub = rospy.Publisher('/supervised_vel', Twist, queue_size=10)
-  cmd_pub = rospy.Publisher(rospy.get_param('control'), Twist, queue_size=10)
+  sup_pub = rospy.Publisher('/supervised_vel', Twist, queue_size=1)
+  cmd_pub = rospy.Publisher(rospy.get_param('control'), Twist, queue_size=1)
   
   # initialize control subscribers
   con_sub = rospy.Subscriber('con_vel', Twist, con_cb)
@@ -141,8 +145,8 @@ if __name__=="__main__":
 
   # subscribe to the clock of gazebo if gazebo is running
   # else initialize clock of python time
-  if rospy.has_param('gazebo/time_step'): # could be that gazebo is starting up slowly...
-    clk_sub = rospy.Subscriber('clock', Clock, clock_cb)
+  # if rospy.has_param('gazebo/time_step'): # could be that gazebo is starting up slowly...
+  clk_sub = rospy.Subscriber('clock', Clock, clock_cb)
 
   # rospy.spin()
   # Ensure node is spinning fast enough, reducing delays between time updates
@@ -150,7 +154,7 @@ if __name__=="__main__":
   while not rospy.is_shutdown():
     # check how long last control is already send
     # in case it is longer than maximum time
-    if (control_time - current_time) > max_time:
+    if (current_time - control_time) > max_time:
       # set control to 0
       print("[control_mapping.py]: set speed back to zero")
       cmd_pub.publish(Twist())

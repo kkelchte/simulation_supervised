@@ -25,7 +25,7 @@
   <group if="$(arg full)">
     <!-- Load parameters for turtlesim as a full demonstration-->
     <include file="$(find simulation_supervised)/launch/load_params.launch">
-      <arg name="robot_config" value="turtle_sim.yaml"/>
+      <arg name="robot_config" value="drone_sim.yaml"/>
     </include>
   </group>
   

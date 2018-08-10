@@ -261,7 +261,14 @@ geometry_msgs::Twist get_twist() {
 	    DYAW = std::max(-1.0f, std::min(DYAW, 1.0f));
 	    twist.angular.x = 0.0 ;
 	    twist.angular.y = 0.0 ;
-	    twist.angular.z = DYAW;
+	    // twist.angular.z = DYAW;
+	    if (0.3 < DYAW < 0.3){ 
+	    	twist.angular.z = 0;
+	    }else if (DYAW <= -0.3) {
+	    	twist.angular.z = -1;	
+	    }else if (DYAW >= 0.3) {
+	    	twist.angular.z = 1;
+	    }
 	    counter=counter+1;
 	    return twist;
 	    
@@ -295,7 +302,7 @@ void callbackRGB(const sensor_msgs::ImageConstPtr& original_image){
 
 	twist = get_twist();
 	// cout << "BA state: " << fsm_state << ", "<< twist<< endl;
-	pubControl.publish(twist);
+	// pubControl.publish(twist);
 	if(fsm_state == 1){ //counter is done waiting ==> take off and adjust height
     std_msgs::Empty msg;
 	  pubControl.publish(twist);
@@ -399,10 +406,10 @@ int main(int argc, char** argv)
 	std::string rgb_image;
 	image_transport::Subscriber sub_rgb_image ;
 	if(nh.getParam("rgb_image", rgb_image)) {
-		sub_rgb_image = it.subscribe(rgb_image,20,callbackRGB);
+		sub_rgb_image = it.subscribe(rgb_image,1,callbackRGB);
 	}
 	else {
-		sub_rgb_image = it.subscribe("/ardrone/kinect/depth/image_raw",20,callbackRGB);
+		sub_rgb_image = it.subscribe("/ardrone/kinect/depth/image_raw",1,callbackRGB);
 	}
 
 	ros::Rate loop_rate(20);

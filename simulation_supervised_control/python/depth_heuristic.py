@@ -19,7 +19,7 @@ import matplotlib.animation as animation
 
 #--------------------------------------------------------------------------------------------------------------
 #
-# Oracle for driving turtlebot in simulation or the real-world based on the LiDAR lazer range finder
+# Oracle for driving turtlebot in simulation or the real-world based on the LiDAR lazer range finder (5FPS)
 # Starts with start_dh topic and publishes control on dh_vel topic.
 # Bar plot is left out by default.
 #
@@ -29,8 +29,8 @@ clip_distance = 3 #5 tweak for doshico
 front_width=40 #50 # define the width of free space in before driving forward
 field_of_view=80 #90 #100
 scale_yaw=0.4 #1 
-turn_speed=0.3 #0.6 #0.1
-speed=0.3 #0.8 #1.3
+turn_speed=0 #0.3 #0.6 #0.1
+speed=0.3 
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -84,6 +84,7 @@ def depth_callback(data):
   msg.linear.z = 0
   msg.angular.z = scale_yaw*yaw_dict[index] #added for doshico environments
 
+
   # print("[depth_heuristic]: speed: {0} angle: {1} index: {2}".format(msg.linear.x, msg.angular.z, index))
   action_pub.publish(msg)
 
@@ -124,7 +125,16 @@ if __name__=="__main__":
   #     exec(p + "= rospy.get_param('"+p+"')")
   #     print("[depth_heuristic]: set {0} to {1}".format(p, rospy.get_param(p)))
 
-  if rospy.has_param('graphics'):
+
+  # only display if depth heuristic is in control or supervision sequence
+  control_sequence = {}
+  if rospy.has_param('control_sequence'):
+    control_sequence=rospy.get_param('control_sequence')
+  supervision_sequence = {}
+  if rospy.has_param('supervision_sequence'):
+    supervision_sequence=rospy.get_param('supervision_sequence')
+  
+  if rospy.has_param('graphics') and ('DH' in control_sequence.values() or 'DH' in supervision_sequence.values()):
     if rospy.get_param('graphics'):
       print("[depth_heuristic]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)

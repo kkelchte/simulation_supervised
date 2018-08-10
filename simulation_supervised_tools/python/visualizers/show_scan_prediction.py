@@ -158,26 +158,7 @@ if __name__=="__main__":
 
   if rospy.has_param('depth_image') and 'scan' in rospy.get_param('depth_image'):
     rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, target_callback, queue_size = 1)
-  
-  # if rospy.has_param('saving_location'):
-  #   loc=rospy.get_param('saving_location')
-  #   if loc[0]=='/':
-  #     saving_location=loc
-  #   else:
-  #     saving_location='$HOME/pilot_data/flights/'+loc
-  # print(saving_location)
-  # if rospy.has_param('save_images'):
-  #   save_images=rospy.get_param('save_images')
-  # if False:
-  # # if save_images:
-  #   print '----------------save images to: ',saving_location
-  #   recording = True
-  #   if not os.path.isdir(saving_location):
-  #     try:
-  #       os.mkdir(saving_location)
-  #     except:
-  #       pass 
-    
+      
   if rospy.has_param('graphics'):
     if rospy.get_param('graphics'):
       print("[show_scan_prediction]: showing graphics.")

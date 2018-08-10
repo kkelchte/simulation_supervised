@@ -121,8 +121,15 @@ if __name__=="__main__":
   rospy.Subscriber('/db_start', Empty, drive_back_callback)
   drive_back_pub = rospy.Publisher('/go', Empty, queue_size=1)
   
+  # only display if drive back is in control or supervision sequence
+  control_sequence = {}
+  if rospy.has_param('control_sequence'):
+    control_sequence=rospy.get_param('control_sequence')
+  supervision_sequence = {}
+  if rospy.has_param('supervision_sequence'):
+    supervision_sequence=rospy.get_param('supervision_sequence')
   
-  if rospy.has_param('graphics'):
+  if rospy.has_param('graphics') and ('DB' in control_sequence.values() or 'DB' in supervision_sequence.values()):
     if rospy.get_param('graphics'):
       print("[drive_back]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
