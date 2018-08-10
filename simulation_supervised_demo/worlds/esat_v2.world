@@ -9,7 +9,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -40,7 +40,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -53,7 +53,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -66,7 +66,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>0.5 -0.1 0.9</direction>
@@ -79,7 +79,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -92,7 +92,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>0 0 0</direction>
@@ -105,7 +105,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>0.5 0.1 0.9</direction>
@@ -118,7 +118,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -131,7 +131,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>0.5 0.1 -0.9</direction>
@@ -144,7 +144,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 1.7</direction>
@@ -157,7 +157,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -170,7 +170,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -183,7 +183,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.3</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -196,7 +196,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -209,7 +209,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
@@ -222,7 +222,7 @@
       <attenuation>
         <range>1000</range>
         <constant>0.9</constant>
-        <linear>0.01</linear>
+        <linear>0.1</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>

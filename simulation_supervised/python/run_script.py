@@ -405,8 +405,8 @@ while run_number < FLAGS.number_of_runs:
       start_time=time.time()
     else:
       time_spend=time.time() - start_time
-    if time_spend > 60*5 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
-      print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+    if time_spend > 60*9 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
+      print("{0}: running more than 9minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
       if crash_number < 3:

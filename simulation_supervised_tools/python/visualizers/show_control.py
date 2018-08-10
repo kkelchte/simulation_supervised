@@ -39,6 +39,9 @@ nn_ctr = 0
 dh_ctr = 0
 db_ctr = 0
 
+cmd_ctr = None
+sup_ctr = None
+
 pilot = ''
 superviser = ''
 state = ''
@@ -46,7 +49,7 @@ state = ''
 # plotting fields
 fig=plt.figure(figsize=(15,10))
 plt.title('Control Display')
-
+font = cv2.FONT_HERSHEY_PLAIN
 current_view = np.zeros((100,150))
 
 implot=plt.imshow(current_view,animated=True)
@@ -58,9 +61,15 @@ def build_image():
   xs=int(view.shape[1]/2)
   ys=int(view.shape[0]/2)  
   # draw center bar
-  cv2.line(view, (xs, ys-5), (xs,ys+5),(0,0,0), 3)
-  if dh_ctr != 0: # draw depth heuristic control  
-    cv2.line(view, (xs, ys), (int(xs-200*dh_ctr),ys),(240,200,0), 9)
+  cv2.line(view, (xs, ys-5), (xs,ys+20),(0,0,0), 3)
+  if cmd_ctr: # draw applied control  
+    cv2.line(view, (xs, ys), (int(xs-150*cmd_ctr.angular.z),ys),(250,250,250), 9)
+    # draw speed
+    cv2.line(view, (20, view.shape[0]-35), (20,int(view.shape[0]-35-150*cmd_ctr.linear.x)),(250,250,250), 9)
+    cv2.putText(view,"linear X",(5,view.shape[0]-10), font, 1,(250,250,250),1)
+  
+  if sup_ctr: # draw supervised control  
+    cv2.line(view, (xs, ys+15), (int(xs-150*sup_ctr.angular.z),ys+15),(0,250,0), 9)
   return current_view
 
 def animate(*args):
@@ -164,6 +173,17 @@ def db_cb(data):
   global db_ctr
   db_ctr=data.angular.z
 
+def cmd_cb(data):
+  """Callback on the control published to robot."""
+  global cmd_ctr
+  cmd_ctr=data
+
+def sup_cb(data):
+  """Callback on the control published to robot."""
+  global sup_ctr
+  sup_ctr=data
+
+
 def fsm_cb(data):
   """Callback on the control configuration coming from FSM."""
   global superviser, pilot
@@ -201,6 +221,9 @@ if __name__=="__main__":
   rospy.Subscriber('dh_vel', Twist, dh_cb)
   rospy.Subscriber('nn_vel', Twist, nn_cb)
   rospy.Subscriber('db_vel', Twist, db_cb) 
+
+  rospy.Subscriber(rospy.get_param('control'), Twist, cmd_cb)
+  rospy.Subscriber('/supervised_vel', Twist, sup_cb)
 
   # listen to fsm to define which control is supervising and which is steering
   rospy.Subscriber('control_config', String, fsm_cb)

@@ -36,6 +36,7 @@ catkin_package()
 
 catkin_install_python(PROGRAMS
     python/depth_heuristic.py
+    python/behavior_arbitration.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -42,8 +42,8 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!--use line for spawning world from .dae mesh in gz model folder-->
     <arg name="world_name" value="$(arg world_file)"/>
-    <!-- <arg name="gui" value="false"/> -->
-    <arg name="gui" value="$(arg graphics)"/>
+    <arg name="gui" value="false"/>
+    <!-- <arg name="gui" value="$(arg graphics)"/> -->
     <arg name="headless" default="true"/>
   </include>
 
@@ -60,11 +60,12 @@
 
   <!-- start behavior arbitration -->
   <!-- <arg name="starting_height" default="0.5"/> -->
-  <arg name="speed" default="1.3"/>
+  <!-- <arg name="speed" default="1.3"/>
   <include file="$(find simulation_supervised_control)/launch/behaviorarbitration.launch">
     <arg name="goal_angle" value="-1"/>
     <arg name="speed" value="$(arg speed)"/>
-  </include>
+  </include> -->
+  <node name="behavior_arbitration" pkg="simulation_supervised_control" type="behavior_arbitration.py" output="screen"/>
   
   <!-- Console: simple (only overtake and go) -->
   <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
@@ -85,5 +86,6 @@
 
   <!-- Visualizations -->
   <!-- Show control -->
+  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
 
 </launch>

@@ -224,7 +224,7 @@ def depth_cb(msg):
   except CvBridgeError, e:
     print(e)
   else:
-    if min_depth != -1 and np.nanmin(de) < min_depth and not shuttingdown:
+    if min_depth != -1 and np.nanmin(de) < min_depth and not shuttingdown and current_state != 'idle':
       print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
       success=False
       shutdown()
@@ -272,7 +272,7 @@ def wrench_cb(data):
   """
   global success
   if shuttingdown or (rospy.get_time()-start_time < delay_evaluation) or current_state != 'running': return
-  if data.wrench.force.z < 3:
+  if data.wrench.force.z < 1:
     print('[fsm.py]: {0}: {2} drag force detected after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, data.wrench.force.z))
     success = False
     shutdown()
@@ -327,6 +327,9 @@ if __name__=="__main__":
     start_nn_pub = rospy.Publisher('/nn_start', Empty, queue_size=10)
     stop_nn_pub = rospy.Publisher('/nn_stop', Empty, queue_size=10)
   # BA: has its own fsm that counts down, takes off, adjusts height and start OA
+  # if 'BA' in control_sequence.values() or 'BA' in supervision_sequence.values():
+  #   start_ba_pub = rospy.Publisher('/ba_start', Empty, queue_size=10)
+  #   stop_ba_pub = rospy.Publisher('/ba_stop', Empty, queue_size=10)
   # DH: turn on and off with publisehrs
   if 'DH' in control_sequence.values() or 'DH' in supervision_sequence.values():
     start_dh_pub = rospy.Publisher('/dh_start', Empty, queue_size=10)
