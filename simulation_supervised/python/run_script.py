@@ -246,7 +246,7 @@ def start_ros():
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
   print("\n{0}: start_ros pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
-  time.sleep(1)
+  time.sleep(10)
   rospy.set_param('evaluate_every',FLAGS.evaluate_every if not FLAGS.evaluation else 1)  
 
 start_ros()
