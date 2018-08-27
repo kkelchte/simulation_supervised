@@ -76,7 +76,6 @@ def cleanup():
 def depth_callback(data):
   """Extract correct turning direction from the depth image and save it in adjust_yaw."""
   global adjust_yaw, depths
-  print '[behavior_arbitration]: received depth'
 
   try:
     # Convert your ROS Image message to OpenCV2
@@ -163,7 +162,6 @@ def image_callback(data):
 def scan_callback(data):
   """Callback of lidar scan.
   Defines the adjust_yaw of the send control."""
-  print '[behavior_arbitration]: received scan'
   global adjust_yaw, depths
   # Preprocess depth:
   ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
@@ -190,8 +188,10 @@ if __name__=="__main__":
   
   # subscribe to depth, rgb image and odometry
   if rospy.has_param('scan'):
+    print("[behavior_arbitration]: based on lidar scan")
     rospy.Subscriber(rospy.get_param('scan'), LaserScan, scan_callback) 
   elif rospy.has_param('depth_image'): 
+    print("[behavior_arbitration]: based on kinect depth")
     rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback)
   else:
     raise IOError('[behavior_arbitration.py] did not find any depth image topic!')
