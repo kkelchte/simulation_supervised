@@ -99,7 +99,7 @@ segments, goal = generate_corridor(length=FLAGS.corridor_length,
                             texture=FLAGS.texture,
                             lights=FLAGS.lights,
                             extension_conf=conf,
-                            save_location=FLAGS.output_dir+'/corridors/'+time.strftime("%Y-%m-%d_%I-%M")+'_'+FLAGS.output_file+'.jpg')
+                            save_location=FLAGS.output_dir+'/corridors/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_'+FLAGS.output_file+'.jpg')
 
 # add them to the world file
 for seg in segments:
@@ -123,4 +123,4 @@ print("[world_generator.py]: created {0}/{1}".format(FLAGS.output_dir, FLAGS.out
 
 # save world file with time_tag in case we need it
 if not os.path.isdir(FLAGS.output_dir+'/worlds'): os.makedirs(FLAGS.output_dir+'/worlds')
-tree.write(FLAGS.output_dir+'/worlds/'+time.strftime("%Y-%m-%d_%I-%M")+'_'+FLAGS.output_file+'.world', encoding="us-ascii", xml_declaration=True, method="xml")
+tree.write(FLAGS.output_dir+'/worlds/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_'+FLAGS.output_file+'.world', encoding="us-ascii", xml_declaration=True, method="xml")
