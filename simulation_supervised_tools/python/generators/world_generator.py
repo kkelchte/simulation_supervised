@@ -46,8 +46,8 @@ parser = argparse.ArgumentParser(description="""world_generator.py: generates a 
 #   ------  Corridor arguments
 parser.add_argument("--type_of_corridor", default='normal', type=str, help="default is normal which is a bended corridor. Empty means it will only create one segment of the combined extensions.")
 parser.add_argument("--corridor_length", default=10, type=int, help="Defines number of tiles the corridor long (not used in case of empty type of corridor).")
-parser.add_argument("--corridor_width", default=2, type=float, help="Defines width of the corridor (not used in case of empty type of corridor).")
-parser.add_argument("--corridor_height", default=2, type=float, help="Defines height of the corridor (not used in case of empty type of corridor).")
+parser.add_argument("--corridor_width", default=3, type=float, help="Defines width of the corridor (not used in case of empty type of corridor).")
+parser.add_argument("--corridor_height", default=3, type=float, help="Defines height of the corridor (not used in case of empty type of corridor).")
 parser.add_argument("--corridor_bends", default=0, type=int, help="Defines the number of turns the corridor should make over its length. Combined with the length it specifies the density of bends.")
 parser.add_argument("--lights", default='default_light', type=str, help="Defines the type of light added in each segment of the corridor according to simsup_demo/lights/.")
 parser.add_argument("--texture", default='Gazebo/Grey', type=str, help="Defines the texture of the walls of the corridor according to gazebo.material.")
@@ -109,9 +109,9 @@ for seg in segments:
 # 5. write world and config file
 # write config file
 # adjust delay_evaluation according to
-env_conf= {'delay_evaluation': 1, #might have to be updated if many extensions introduce delays
+env_conf= {'delay_evaluation': 5, #might have to be updated if many extensions introduce delays
         'min_depth': 0.2,
-        'starting_height': FLAGS.corridor_height/2.,
+        'starting_height': FLAGS.corridor_height/3.,
         'goal_min_x': goal[0],
         'goal_max_x': goal[1],
         'goal_min_y': goal[2],

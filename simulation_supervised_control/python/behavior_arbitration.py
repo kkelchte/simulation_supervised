@@ -43,9 +43,9 @@ adjust_height = 1 # used to adjust the height and keep it at starting_height
 adjust_yaw = 0 # define in which direction to fly
 
 # BA params
-clip_distance = 3 #5 tweak for doshico
+clip_distance = 5 # tweak for doshico
 front_width=40 # define the width of free space in percentage for going straight
-horizontal_field_of_view=80 # define percentage of width of depth image used to extract collision
+horizontal_field_of_view=100 # define percentage of width of depth image used to extract collision
 vertical_field_of_view=60 # define percentage of width of depth image used to extract collision
 scale_yaw=0.4 #1 
 turn_speed=0 # define the forward speed when turning
