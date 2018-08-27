@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='us-ascii'?>
+<sdf version='1.6'>
+  <world name='default'>
+    <light name='spot_light' type='spot'>
+      <cast_shadows>0</cast_shadows>
+      <!-- define diffuse and specular color = white -->
+      <specular>255 255 255 255</specular>
+      <diffuse>255 255 255 255</diffuse>
+      <pose>0 0 0 0 0 0</pose>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>2.5</outer_angle>
+        <falloff>5</falloff>
+      </spot>
+      <attenuation>
+        <range>3.5</range>
+        <constant>0.3</constant>
+        <linear>0.02</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <!-- <direction>0 0 -1</direction> -->
+    </light>
+  </world>
+</sdf>

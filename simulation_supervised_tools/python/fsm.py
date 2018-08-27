@@ -12,6 +12,8 @@ from std_msgs.msg import String
 import numpy as np
 import subprocess,shlex
 
+import xml.etree.ElementTree as ET # used to parse goal-tile from world file
+
 from cv_bridge import CvBridge, CvBridgeError
 bridge = CvBridge()
 
@@ -80,6 +82,7 @@ success = None
 start_time = -1
 max_duration = -1
 max_distance = -1
+goal={}
 delay_evaluation = -1
 min_depth = -1
 world_name='unk'
@@ -96,6 +99,8 @@ run_number = 0 # in case a 3 or 2 fase fsm is running, this counter keeps track 
 evaluate_every=20
 data_location = ''
 shuttingdown = False
+
+
 
 def init():
   """Initialize state 0 which is IDLE or RUNNING depending on the number of states."""
@@ -204,8 +209,6 @@ def shutdown():
     time.sleep(3) #changed from 1
     subprocess.Popen(shlex.split("kill "+pid)).wait()
 
-
-
 def time_check():
   """Keep track of the time. If the duration is longer than max_duration shutdown with succes."""
   global start_time, success
@@ -265,6 +268,11 @@ def gt_cb(data):
     success = True
     shutdown()
 
+  if goal and goal["goal_min_x"] < data.pose.pose.position.x < goal["goal_max_x"] and goal["goal_min_y"] < data.pose.pose.position.y < goal["goal_max_y"] and not shuttingdown:
+    print('[fsm.py]: {0}: ({1:0.3f},{2:0.3f}) reached goal tile ({3}) -----------success after {4}s'.format(rospy.get_time(), data.pose.pose.position.x, data.pose.pose.position.y, goal, rospy.get_time()-start_time))
+    success = True
+    shutdown()
+
 def wrench_cb(data):
   """
   Check if the force from the motors of the drone is still giving a minimum z-force.
@@ -284,7 +292,7 @@ def write(filename, message):
     f.write(message)
     f.close
   except:
-    print('[fsm]: FAILED TO WRITE LOGFILE: {}'.format(filename))  
+    print('[fsm]: FAILED TO WRITE LOGFILE: {}'.format(filename))
 
 if __name__=="__main__":
   rospy.init_node('fsm', anonymous=True)
@@ -299,9 +307,22 @@ if __name__=="__main__":
   if rospy.has_param('save_images'):
     save_images=rospy.get_param('save_images')
 
+  if rospy.has_param('world_name') :
+    world_name = os.path.basename(rospy.get_param('world_name').split('.')[0])
+    if 'sandbox' in world_name: world_name='sandbox'
+  
   print("[fsm.py]: states: {}".format(state_sequence))
   print("[fsm.py]: controls: {}".format(control_sequence))
   print("[fsm.py]: saving images: {}".format(save_images))
+
+  # get goal location if params are specified:
+  for p in ["goal_max_x","goal_min_x","goal_max_y","goal_min_y"]:
+    if rospy.has_param(p):
+      goal[p] = rospy.get_param(p)
+  if goal: print("[fsm.py]: goal: {0} < x < {1}; {2} < y < {3}".format(goal["goal_min_x"],
+                                                                      goal["goal_max_x"],
+                                                                      goal["goal_min_y"],
+                                                                      goal["goal_max_y"]))
 
   if not state_sequence or not control_sequence:
     print("[fsm.py]: No FSM configuration found so shutting down...")
@@ -383,10 +404,6 @@ if __name__=="__main__":
   if rospy.has_param('data_location'): # save the data location to change after each new 'go' call
     data_location=rospy.get_param('data_location')
   
-
-  if rospy.has_param('world_name') :
-    world_name = os.path.basename(rospy.get_param('world_name').split('.')[0])
-    if 'sandbox' in world_name: world_name='sandbox'
   if rospy.has_param('depth_image'):
     if 'scan' in rospy.get_param('depth_image'):
       rospy.Subscriber(rospy.get_param('depth_image'), LaserScan, scan_cb)

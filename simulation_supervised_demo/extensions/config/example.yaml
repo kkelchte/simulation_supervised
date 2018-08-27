@@ -1,0 +1,60 @@
+# Define for each type / variation of extension a new extension
+# Type: 'blocked_hole', 'panel', 'passway', 'ceiling', 'obstacle'
+# Number: number of this extensions to be added to the total corridor (can be left out)
+# Type_specific: arguments specific to the instances of this extensions
+---
+extension_0:
+  type: 'blocked_hole'
+  number: 2
+  type_specific:
+    height: 2
+    width: 0.7
+    z_location: 0
+    texture: 'Gazebo/Grey'
+
+extension_1:
+  type: 'blocked_hole'
+  number: 2
+  type_specific:
+    height: 1
+    width: 0.7
+    z_location: 1
+    texture: 'Gazebo/Grey'
+
+extension_2:
+  type: 'panel'
+  type_specific:
+    height: 1
+    width: 0.7
+    z_location: 1
+    texture: 'Gazebo/Grey'
+
+extension_3:
+  type: 'passway'
+  number: 2
+  type_specific:
+    height: 1
+    width: 0.7
+    z_location: 1
+    name: 'arc'
+    texture: 'Gazebo/Grey'
+
+extension_4:
+  type: 'ceiling'
+  number: 2
+  type_specific:
+    length: 1
+    height: 1
+    width: 0.7
+    offset: 1
+    orientation: 'parallel'
+    texture: 'Gazebo/Grey'
+
+extension_5:
+  type: 'obstacle'
+  number: 2
+  type_specific:
+    name: 'human'
+    scale: 0.7
+    x_location: 1
+    y_location: 1

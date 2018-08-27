@@ -1,0 +1,8 @@
+---
+extension_2:
+  type: 'panel'
+  type_specific:
+    height: 1
+    width: 0.7
+    z_location: 1
+    texture: 'Gazebo/Grey'

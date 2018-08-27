@@ -1,0 +1,7 @@
+delay_evaluation: 1
+goal_max_x: 1.0
+goal_max_y: 23.0
+goal_min_x: -1.0
+goal_min_y: 21.0
+min_depth: 0.2
+starting_height: 1.0

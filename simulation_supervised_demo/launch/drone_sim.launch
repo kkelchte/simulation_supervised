@@ -3,10 +3,12 @@
   <!-- Define parameters from arguments -->
   <arg name="log_folder" default="tmp"/> <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
   <param name="log_folder" value="$(arg log_folder)"/>
+  
   <arg name="world_name" default="objects"/> <!-- worldname is used to load correct config, name logging and find modified logname -->
   <param name="world_name" value="$(arg world_name)"/>
   <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> <!-- worldfile defines the actual gazebo world file loaded -->
   <param name="world_file" value="$(arg world_file)"/>
+  <arg name="world_config" default="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> <!-- yaml with extra ros params to load -->
   
   <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
   <param name="evaluate" value="$(arg evaluate)"/>
@@ -31,7 +33,7 @@
   
   <!-- Load parameters for environment-->
   <!-- <rosparam command="load" file="$(find simulation_supervised)/config/environment/debug.yaml"/>  -->
-  <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+  <rosparam command="load" file="$(arg world_config)"/> 
 
   <!-- Load parameters for fsm-->
   <arg name="fsm_config" default="console_fsm"/>

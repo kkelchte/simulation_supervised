@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='us-ascii'?>
+<sdf version='1.6'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>0</cast_shadows>
+      <pose>0 0 0 0 -0 0</pose>
+      <attenuation>
+        <range>1</range>
+        <constant>0.3</constant>
+        <linear>0.02</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>0 0 -1</direction>
+    </light>
+  </world>
+</sdf>

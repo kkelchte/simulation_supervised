@@ -24,7 +24,7 @@ img_type = "unknown"
 current_pos = []
 ready = False
 finished = True
-transformations={'unknown':(100,100,-5,100),
+transformations={'unknown':(10,400,-10.400),
     'forest':(6.5, 438.0, -6.6, 418.0),
     'canyon':(15.5, 424.0, -10.6, 780),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
@@ -55,6 +55,7 @@ def draw_positions(file_name):
   plt.plot(x,y, 'v',ms=1)
   plt.axis('off')
   # plt.show()
+  print("[gt_listener]: print run to {}".format(file_name))
   plt.savefig(file_name, bbox_inches='tight')
   
 def ready_cb(data):
@@ -98,7 +99,9 @@ if __name__=="__main__":
     except Exception as e:
       print('[gt_listener]: failed to load background image: '+img_file+'. '+str(e))
   elif rospy.has_param('world_name') :
-    img_type=rospy.get_param('world_name')
+    world = rospy.get_param('world_name')
+    if world in transformations.keys(): 
+      img_type=world
 
   log_folder = '/tmp/log'
   if rospy.has_param('log_folder'):

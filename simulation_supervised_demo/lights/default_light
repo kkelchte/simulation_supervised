@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='us-ascii'?>
+<sdf version='1.6'>
+  <world name='default'>
+    <light name='lightball_0' type='point'>
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 -0.25 1 0 0 0</pose>
+      <diffuse>0.01 0.01 0.01 0</diffuse> <!-- define color -->
+    </light>
+    <light name='lightball_1' type='point'>
+      <cast_shadows>0</cast_shadows>
+      <pose>+0.25 -0.25 1 0 0 0</pose>
+      <diffuse>0.01 0.01 0.01 0</diffuse>
+    </light>
+    <light name='lightball_2' type='point'>
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 +0.25 1 0 0 0</pose>
+      <diffuse>0.01 0.01 0.01 0</diffuse>
+    </light>
+    <light name='lightball_3' type='point'>
+      <cast_shadows>0</cast_shadows>
+      <pose>+0.25 +0.25 1 0 0 0</pose>
+      <diffuse>0.01 0.01 0.01 0</diffuse>
+    </light>
+  </world>
+</sdf>

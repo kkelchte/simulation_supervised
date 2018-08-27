@@ -19,6 +19,10 @@ Exit code:
 3) communication with logfolder (Opal) is blocked
 4) config file is missing
 
+Example usage:
+Let behavior arbitration fly with drone through default canyon in singularity environment 1 time while saving images. 
+python run_script.py --robot drone_sim --fsm oracle_drone_fsm --world canyon --reuse_default_world -n 1 -ds -p params.yaml
+
 Author: Klaas Kelchtermans
 
 Dependecies: simulation_supervised, pilot, klaas_robots
@@ -83,7 +87,25 @@ def wait_for_create_dataset():
     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
     p_grep = subprocess.Popen(["grep","create_dataset"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
     out = p_grep.communicate()[0]
-    time.sleep(0.2)  
+    time.sleep(0.2)
+
+def wait_for_ros_to_start():
+  """Ros might take some time to start the first time so wait till its well in the ps -ef"""  
+  time.sleep(1)
+  p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
+  while p_ps == 1:
+    time.sleep(1)
+    p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
+    # print p_ps
+
+#   p_grep = subprocess.Popen(["grep","ros"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+#   print("{0}: wait for ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+#   out = p_grep.communicate()[0]
+#   while not "create_dataset" in out:
+#     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
+#     p_grep = subprocess.Popen(["grep","create_dataset"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
+#     out = p_grep.communicate()[0]
+#     time.sleep(0.2)
 
 
 def kill_popen(process_name, process_popen):
@@ -181,22 +203,22 @@ if FLAGS.log_tag == 'testing_online':
 if FLAGS.worlds == None : FLAGS.worlds=['canyon']
 else: #worlds are appended in a nested list... so get them out.
   worlds=[]
-  for w in FLAGS.worlds: 
-    if os.path.isfile(simulation_supervised_dir+'/config/environment/'+w[0]+'.yaml'):
-      worlds.append(w[0])
-    else:
-      print("Could not find environment configuration for {}".format(w[0]))
-      sys.exit(4)
-
+  for w in FLAGS.worlds: worlds.append(w[0])
   FLAGS.worlds = worlds[:]
+
 if FLAGS.seed: np.random.seed(FLAGS.seed)
 FLAGS.params=load_param_file(FLAGS.paramfile) if FLAGS.paramfile else ""
 
+# check if robot configuration exists is there:
+if not os.path.isfile(simulation_supervised_dir+'/config/robot/'+FLAGS.robot+'.yaml'):
+  print("Could not find robot configuration for {}".format(w[0]))
+  sys.exit(4)
+
 # try to extract condor host
-# try:
-#   FLAGS.condor_host=subprocess.check_output(shlex.split("cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1)"))  
-# except:
-FLAGS.condor_host='unknown_host'
+try:
+  FLAGS.condor_host=subprocess.check_output(shlex.split("cat $_CONDOR_JOB_AD | grep RemoteHost | head -1 | cut -d '=' -f 2 | cut -d '@' -f 2 | cut -d '.' -f 1)"))  
+except:
+  FLAGS.condor_host='unknown_host'
 
 # Create main log folder
 if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
@@ -245,8 +267,8 @@ def start_ros():
   args = shlex.split("xterm -iconic -l -lf {0} -hold -e {1}".format(xterm_log_file,command))
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
-  print("\n{0}: start_ros pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
-  time.sleep(10)
+  print("{0}: start_ros pid {1}\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
+  wait_for_ros_to_start()
   rospy.set_param('evaluate_every',FLAGS.evaluate_every if not FLAGS.evaluation else 1)  
 
 start_ros()
@@ -287,16 +309,17 @@ def start_python():
                                                                                 FLAGS.code_root,
                                                                                 FLAGS.python_project,
                                                                                 FLAGS.params)
-  print("Tensorflow command: \n {}".format(command))
+  print("Tensorflow command:\n {}".format(command))
   xterm_log_file='{0}/xterm_python_{1}.txt'.format(python_xterm_log_dir,time.strftime("%Y-%m-%d_%I%M"))
   if os.path.isfile(xterm_log_file): os.remove(xterm_log_file)
   args = shlex.split("xterm -l -lf {0} -hold -e {1}".format(xterm_log_file, command))
   # Execute command
   python_popen = subprocess.Popen(args)
   pid_python = python_popen.pid
-  print("\n{0}: start_python pid {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_python))
+  print("{0}: start_python pid {1} \n\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_python))
   # Wait for creation of tensorflow log file to know the python node is running
   start_time = time.time()
+
   while(not os.path.isfile(FLAGS.log_folder+'/tf_log')):
     time.sleep(1)
     if time.time()-start_time > 5*60:
@@ -358,12 +381,18 @@ while run_number < FLAGS.number_of_runs:
     generator_file="{0}/python/generators/{1}_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1],world_name)
     subprocess.Popen(shlex.split("python "+generator_file+" "+FLAGS.log_folder)).wait()
     command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
-  elif world_name == 'canyon':
+  elif world_name == 'canyon' and FLAGS.reuse_default_world:
     # reuse default 20 evaluation canyons
     world_file='{0}/../simulation_supervised_demo/worlds/canyon_evaluation/{1:05d}_canyon.world'.format(simulation_supervised_dir,run_number%20)
     world_image='{0}/../simulation_supervised_demo/worlds/canyon_evaluation/{1:05d}_canyon.png'.format(simulation_supervised_dir,run_number%20)
     command="{0} background:={1} world_file:={2}".format(command, world_image, world_file)
-
+  elif world_name in ['corridor'] and not FLAGS.reuse_default_world:
+    generator_file="{0}/python/generators/world_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1])
+    generator_command="python "+generator_file+" --output_dir "+FLAGS.log_folder+" --output_file "+world_name
+    for p in others: generator_command="{0} {1}".format(generator_command, p)
+    subprocess.call(shlex.split(generator_command))
+    command="{0} world_file:={1} world_config:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.world', FLAGS.log_folder+'/'+world_name+'.yaml')
+  
   # clean up gazebo ros folder every now and then
   if run_number%50 == 0 : shutil.rmtree("{0}/.gazebo/log".format(os.environ['HOME']),ignore_errors=True)
     
