@@ -5,4 +5,5 @@ flattrim: /flattrim
 control: /cmd_vel
 rgb_image: /kinect/kinect/rgb/image_raw
 depth_image: /kinect/kinect/depth/image_raw
+scan: /scan
 gt_info: /ground_truth/state

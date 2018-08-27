@@ -54,7 +54,7 @@
   <arg name="y" default="0"/>
   <arg name="Yspawned" default="1.57"/>
   <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
-    <!-- Note: do not change quadrotor model with model argument as then pose estimation fails to start and /ground_truth/state will not be published on which fsm.py depends to start the simulation. -->
+    <!-- Note: do not change quadrotor model with model argument as then pose estimation fails to start and /ground_truth/state will not be published on which fsm.py depends to start the simulation.-->
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
     <arg name="Y" default="$(arg Yspawned)"/>

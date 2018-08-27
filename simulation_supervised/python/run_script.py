@@ -94,18 +94,11 @@ def wait_for_ros_to_start():
   time.sleep(1)
   p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
   while p_ps == 1:
+    print("{0}: wait for ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     time.sleep(1)
     p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
-    # print p_ps
 
-#   p_grep = subprocess.Popen(["grep","ros"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
-#   print("{0}: wait for ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-#   out = p_grep.communicate()[0]
-#   while not "create_dataset" in out:
-#     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
-#     p_grep = subprocess.Popen(["grep","create_dataset"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
-#     out = p_grep.communicate()[0]
-#     time.sleep(0.2)
+
 
 
 def kill_popen(process_name, process_popen):

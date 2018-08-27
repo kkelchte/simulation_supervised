@@ -11,6 +11,7 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
 from std_msgs.msg import Empty
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import LaserScan
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -42,9 +43,9 @@ adjust_height = 1 # used to adjust the height and keep it at starting_height
 adjust_yaw = 0 # define in which direction to fly
 
 # BA params
-clip_distance = 3 #5 tweak for doshico
+clip_distance = 5 # tweak for doshico
 front_width=40 # define the width of free space in percentage for going straight
-horizontal_field_of_view=80 # define percentage of width of depth image used to extract collision
+horizontal_field_of_view=100 # define percentage of width of depth image used to extract collision
 vertical_field_of_view=60 # define percentage of width of depth image used to extract collision
 scale_yaw=0.4 #1 
 turn_speed=0 # define the forward speed when turning
@@ -75,6 +76,7 @@ def cleanup():
 def depth_callback(data):
   """Extract correct turning direction from the depth image and save it in adjust_yaw."""
   global adjust_yaw, depths
+
   try:
     # Convert your ROS Image message to OpenCV2
     de = bridge.imgmsg_to_cv2(data, desired_encoding='passthrough')#gets float of 32FC1 depth image
@@ -157,11 +159,39 @@ def image_callback(data):
   elif current_state == 3:
     action_pub.publish(control)
 
+def scan_callback(data):
+  """Callback of lidar scan.
+  Defines the adjust_yaw of the send control."""
+  global adjust_yaw, depths
+  # Preprocess depth:
+  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
+
+  # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
+  ranges=list(reversed(ranges[:horizontal_field_of_view/2]))+list(reversed(ranges[-horizontal_field_of_view/2:]))
+
+  # turn away from the minimum (non-zero) depth reading
+  # discretize 3 bins (:-front_width/2:front_width/2:)
+  # range that covers going straight.
+  depths=[np.nanmin(ranges[0:horizontal_field_of_view/2-front_width/2]),
+          np.nanmin(ranges[horizontal_field_of_view/2-front_width/2:horizontal_field_of_view/2+front_width/2]),
+          np.nanmin(ranges[horizontal_field_of_view/2+front_width/2:])]
+  
+  # choose one discrete action [left, straight, right] according to maximum depth 
+  if depths[np.argmax(depths)] == depths[1]: # incase straight is as good as the best, go straight
+    adjust_yaw = 0
+  else:    
+    adjust_yaw = -1*(np.argmax(depths)-1) #as a yaw turn of +1 corresponds to turning left and -1 to turning right
+
+
 if __name__=="__main__":
   rospy.init_node('Behavior_arbitration', anonymous=True)
   
   # subscribe to depth, rgb image and odometry
-  if rospy.has_param('depth_image'): 
+  if rospy.has_param('scan'):
+    print("[behavior_arbitration]: based on lidar scan")
+    rospy.Subscriber(rospy.get_param('scan'), LaserScan, scan_callback) 
+  elif rospy.has_param('depth_image'): 
+    print("[behavior_arbitration]: based on kinect depth")
     rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback)
   else:
     raise IOError('[behavior_arbitration.py] did not find any depth image topic!')

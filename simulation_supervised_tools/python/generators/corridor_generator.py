@@ -113,7 +113,7 @@ class Tile(object):
             1: ['wall_top','wall_bottom','wall_left', 'wall_right'],
             2: ['wall_top','wall_bottom','wall_front', 'wall_left'],
             3: ['wall_top','wall_bottom','wall_front', 'wall_right'],
-            4: ['wall_top','wall_bottom','wall_front', 'wall_left', 'wall_right']}
+            4: ['wall_top','wall_bottom', 'wall_left', 'wall_right']}
     wall_models=[ m for m in world.findall('model') if m.attrib['name'] in walls[self.tile_type]]
     # 2. change height, width and texture accordingly
     for m in wall_models:
@@ -332,10 +332,10 @@ def generate_corridor(length=10,
   """
   sequence=generate_map(length=length, bends=bends)
   segments=translate_map_to_element_tree(sequence,
-                                        width=2,
-                                        height=2,
-                                        texture='Gazebo/Grey',
-                                        lights='default_light',
+                                        width=width,
+                                        height=height,
+                                        texture=texture,
+                                        lights=lights,
                                         extension_conf=extension_conf)
   goal = get_min_max_x_y_goal(segments)
   if save_location: visualize(sequence,save_location)

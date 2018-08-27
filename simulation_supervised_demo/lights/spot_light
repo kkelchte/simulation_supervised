@@ -9,11 +9,11 @@
       <pose>0 0 0 0 0 0</pose>
       <spot>
         <inner_angle>0.1</inner_angle>
-        <outer_angle>2.5</outer_angle>
-        <falloff>5</falloff>
+        <outer_angle>2.9</outer_angle>
+        <falloff>4</falloff>
       </spot>
       <attenuation>
-        <range>3.5</range>
+        <range>4</range>
         <constant>0.3</constant>
         <linear>0.02</linear>
         <quadratic>0.001</quadratic>

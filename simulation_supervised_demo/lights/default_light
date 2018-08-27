@@ -4,22 +4,26 @@
     <light name='lightball_0' type='point'>
       <cast_shadows>0</cast_shadows>
       <pose>-0.25 -0.25 1 0 0 0</pose>
-      <diffuse>0.01 0.01 0.01 0</diffuse> <!-- define color -->
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
     </light>
     <light name='lightball_1' type='point'>
       <cast_shadows>0</cast_shadows>
       <pose>+0.25 -0.25 1 0 0 0</pose>
-      <diffuse>0.01 0.01 0.01 0</diffuse>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
     </light>
     <light name='lightball_2' type='point'>
       <cast_shadows>0</cast_shadows>
       <pose>-0.25 +0.25 1 0 0 0</pose>
-      <diffuse>0.01 0.01 0.01 0</diffuse>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
     </light>
     <light name='lightball_3' type='point'>
       <cast_shadows>0</cast_shadows>
       <pose>+0.25 +0.25 1 0 0 0</pose>
-      <diffuse>0.01 0.01 0.01 0</diffuse>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
     </light>
   </world>
 </sdf>
