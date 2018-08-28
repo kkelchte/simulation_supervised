@@ -54,16 +54,30 @@ def visualize(sequence, save_location=""):
   else:
     plt.show()
 
-
+generator_dic={
+        'panel': generate_panel,
+        'passway': generate_passway,
+        'obstacle': generate_obstacle,
+        'ceiling': generate_ceiling,
+        'blocked_hole': generate_blocked_hole,
+      }
+      
 ####### Tile classe
 class Tile(object):
   """A Tile has a position and an entering orientation"""
   def __init__(self, x, y, orientation, tile_type):
+    walls= {0: ['top','bottom','back', 'left', 'right'],
+        1: ['top','bottom','left', 'right'],
+        2: ['top','bottom','front', 'left'],
+        3: ['top','bottom','front', 'right'],
+        4: ['top','bottom', 'left', 'right']}
     self.x=x
     self.y=y
     self.o=orientation
     self.tile_type = tile_type
     self.extensions = []
+    self.walls = walls[self.tile_type]
+
   
   def update_orientation(self):
     """turn clockwise or counterclockwise or stay"""
@@ -95,13 +109,8 @@ class Tile(object):
     new_x,new_y=self.update_position(new_orientation)
     return Tile(new_x,new_y,new_orientation,new_tile_type)
 
-  def get_elements(self, width, height, texture, lights):
-    """Translate the tile to a corridor element parsed from segmented worlds
-    in simulation_supervised_demo/worlds/segment.world. 
-    Afterwhich heigth, width, texture is adjusted and lights is added.
-    Lights are parsed from simsup_demo/lights/.
-    Than position and orientation of all elements are adjusted.
-    In the end the elements are given a better name.
+  def get_wall_models(self, width, height, texture):
+    """Parses the wall models and position them accordingly.
     """
     # 1. get wall models for front, back, left, right wall depending on which type of tile
     worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
@@ -109,12 +118,9 @@ class Tile(object):
     tree = ET.parse(worlds_location+template_world)
     root = tree.getroot()
     world = root.find('world')
-    walls= {0: ['wall_top','wall_bottom','wall_back', 'wall_left', 'wall_right'],
-            1: ['wall_top','wall_bottom','wall_left', 'wall_right'],
-            2: ['wall_top','wall_bottom','wall_front', 'wall_left'],
-            3: ['wall_top','wall_bottom','wall_front', 'wall_right'],
-            4: ['wall_top','wall_bottom', 'wall_left', 'wall_right']}
-    wall_models=[ m for m in world.findall('model') if m.attrib['name'] in walls[self.tile_type]]
+
+    wall_models=[ m for m in world.findall('model') if m.attrib['name'][5:] in self.walls]
+    
     # 2. change height, width and texture accordingly
     for m in wall_models:
       # adjust the pose of the segment according to the width and the height
@@ -141,7 +147,35 @@ class Tile(object):
       material_element=link_element.find('visual').find('material').find('script').find('name')
       material_element.text = texture
 
-    # 3. add lights accordingly
+    # 3. adjust pose of wall models
+    rotation_matrix={'+y':np.array([[1,0],[0,1]]),
+          '-y':np.array([[-1,0],[0,-1]]), # turn over 180 degr
+          '-x':np.array([[0,-1],[1,0]]), #turn +90degr around z (left)
+          '+x':np.array([[0,1],[-1,0]])} #turn -90degr around z (right)
+    thetas={'+y':0,
+            '-y':3.14,
+            '-x':1.57,
+            '+x':-1.57}
+    for m in wall_models:
+      # step 1 rotate to correct orientation
+      pose_element=m.find('pose')
+      pose_6d=[float(v) for v in pose_element.text.split(' ')]
+      position=np.array([pose_6d[0], pose_6d[1]])
+      position=np.matmul(rotation_matrix[self.o], position)
+      pose_6d[5]+=thetas[self.o]
+      pose_6d[0]=position[0]
+      pose_6d[1]=position[1]
+      # step 2 translate
+      pose_6d[0]+=width*self.x
+      pose_6d[1]+=width*self.y
+      pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+    
+    return wall_models
+
+  def get_lights(self, lights, width, height):
+    """Lights are parsed from simsup_demo/lights/.
+    """
+    # add lights accordingly
     light_models=[]
     if not isinstance(lights,list):
       lights=[lights]
@@ -158,8 +192,34 @@ class Tile(object):
           pose_6d[2]=height-0.01
           pose_element.text = str(pose_6d[0])+" "+str(pose_6d[1])+" "+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
         light_models.append(lightelement)
+    return light_models
 
-    # 4. adjust pose of link (currently only works for width 2)
+  def get_extensions(self, width, height):
+    """ Go over list of self.extensions.
+    Distribute the extensions over the different walls avoiding overlap.
+    Get elements of the models with the extension_generator.
+    return list of elements required for the extension.
+    """
+    # add extensions
+    extension_models=[]
+
+    # distribute extensions over different walls
+    possible_walls=self.walls[2:]
+    for i, (k, arg) in enumerate(self.extensions):
+      if k in ['panel','blocked_hole']:
+        try:
+          arg['wall']=np.random.choice(possible_walls)
+        except ValueError:
+          self.extensions.remove(self.extensions[i])
+        else:
+          possible_walls.remove(arg['wall'])
+        
+    # generate element
+    for k, arg in self.extensions:
+      if 'z_location' in arg.keys(): arg['z_location']*=(height-arg['height'])
+      extension_models.append(generator_dic[k](**arg))
+
+    # rotate and translate all extension models according to position and orientation as well as width
     rotation_matrix={'+y':np.array([[1,0],[0,1]]),
           '-y':np.array([[-1,0],[0,-1]]), # turn over 180 degr
           '-x':np.array([[0,-1],[1,0]]), #turn +90degr around z (left)
@@ -168,14 +228,12 @@ class Tile(object):
             '-y':3.14,
             '-x':1.57,
             '+x':-1.57}
-    # wall_models = [wall_models[0]]
-    # self.o='+x'
-    # self.x=2
-    # self.y=1
-    for m in wall_models:
+    for m in extension_models:
       # step 1 rotate to correct orientation
       pose_element=m.find('pose')
       pose_6d=[float(v) for v in pose_element.text.split(' ')]
+      pose_6d[0]*=width/2.
+      pose_6d[1]*=width/2.
       position=np.array([pose_6d[0], pose_6d[1]])
       position=np.matmul(rotation_matrix[self.o], position)
       pose_6d[5]+=thetas[self.o]
@@ -185,20 +243,32 @@ class Tile(object):
       pose_6d[0]+=width*self.x
       pose_6d[1]+=width*self.y
       pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
-      # import pdb; pdb.set_trace()
-    
-    # 5. add extensions
-    extension_models=[]
-    print("[corridor_generator]: found {0} extensions: {1}".format(len(self.extensions),self.extensions))
+
+    return extension_models
+
+
+  def get_elements(self, width, height, texture, lights):
+    """Translate the tile to a corridor element parsed from segmented worlds
+    in simulation_supervised_demo/worlds/segment.world. 
+    Afterwhich heigth, width, texture is adjusted and lights is added.
+    Lights are parsed from simsup_demo/lights/.
+    Than position and orientation of all elements are adjusted.
+    In the end the elements are given a better name.
+    """
+    wall_models=self.get_wall_models(width, height, texture)
+    light_models=self.get_lights(lights, width, height)
+    extension_models = self.get_extensions(width, height)
+ 
     # Change name attributes so gazebo does not complain
     models=wall_models+light_models+extension_models
     for m in models:
       m.attrib['name']=m.attrib['name']+"_"+str(self.x)+"_"+str(self.y)+"_"+str(self.tile_type)
+
     return models
 
   def to_string(self):
     """display fields"""
-    return "tile(x={0} ,y={1}, orientation={2}, type={3})".format(self.x, self.y, self.o, self.tile_type)  
+    return "tile(x={0} ,y={1}, orientation={2}, type={3}, ext={4})".format(self.x, self.y, self.o, self.tile_type,[v[0] for v in self.extensions])  
 
 def from_sequence_to_tiles(sequence):
   """Translate a sequence of types of tiles,
@@ -263,35 +333,25 @@ def translate_map_to_element_tree(sequence, width, height, texture, lights, exte
   tiles=from_sequence_to_tiles(sequence)
 
   if extension_conf:
-    for k in extension_conf.keys(): 
-      generator_dic={
-        'panel': generate_panel,
-        'blocked_hole': generate_blocked_hole,
-        'passway': generate_passway,
-        'ceiling': generate_ceiling,
-        'obstacle': generate_obstacle,
-      }
-      for k in extension_conf.keys():
-        try:
-          num=extension_conf[k]['number'] # get number of occurences of this extension
-        except KeyError: # in case it is not specified added to all segments
-          num=len(tiles)
-        print("[world_generator]: adding {0}: {2} {1}(s)".format(k, extension_conf[k]['type'], num))
-        # select tiles to add extension
-        picked_indices=np.random.choice(range(len(tiles)), size=num)
-        for i in range(num):
-          tile=tiles[picked_indices[i]]
-          try:
-            extension = generator_dic[extension_conf[k]['type']](extension_conf[k]['type_specific'],tile_type=tile.tile_type)
-          except KeyError:
-            raise(NotImplementedError(''))
-          else:
-            tile.extensions.append(extension)
-
+    for k in extension_conf.keys():
+      try:
+        num=extension_conf[k]['number'] # get number of occurences of this extension
+      except KeyError: # in case it is not specified added to all segments
+        num=len(tiles)-2
+      else:
+        num=min(num,len(tiles)-2)
+      print("[world_generator]: adding {0}: {2} {1}(s)".format(k, extension_conf[k]['type'], num))
+      # select tiles to add extension
+      indices = np.array(range(len(tiles)-2))
+      np.random.shuffle(indices) #sort the tile (except for final tile)
+      indices += 1
+      for i in range(num):
+        tiles[indices[i]].extensions.append((extension_conf[k]['type'],extension_conf[k]['type_specific']))
+          
   # Get all elements of tiles
   for tile in tiles:
     elements=tile.get_elements(width, height, texture, lights)
-    print "{0}: {1}".format(tile.to_string(), [e.attrib["name"] for e in elements])    
+    print "{}".format(tile.to_string())    
     segments.extend(elements)
   return segments
 
@@ -369,17 +429,43 @@ if __name__ == '__main__':
 
   #########
   # Test 3: generate specific sequence and seave as new.world
+  # worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+  # template_world='empty_world.world'
+  # tree = ET.parse(worlds_location+template_world)
+  # root = tree.getroot()
+  # sequence = [0,1,2,2,1,1,3,3,1,2,4]
+  # # sequence = [0]
+  # segments = translate_map_to_element_tree(sequence,
+  #                                       width=3,
+  #                                       height=2,
+  #                                       texture='Gazebo/White',
+  #                                       lights='default_light')
+  # goal = get_min_max_x_y_goal(segments)
+  # print 'goal: ',goal
+  # world=root.find('world')
+  # for seg in segments:
+  #   pretty_append(world, seg)
+  # tree.write(os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
+
+  ########
+  # Test 4: generate basic corridor with a panel
+  
   worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
   template_world='empty_world.world'
   tree = ET.parse(worlds_location+template_world)
   root = tree.getroot()
-  sequence = [0,1,2,2,1,1,3,3,1,2,4]
-  # sequence = [0]
+  
+  sequence = [0,1,1,1,4]
+
+  extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
+  extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))
+  
   segments = translate_map_to_element_tree(sequence,
                                         width=3,
                                         height=2,
                                         texture='Gazebo/White',
-                                        lights='default_light')
+                                        lights='default_light',
+                                        extension_conf=extension_conf)
   goal = get_min_max_x_y_goal(segments)
   print 'goal: ',goal
   world=root.find('world')
@@ -387,6 +473,4 @@ if __name__ == '__main__':
     pretty_append(world, seg)
   tree.write(os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
 
-  ########
-  # Test 4: generate empty corridor for a specific extension
   print 'done'

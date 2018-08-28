@@ -25,7 +25,7 @@ current_pos = []
 ready = False
 finished = True
 transformations={'unknown':(10,200,-10,200),
-    'corridor':(10,200,-10,200),
+    'corridor':(1,1,-1,1),
     'forest':(6.5, 438.0, -6.6, 418.0),
     'canyon':(15.5, 424.0, -10.6, 780),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
