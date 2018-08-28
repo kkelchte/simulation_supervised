@@ -1,0 +1,30 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+extension_0:
+  type: 'panel'
+  number: 1
+  type_specific:
+    height: 1
+    width: 0.7
+    z_location: 0.5
+    offset: 0
+    texture: 'Gazebo/Black'
+extension_1:
+  type: 'panel'
+  number: 1
+  type_specific:
+    height: 0.5
+    width: 1
+    z_location: 0.5
+    offset: 0
+    texture: 'Gazebo/Red'
+extension_2:
+  type: 'panel'
+  number: 1
+  type_specific:
+    height: 0.25
+    width: 0.25
+    z_location: 0.5
+    offset: 0
+    texture: 'Gazebo/Blue'

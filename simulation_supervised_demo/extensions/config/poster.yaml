@@ -1,0 +1,13 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+poster:
+  type: 'panel'
+  number: 5
+  type_specific:
+    height: 1
+    width: 0.7
+    thickness: 0.02
+    z_location: 0.8
+    offset: 0
+    texture: 'Gazebo/Blue'
