@@ -44,8 +44,8 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!--use line for spawning world from .dae mesh in gz model folder-->
     <arg name="world_name" value="$(arg world_file)"/>
-    <arg name="gui" value="false"/>
-    <!-- <arg name="gui" value="$(arg graphics)"/> -->
+    <!-- <arg name="gui" value="true"/> -->
+    <arg name="gui" value="$(arg graphics)"/>
     <arg name="headless" default="true"/>
   </include>
 

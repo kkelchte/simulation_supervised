@@ -44,7 +44,7 @@ def pretty_append(world, element):
 # 1. parse recipe from arguments and yaml configuration file
 parser = argparse.ArgumentParser(description="""world_generator.py: generates a random corridor as a world file (later possibly also a top down view) based on the extensions.""")
 #   ------  Corridor arguments
-parser.add_argument("--type_of_corridor", default='normal', type=str, help="default is normal which is a bended corridor. Empty means it will only create one segment of the combined extensions.")
+parser.add_argument("--corridor_type", default='normal', type=str, help="default is normal which is a bended corridor. Empty means wall parts of segments will not have a visible part.")
 parser.add_argument("--corridor_length", default=10, type=int, help="Defines number of tiles the corridor long (not used in case of empty type of corridor).")
 parser.add_argument("--corridor_width", default=3, type=float, help="Defines width of the corridor (not used in case of empty type of corridor).")
 parser.add_argument("--corridor_height", default=3, type=float, help="Defines height of the corridor (not used in case of empty type of corridor).")
@@ -90,6 +90,7 @@ world = root.find('world')
 # 4. Build a corridor and add extensions:
 # returns all segments (models) to be added to the tree
 segments=[]
+
 # save output image in 'corridors'
 if not os.path.isdir(FLAGS.output_dir+'/corridors'): os.makedirs(FLAGS.output_dir+'/corridors')
 segments, goal = generate_corridor(length=FLAGS.corridor_length,
@@ -98,8 +99,9 @@ segments, goal = generate_corridor(length=FLAGS.corridor_length,
                             height=FLAGS.corridor_height,
                             texture=FLAGS.texture,
                             lights=FLAGS.lights,
+                            visual=FLAGS.corridor_type=='normal',
                             extension_conf=conf,
-                            save_location=FLAGS.output_dir+'/corridors/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_'+FLAGS.output_file+'.jpg')
+                            save_location=FLAGS.output_dir+'/corridors/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_'+FLAGS.output_file+'.png')
 
 # add them to the world file
 for seg in segments:

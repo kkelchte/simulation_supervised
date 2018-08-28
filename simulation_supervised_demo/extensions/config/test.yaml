@@ -1,30 +1,14 @@
-#Offset is between -1:1
-#z-location is between 0:1
+# Offset is between -1:1
+# z-location is between 0:1
+# everything that is not specified is randomly selected.
 ---
 extension_0:
   type: 'panel'
   number: 1
   type_specific:
-    height: 1
-    width: 0.7
-    z_location: 0.
-    offset: -1
-    texture: 'Gazebo/Black'
+    dummy: ''
 extension_1:
   type: 'panel'
   number: 1
   type_specific:
-    height: 0.5
-    width: 1
-    z_location: 0.
-    offset: -1
-    texture: 'Gazebo/Red'
-extension_2:
-  type: 'panel'
-  number: 1
-  type_specific:
-    height: 0.25
-    width: 0.25
-    z_location: 1
-    offset: -1
-    texture: 'Gazebo/Blue'
+    dummy: ''

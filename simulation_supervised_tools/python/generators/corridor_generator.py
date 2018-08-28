@@ -54,14 +54,7 @@ def visualize(sequence, save_location=""):
   else:
     plt.show()
 
-generator_dic={
-        'panel': generate_panel,
-        'passway': generate_passway,
-        'obstacle': generate_obstacle,
-        'ceiling': generate_ceiling,
-        'blocked_hole': generate_blocked_hole,
-      }
-      
+
 ####### Tile classe
 class Tile(object):
   """A Tile has a position and an entering orientation"""
@@ -71,6 +64,13 @@ class Tile(object):
         2: ['top','bottom','front', 'left'],
         3: ['top','bottom','front', 'right'],
         4: ['top','bottom', 'left', 'right']}
+    self.generator_dic={
+      'panel': generate_panel,
+      'passway': generate_passway,
+      'obstacle': generate_obstacle,
+      'ceiling': generate_ceiling,
+      'blocked_hole': generate_blocked_hole,
+    }
     self.x=x
     self.y=y
     self.o=orientation
@@ -78,7 +78,6 @@ class Tile(object):
     self.extensions = []
     self.walls = walls[self.tile_type]
 
-  
   def update_orientation(self):
     """turn clockwise or counterclockwise or stay"""
     orientation_list=["+y","+x","-y","-x"]
@@ -109,7 +108,7 @@ class Tile(object):
     new_x,new_y=self.update_position(new_orientation)
     return Tile(new_x,new_y,new_orientation,new_tile_type)
 
-  def get_wall_models(self, width, height, texture):
+  def get_wall_models(self, width, height, texture, visual=True, verbose=False):
     """Parses the wall models and position them accordingly.
     """
     # 1. get wall models for front, back, left, right wall depending on which type of tile
@@ -147,6 +146,9 @@ class Tile(object):
       material_element=link_element.find('visual').find('material').find('script').find('name')
       material_element.text = texture
 
+      # in case visual = False the walls should be invisible
+      if not visual:  link_element.remove(link_element.find('visual'))
+
     # 3. adjust pose of wall models
     rotation_matrix={'+y':np.array([[1,0],[0,1]]),
           '-y':np.array([[-1,0],[0,-1]]), # turn over 180 degr
@@ -172,7 +174,7 @@ class Tile(object):
     
     return wall_models
 
-  def get_lights(self, lights, width, height):
+  def get_lights(self, lights, width, height, verbose=False):
     """Lights are parsed from simsup_demo/lights/.
     """
     # add lights accordingly
@@ -194,7 +196,7 @@ class Tile(object):
         light_models.append(lightelement)
     return light_models
 
-  def get_extensions(self, width, height):
+  def get_extensions(self, width, height, verbose=False):
     """ Go over list of self.extensions.
     Distribute the extensions over the different walls avoiding overlap.
     Get elements of the models with the extension_generator.
@@ -203,10 +205,20 @@ class Tile(object):
     # add extensions
     extension_models=[]
 
+    # print("corridor_generator: got {0} extensions in this tile.".format(len(self.extensions)))
+
     # distribute extensions over different walls
     possible_walls=self.walls[2:]
+    # check if there is a wall specified in extension list
+    for (k,arg) in self.extensions:
+      if not isinstance(arg, type(None)) and 'wall' in arg.keys() :
+        if arg['wall'] in possible_walls: 
+          possible_walls.remove(arg['wall'])
+        else: #if wall is not possible remove it
+          del arg['wall']
+    # give other extensions a wall  
     for i, (k, arg) in enumerate(self.extensions):
-      if k in ['panel','blocked_hole']:
+      if k in ['panel','blocked_hole'] and 'wall' not in arg.keys():
         try:
           arg['wall']=np.random.choice(possible_walls)
         except ValueError:
@@ -215,9 +227,10 @@ class Tile(object):
           possible_walls.remove(arg['wall'])
         
     # generate element
+    arg={}
     for k, arg in self.extensions:
-      if 'z_location' in arg.keys(): arg['z_location']*=(height-arg['height'])
-      extension_models.append(generator_dic[k](**arg))
+      arg['verbose']=verbose
+      extension_models.append(self.generator_dic[k](**arg))
 
     # rotate and translate all extension models according to position and orientation as well as width
     rotation_matrix={'+y':np.array([[1,0],[0,1]]),
@@ -228,12 +241,14 @@ class Tile(object):
             '-y':3.14,
             '-x':1.57,
             '+x':-1.57}
+
     for m in extension_models:
       # step 1 rotate to correct orientation
       pose_element=m.find('pose')
       pose_6d=[float(v) for v in pose_element.text.split(' ')]
       pose_6d[0]*=width/2.
-      pose_6d[1]*=width/2.
+      pose_6d[1]*=width/2. #corridor is expected to be 2m width
+      pose_6d[2]*=height/2 #corridor is expected to be 2m high, has to be rescaled to height
       position=np.array([pose_6d[0], pose_6d[1]])
       position=np.matmul(rotation_matrix[self.o], position)
       pose_6d[5]+=thetas[self.o]
@@ -247,7 +262,7 @@ class Tile(object):
     return extension_models
 
 
-  def get_elements(self, width, height, texture, lights):
+  def get_elements(self, width, height, texture, lights, visual, verbose):
     """Translate the tile to a corridor element parsed from segmented worlds
     in simulation_supervised_demo/worlds/segment.world. 
     Afterwhich heigth, width, texture is adjusted and lights is added.
@@ -255,14 +270,20 @@ class Tile(object):
     Than position and orientation of all elements are adjusted.
     In the end the elements are given a better name.
     """
-    wall_models=self.get_wall_models(width, height, texture)
-    light_models=self.get_lights(lights, width, height)
-    extension_models = self.get_extensions(width, height)
+    wall_models=self.get_wall_models(width, height, texture, visual, verbose)
+    light_models=self.get_lights(lights, width, height, verbose)
+    extension_models = self.get_extensions(width, height, verbose)
  
     # Change name attributes so gazebo does not complain
     models=wall_models+light_models+extension_models
+
+    names=[]
     for m in models:
-      m.attrib['name']=m.attrib['name']+"_"+str(self.x)+"_"+str(self.y)+"_"+str(self.tile_type)
+      i=0
+      while m.attrib['name']+"_"+str(self.x)+"_"+str(self.y)+"_"+str(i)+"_"+str(self.tile_type) in names:
+        i+=1
+      names.append(m.attrib['name']+"_"+str(self.x)+"_"+str(self.y)+"_"+str(i)+"_"+str(self.tile_type))
+      m.attrib['name']=m.attrib['name']+"_"+str(self.x)+"_"+str(self.y)+"_"+str(i)+"_"+str(self.tile_type)
 
     return models
 
@@ -325,7 +346,7 @@ def generate_map(length, bends):
     feasible = is_feasible(sequence)
   return sequence
 
-def translate_map_to_element_tree(sequence, width, height, texture, lights, extension_conf):
+def translate_map_to_element_tree(sequence, width, height, texture, lights, visual=True, extension_conf={}, verbose=False):
   """For each tile in the trajectory sequence,
   append a corresponding corridor segment on correct location.
   """
@@ -333,6 +354,7 @@ def translate_map_to_element_tree(sequence, width, height, texture, lights, exte
   tiles=from_sequence_to_tiles(sequence)
 
   if extension_conf:
+    # spread out a number of extensions over the different tiles
     for k in extension_conf.keys():
       try:
         num=extension_conf[k]['number'] # get number of occurences of this extension
@@ -350,8 +372,8 @@ def translate_map_to_element_tree(sequence, width, height, texture, lights, exte
           
   # Get all elements of tiles
   for tile in tiles:
-    elements=tile.get_elements(width, height, texture, lights)
-    print "{}".format(tile.to_string())    
+    elements=tile.get_elements(width, height, texture, lights, visual, verbose)
+    if verbose: print "{}".format(tile.to_string())    
     segments.extend(elements)
   return segments
 
@@ -384,6 +406,7 @@ def generate_corridor(length=10,
                       height=2,
                       texture='Gazebo/Grey',
                       lights='default_light',
+                      visual=True,
                       save_location='',
                       extension_conf={}):
   """ The function creates a map of a possible trajectory.
@@ -396,6 +419,7 @@ def generate_corridor(length=10,
                                         height=height,
                                         texture=texture,
                                         lights=lights,
+                                        visual=visual,
                                         extension_conf=extension_conf)
   goal = get_min_max_x_y_goal(segments)
   if save_location: visualize(sequence,save_location)
@@ -448,29 +472,36 @@ if __name__ == '__main__':
   # tree.write(os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
 
   ########
-  # Test 4: generate basic corridor with a panel
+  # Test 4: generate empty corridor with a panel
   
   worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
   template_world='empty_world.world'
   tree = ET.parse(worlds_location+template_world)
   root = tree.getroot()
   
-  sequence = [0,1,1,1,4]
+  sequence = [0,1,4]
 
   extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
   extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))
+  
   
   segments = translate_map_to_element_tree(sequence,
                                         width=3,
                                         height=2,
                                         texture='Gazebo/White',
                                         lights='default_light',
-                                        extension_conf=extension_conf)
-  goal = get_min_max_x_y_goal(segments)
-  print 'goal: ',goal
+                                        visual=True,
+                                        extension_conf=extension_conf,
+                                        verbose=True)
+  # append segments to world and write world
   world=root.find('world')
   for seg in segments:
     pretty_append(world, seg)
-  tree.write(os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
+  tree.write(os.environ['HOME']+'/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
+
+  # save image
+  save_location=os.environ['HOME']+'/corridors'
+  if not os.path.isdir(save_location): os.makedirs(save_location)
+  visualize(sequence,save_location+'/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_new.jpg')
 
   print 'done'

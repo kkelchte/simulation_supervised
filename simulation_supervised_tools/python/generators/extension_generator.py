@@ -10,12 +10,18 @@ import matplotlib.pyplot as plt
 
 template_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/templates/'
 
-def generate_panel(height=1,
-                    width=0.7,
-                    z_location=1,
-                    offset=0,
-                    texture= 'Gazebo/Grey',
-                    wall=""):
+
+prefab_textures=['Gazebo/Grey','Gazebo/Blue','Gazebo/Red','Gazebo/Green','Gazebo/White','Gazebo/Black']
+
+def generate_panel(dummy='', # used to set a dummy argument in order to avoid empty argument dictionaries
+                    height=None,
+                    width=None,
+                    thickness=None,
+                    z_location=None,
+                    offset=None,
+                    texture=None,
+                    wall=None,
+                    verbose=False):
   """
   Args:
   height of the panel
@@ -26,15 +32,26 @@ def generate_panel(height=1,
   wall (left, right, front or back) ==> if '' pick random (left,right)
   Returns model placed in centered segment.
   """
-  if not wall: wall=np.random.choice(["right","left"])
+  # fill in randomly all that is not specified
+  if height==None: height = np.random.uniform(0.1,2)
+  if width==None: width = np.random.uniform(0.1,2)
+  if thickness==None: thickness = np.random.uniform(0.001,0.3)
+  if z_location==None: z_location = np.random.uniform(0,1) #ALLWAYS BETWEEN 0 and 1
+  if offset==None: offset = np.random.uniform(-0.5,0.5)
+  if texture==None: texture = np.random.choice(prefab_textures)
+  if wall==None: texture = np.random.choice(["right","left"])
+  
+  if verbose: print("[generate_panel]: height {0}, width {1}, thicknes {2}, z_location {3}, offset {4}, texture {5}, wall {6}".format(height,width,thickness,z_location,offset,texture,wall))
   # Get template
   panel_tree = ET.parse(template_location+'panel.xml')
   panel = panel_tree.getroot().find('world').find('model')
   # change shape of panel according to heigth and width
   for child in iter(['collision', 'visual']):
     size_el=panel.find('link').find(child).find('geometry').find('box').find('size')
-    size=[float(v) for v in size_el.text.split(' ')]
-    size_el.text=str(size[0])+" "+str(width)+" "+str(height)
+    # size=[float(v) for v in size_el.text.split(' ')]
+    # thickness is multiplied as the center of the panel remains in the wall
+    # this ensures the offset by multiplying with width/2 remains correctly
+    size_el.text=str(2*thickness)+" "+str(width)+" "+str(height)
 
   # change position of panel according to wall, z_location and offset
   pose_el=panel.find('pose')
@@ -42,9 +59,13 @@ def generate_panel(height=1,
   position={"left":[-1, offset],
             "right":[1, offset],
             "front":[offset, 1],
-            "back":[offset, -1],}
+            "back":[offset, -1]}
+  orientation={"left":0,
+              "right":0,
+              "front":1.57,
+              "back":1.57}
   pose_6d = [float(v) for v in pose_el.text.split(' ')]
-  pose_el.text=str(position[wall][0])+" "+str(position[wall][1])+" "+str(z_location+height/2.)+" "+str(pose_6d[3])+" "+str(pose_6d[4])+" "+str(pose_6d[5])
+  pose_el.text=str(position[wall][0])+" "+str(position[wall][1])+" "+str(z_location*(2-height)+height/2.)+" "+str(pose_6d[3])+" "+str(pose_6d[4])+" "+str(orientation[wall])
   # correct texture
   material=panel.find('link').find('visual').find('material').find('script').find('name')
   material.text=texture

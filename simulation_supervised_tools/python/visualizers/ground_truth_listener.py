@@ -25,7 +25,8 @@ current_pos = []
 ready = False
 finished = True
 transformations={'unknown':(10,200,-10,200),
-    'corridor':(1,1,-1,1),
+    'corridor':(5,300,-5,400),
+    'different_corridor':(5,300,-5,400),
     'forest':(6.5, 438.0, -6.6, 418.0),
     'canyon':(15.5, 424.0, -10.6, 780),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
@@ -91,18 +92,14 @@ if __name__=="__main__":
     img_file=rospy.get_param('background')
     try:
       img=mpimg.imread(img_file)
-      img_type = img_file.split("/")[-1].split(".")[0]
-      if 'sandbox' in img_type:
-        img_type = 'sandbox'
-      if 'canyon' in img_type:
-        img_type = 'canyon'
-      print("[gt_listener]: img_type: {}".format(img_type))
     except Exception as e:
       print('[gt_listener]: failed to load background image: '+img_file+'. '+str(e))
-  elif rospy.has_param('world_name') :
+  if rospy.has_param('world_name') :
     world = rospy.get_param('world_name')
     if world in transformations.keys(): 
       img_type=world
+
+  print("[gt_listener]: img_type: {}".format(img_type))
 
   log_folder = '/tmp/log'
   if rospy.has_param('log_folder'):
