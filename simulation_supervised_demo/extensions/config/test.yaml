@@ -2,6 +2,12 @@
 # z-location is between 0:1
 # everything that is not specified is randomly selected.
 ---
+pipes:
+  type: 'ceiling'
+  type_specific:
+    dummy: ''
+    name: '3pipes'
+    texture: 'Gazebo/Black'
 doorway:
   type: 'passway'
   number: 1

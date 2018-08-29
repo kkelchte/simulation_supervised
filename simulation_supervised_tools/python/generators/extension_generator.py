@@ -144,17 +144,41 @@ def generate_obstacle(dummy='',
 
   return obstacle
 
-def generate_ceiling(length=1,
-  height= 1,
-  width= 0.7,
-  offset= 1,
-  orientation= 'parallel',
-  texture= 'Gazebo/Grey',
-  tile_type=-1):
+def generate_ceiling(dummy='',
+  name=None,
+  model_dir='',
+  tile_type=1,
+  length = 2,
+  texture=None,
+  verbose=False):
+  """Load model with name 'name_tile_type' {1,2 or 3} from model_dir.
+  Adjust the texture accordingly.
   """
-  """
+  if tile_type in [0,4]: tile_type=1 #the start and end tile is the same as straight
+  if name == None: name=np.random.choice(['3pipes'])
+  if texture==None: texture = np.random.choice(prefab_textures)
+  
+  if not model_dir: model_dir=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/models'
+  if not os.path.isfile(model_dir+'/'+name+'_'+str(tile_type)+'/model.sdf'):
+    print("[extension_generator]: failed to load model {0}, not in {1}".format(name, model_dir))
+    return -1  
+  if verbose: print("[generate_ceiling]: name {0}, tile_type {1}, texture {2}".format(name, tile_type, texture))
+  
+  # load element
+  ceiling_tree = ET.parse(model_dir+'/'+name+'_'+str(tile_type)+'/model.sdf')
+  ceiling_models = ceiling_tree.getroot().findall('model')
 
-  return ET.Element('None')
+  # adjust length of elements
+  for ceiling in ceiling_models:
+    for child in iter(['collision', 'visual']):
+      length_el=ceiling.find('link').find(child).find('geometry').find('cylinder').find('length')
+      length_el.text = str(length)
+
+  # adjust texture
+  for ceiling in ceiling_models:
+    material=ceiling.find('link').find('visual').find('material').find('script').find('name')
+    material.text=texture
+  return ceiling_models
 
 def generate_blocked_hole(height= 1,
   width= 0.7,

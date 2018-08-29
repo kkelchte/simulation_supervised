@@ -226,6 +226,10 @@ class Tile(object):
           self.extensions.remove(self.extensions[i])
         else:
           possible_walls.remove(arg['wall'])
+
+    # in case of a ceiling element the length should be adjusted to the width
+    for (k,arg) in self.extensions:
+      if k == 'ceiling': arg['length'] = width
         
     # generate element
     arg={}
@@ -233,8 +237,9 @@ class Tile(object):
       arg['verbose']=verbose
       element = self.generator_dic[k](**arg)
       if isinstance(element, ET.Element): extension_models.append(element)
+      elif isinstance(element, list): extension_models.extend(element)
 
-    # rotate and translate all extension models according to position and orientation as well as width
+    # rotate and translate all extension models according to position and orientation as well as adjust width and height
     rotation_matrix={'+y':np.array([[1,0],[0,1]]),
           '-y':np.array([[-1,0],[0,-1]]), # turn over 180 degr
           '-x':np.array([[0,-1],[1,0]]), #turn +90degr around z (left)
@@ -248,9 +253,11 @@ class Tile(object):
       # step 1 rotate to correct orientation
       pose_element=m.find('pose')
       pose_6d=[float(v) for v in pose_element.text.split(' ')]
+      # adjust width (no influence on ceiling element)
       pose_6d[0]*=width/2.
       pose_6d[1]*=width/2. #corridor is expected to be 2m width
-      pose_6d[2]*=height/2 #corridor is expected to be 2m high, has to be rescaled to height
+      # adjust height for panel and ceiling (no influence on obstacle or passway)
+      pose_6d[2]*=height/2. #corridor is expected to be 2m high, has to be rescaled to height
       position=np.array([pose_6d[0], pose_6d[1]])
       position=np.matmul(rotation_matrix[self.o], position)
       pose_6d[5]+=thetas[self.o]
@@ -362,6 +369,8 @@ def translate_map_to_element_tree(sequence, width, height, texture, lights, visu
         possible_tiles=[t for t in tiles if t.tile_type == 1 and "passway" not in [e[0] for e in t.extensions]]
       elif extension_conf[k]['type'] in ["panel", "blocked_hole","obstacle"]:
         possible_tiles=[t for t in tiles if t.tile_type in [1,2,3]]
+      elif extension_conf[k]['type'] in ["ceiling"]:
+        possible_tiles=[t for t in tiles if "ceiling" not in [e[0] for e in t.extensions]]
       else:
         possible_tiles=tiles
       try:
@@ -516,7 +525,7 @@ if __name__ == '__main__':
   template_world='empty_world.world'
   tree = ET.parse(worlds_location+template_world)
   root = tree.getroot()  
-  sequence = [0,1,3,1,4]
+  sequence = [0,1,1,4]
   extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
   extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))  
   segments = translate_map_to_element_tree(sequence,
