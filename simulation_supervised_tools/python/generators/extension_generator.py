@@ -12,16 +12,17 @@ template_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simul
 
 
 prefab_textures=['Gazebo/Grey','Gazebo/Blue','Gazebo/Red','Gazebo/Green','Gazebo/White','Gazebo/Black']
+prefab_obstacles=['person_standing','bookshelf']
 
 def generate_panel(dummy='', # used to set a dummy argument in order to avoid empty argument dictionaries
-                    height=None,
-                    width=None,
-                    thickness=None,
-                    z_location=None,
-                    offset=None,
-                    texture=None,
-                    wall=None,
-                    verbose=False):
+  height=None,
+  width=None,
+  thickness=None,
+  z_location=None,
+  offset=None,
+  texture=None,
+  wall=None,
+  verbose=False):
   """
   Args:
   height of the panel
@@ -66,49 +67,100 @@ def generate_panel(dummy='', # used to set a dummy argument in order to avoid em
               "back":1.57}
   pose_6d = [float(v) for v in pose_el.text.split(' ')]
   pose_el.text=str(position[wall][0])+" "+str(position[wall][1])+" "+str(z_location*(2-height)+height/2.)+" "+str(pose_6d[3])+" "+str(pose_6d[4])+" "+str(orientation[wall])
-  # correct texture
+  # adjust texture
   material=panel.find('link').find('visual').find('material').find('script').find('name')
   material.text=texture
   return panel
 
-def generate_passway(height= 1,
-                    width= 0.7,
-                    z_location= 1,
-                    name= 'arc',
-                    texture= 'Gazebo/Grey',
-                    tile_type=-1):
+def generate_passway(dummy='',
+  name=None,
+  model_dir='',
+  offset=None,
+  texture=None,
+  verbose=False):
+  """Get a passway from simsup_demo/models and place it in the middle of the tile,
+  adjust texture and offset.
   """
-  """
+  if name == None: name=np.random.choice(['arc','doorway'])
+  if offset == None: offset=np.random.uniform(-0.8,0.8)
+  if texture==None: texture = np.random.choice(prefab_textures)
+  if not model_dir: model_dir=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/models'
+  if not os.path.isfile(model_dir+'/'+name+'/model.sdf'):
+    print("[extension_generator]: failed to load model {0}, not in {1}".format(name, model_dir))
+    return -1
+  
+  if verbose: print("[generate_passway]: name {0}, offset {1}, texture {2}".format(name, offset, texture))
+  
+  # load element
+  passway_tree = ET.parse(model_dir+'/'+name+'/model.sdf')
+  passway = passway_tree.getroot().find('model')
 
-  return ET.Element('None')
+  # adjust position
+  pose_6d = [float(v) for v in passway.find('pose').text.split(' ')]
+  pose_6d[1] = offset
+  passway.find('pose').text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
 
-def generate_obstacle(name='human',
-                      scale=0.7,
-                      x_location=1,
-                      y_location=1,
-                      tile_type=-1):
-  """
-  """
+  # adjust texture
+  material=passway.find('link').find('visual').find('material').find('script').find('name')
+  material.text=texture
+  return passway
 
-  return ET.Element('None')
+def generate_obstacle(dummy='',
+  name=None,
+  model_dir='',
+  side_offset=None,
+  offset=None,
+  wall=None,
+  verbose=False):
+  """ Get an element from simsup_demo/models and place it on the side of the tile.
+  """
+  if name == None: name=np.random.choice(prefab_obstacles)
+  if side_offset == None: offset=np.random.uniform(0.7,0.9)
+  if offset == None: offset=np.random.uniform(-0.5,0.5)
+  if wall == None: wall = np.random.choice(["right","left"])
+  
+  if not model_dir: model_dir=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/models'
+  if not os.path.isfile(model_dir+'/'+name+'/model.sdf'):
+    print("[extension_generator]: failed to load model {0}, not in {1}".format(name, model_dir))
+    return -1
+
+  if verbose: print("[generate_obstacle]: name {0}, offset {1}, wall {2}".format(name, offset, wall))
+
+  # load element
+  obstacle_tree = ET.parse(model_dir+'/'+name+'/model.sdf')
+  obstacle = obstacle_tree.getroot().find('model')
+
+  # adjust position
+  position={"left":[-side_offset, offset],
+            "right":[side_offset, offset],
+            "front":[offset, side_offset],
+            "back":[offset, -side_offset]}
+  orientation={"left":0,
+              "right":0,
+              "front":1.57,
+              "back":1.57}
+  pose_6d = [float(v) for v in obstacle.find('pose').text.split(' ')]
+  obstacle.find('pose').text = str(position[wall][0])+" "+str(position[wall][1])+" "+str(pose_6d[2])+" "+str(pose_6d[3])+" "+str(pose_6d[4])+" "+str(orientation[wall])
+
+  return obstacle
 
 def generate_ceiling(length=1,
-                    height= 1,
-                    width= 0.7,
-                    offset= 1,
-                    orientation= 'parallel',
-                    texture= 'Gazebo/Grey',
-                    tile_type=-1):
+  height= 1,
+  width= 0.7,
+  offset= 1,
+  orientation= 'parallel',
+  texture= 'Gazebo/Grey',
+  tile_type=-1):
   """
   """
 
   return ET.Element('None')
 
 def generate_blocked_hole(height= 1,
-                          width= 0.7,
-                          z_location= 1,
-                          texture= 'Gazebo/Grey',
-                          tile_type=-1):
+  width= 0.7,
+  z_location= 1,
+  texture= 'Gazebo/Grey',
+  tile_type=-1):
   """
   """
 

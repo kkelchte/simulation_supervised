@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="person_standing">
+    <pose>0 0 0 0 0 0</pose>
     <static>1</static>
     <link name="link">
       <inertial>

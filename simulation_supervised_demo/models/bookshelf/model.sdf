@@ -2,7 +2,9 @@
 <sdf version="1.5">
   <model name="bookshelf">
     <static>true</static>
+    <pose>0 0 0 0 0</pose>
     <link name="link">
+      <pose>0 0 0 0 0 -1.57</pose>
       <inertial>
         <mass>1.0</mass>
       </inertial>

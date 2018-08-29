@@ -216,9 +216,10 @@ class Tile(object):
           possible_walls.remove(arg['wall'])
         else: #if wall is not possible remove it
           del arg['wall']
+    
     # give other extensions a wall  
     for i, (k, arg) in enumerate(self.extensions):
-      if k in ['panel','blocked_hole'] and 'wall' not in arg.keys():
+      if k in ['panel','blocked_hole','obstacle'] and 'wall' not in arg.keys():
         try:
           arg['wall']=np.random.choice(possible_walls)
         except ValueError:
@@ -230,7 +231,8 @@ class Tile(object):
     arg={}
     for k, arg in self.extensions:
       arg['verbose']=verbose
-      extension_models.append(self.generator_dic[k](**arg))
+      element = self.generator_dic[k](**arg)
+      if isinstance(element, ET.Element): extension_models.append(element)
 
     # rotate and translate all extension models according to position and orientation as well as width
     rotation_matrix={'+y':np.array([[1,0],[0,1]]),
@@ -356,19 +358,24 @@ def translate_map_to_element_tree(sequence, width, height, texture, lights, visu
   if extension_conf:
     # spread out a number of extensions over the different tiles
     for k in extension_conf.keys():
+      if extension_conf[k]['type'] in ["passway"]: # passways are only set on straight segments
+        possible_tiles=[t for t in tiles if t.tile_type == 1 and "passway" not in [e[0] for e in t.extensions]]
+      elif extension_conf[k]['type'] in ["panel", "blocked_hole","obstacle"]:
+        possible_tiles=[t for t in tiles if t.tile_type in [1,2,3]]
+      else:
+        possible_tiles=tiles
       try:
         num=extension_conf[k]['number'] # get number of occurences of this extension
       except KeyError: # in case it is not specified added to all segments
-        num=len(tiles)-2
+        num=len(possible_tiles)
       else:
-        num=min(num,len(tiles)-2)
+        num=min(num,len(possible_tiles))
       print("[world_generator]: adding {0}: {2} {1}(s)".format(k, extension_conf[k]['type'], num))
       # select tiles to add extension
-      indices = np.array(range(len(tiles)-2))
+      indices = np.array(range(len(possible_tiles)))
       np.random.shuffle(indices) #sort the tile (except for final tile)
-      indices += 1
       for i in range(num):
-        tiles[indices[i]].extensions.append((extension_conf[k]['type'],extension_conf[k]['type_specific']))
+        possible_tiles[indices[i]].extensions.append((extension_conf[k]['type'],extension_conf[k]['type_specific']))
           
   # Get all elements of tiles
   for tile in tiles:
@@ -472,22 +479,49 @@ if __name__ == '__main__':
   # tree.write(os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
 
   ########
-  # Test 4: generate empty corridor with a panel
+  # Test 4: generate empty corridor with a panel  
+  # worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+  # template_world='empty_world.world'
+  # tree = ET.parse(worlds_location+template_world)
+  # root = tree.getroot()
   
+  # sequence = [0,1,4]
+
+  # extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
+  # extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))
+  
+  
+  # segments = translate_map_to_element_tree(sequence,
+  #                                       width=3,
+  #                                       height=2,
+  #                                       texture='Gazebo/White',
+  #                                       lights='default_light',
+  #                                       visual=True,
+  #                                       extension_conf=extension_conf,
+  #                                       verbose=True)
+  # # append segments to world and write world
+  # world=root.find('world')
+  # for seg in segments:
+  #   pretty_append(world, seg)
+  # tree.write(os.environ['HOME']+'/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
+
+  # # save image
+  # save_location=os.environ['HOME']+'/corridors'
+  # if not os.path.isdir(save_location): os.makedirs(save_location)
+  # visualize(sequence,save_location+'/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_new.jpg')
+
+  ########
+  # Test 5: generate straight corridor with passway
   worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
   template_world='empty_world.world'
   tree = ET.parse(worlds_location+template_world)
-  root = tree.getroot()
-  
-  sequence = [0,1,4]
-
+  root = tree.getroot()  
+  sequence = [0,1,3,1,4]
   extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
-  extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))
-  
-  
+  extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))  
   segments = translate_map_to_element_tree(sequence,
                                         width=3,
-                                        height=2,
+                                        height=3,
                                         texture='Gazebo/White',
                                         lights='default_light',
                                         visual=True,
@@ -500,8 +534,8 @@ if __name__ == '__main__':
   tree.write(os.environ['HOME']+'/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
 
   # save image
-  save_location=os.environ['HOME']+'/corridors'
-  if not os.path.isdir(save_location): os.makedirs(save_location)
-  visualize(sequence,save_location+'/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_new.jpg')
+  # save_location=os.environ['HOME']+'/corridors'
+  # if not os.path.isdir(save_location): os.makedirs(save_location)
+  # visualize(sequence,save_location+'/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_new.jpg')
 
   print 'done'

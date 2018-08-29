@@ -2,13 +2,38 @@
 # z-location is between 0:1
 # everything that is not specified is randomly selected.
 ---
-extension_0:
-  type: 'panel'
+doorway:
+  type: 'passway'
   number: 1
   type_specific:
     dummy: ''
-extension_1:
-  type: 'panel'
+    name: 'doorway'
+    offset: 1
+    texture: 'Gazebo/Grey'
+arc:
+  type: 'passway'
   number: 1
   type_specific:
     dummy: ''
+    name: 'arc'
+    offset: 1
+    texture: 'Gazebo/Grey'
+panel:
+  type: 'panel'
+  number: 3
+  type_specific:
+    dummy: ''
+obstacle:
+  type: 'obstacle'
+  number: 2
+  type_specific:
+    dummy: ''
+    name: 'person_standing'
+    side_offset: 0.7
+bookshelf:
+  type: 'obstacle'
+  number: 2
+  type_specific:
+    dummy: ''
+    name: 'bookshelf'
+    side_offset: 0.9
