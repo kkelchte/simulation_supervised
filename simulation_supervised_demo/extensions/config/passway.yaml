@@ -1,0 +1,25 @@
+# Offset is between -1:1
+# z-location is between 0:1
+# everything that is not specified is randomly selected.
+---
+doorway:
+  type: 'passway'
+  number: 1
+  type_specific:
+    dummy: ''
+    name: 'doorway'
+    offset: 1
+    texture: 'Gazebo/Grey'
+arc:
+  type: 'passway'
+  number: 1
+  type_specific:
+    dummy: ''
+    name: 'arc'
+    offset: 1
+    texture: 'Gazebo/Grey'
+panel:
+  type: 'panel'
+  number: 3
+  type_specific:
+    dummy: ''

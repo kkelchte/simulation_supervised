@@ -1,0 +1,183 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='pipe_one'>
+    <static>1</static>
+    <pose frame=''>0 0 1.84 0 0 0</pose>
+    <link name='link_0'>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <pose frame=''>0 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+  <model name='pipe_two'>
+    <static>1</static>
+    <pose frame=''>0 0 1.84 0 0 0</pose>
+    <link name='link_0'>
+      <visual name='visual'>
+        <pose frame=''>0.7 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.16</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <pose frame=''>0.7 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.16</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+  <model name='pipe_three'>
+    <static>1</static>
+    <pose frame=''>0 0 1.84 0 0 0</pose>
+    <link name='link_0'>
+      <visual name='visual'>
+        <pose frame=''>-0.18 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Yellow</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <pose frame=''>-0.18 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+  <model name='pipe_one_1'>
+    <static>1</static>
+    <pose frame=''>0 0 1.84 0 0 1.57</pose>
+    <link name='link_0'>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <pose frame=''>0 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+  <model name='pipe_two_1'>
+    <static>1</static>
+    <pose frame=''>0 0 1.84 0 0 1.57</pose>
+    <link name='link_0'>
+      <visual name='visual'>
+        <pose frame=''>0.7 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.16</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <pose frame=''>0.7 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.16</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+  <model name='pipe_three_1'>
+    <static>1</static>
+    <pose frame=''>0 0 1.84 0 0 1.57</pose>
+    <link name='link_0'>
+      <visual name='visual'>
+        <pose frame=''>-0.18 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Yellow</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <pose frame=''>-0.18 0 0 1.57 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

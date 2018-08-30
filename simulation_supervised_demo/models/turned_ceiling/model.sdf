@@ -1,0 +1,75 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='turned_ceiling'>
+    <link name='link_0'>
+      <pose frame=''>-0 0 0 0 -0 0</pose>
+      <visual name='visual'>
+        <geometry>
+          <polyline>
+            <height>0.1</height>
+            <point>-0.500001 0.500001</point>
+            <point>-0.486913 0.337795</point>
+            <point>-0.44902 0.183923</point>
+            <point>-0.388383 0.0404425</point>
+            <point>-0.307059 -0.0905872</point>
+            <point>-0.207107 -0.207107</point>
+            <point>-0.0905872 -0.307059</point>
+            <point>0.0404425 -0.388383</point>
+            <point>0.183923 -0.44902</point>
+            <point>0.337795 -0.486913</point>
+            <point>0.500001 -0.500001</point>
+            <point>0.500001 0.300001</point>
+            <point>0.46756 0.302619</point>
+            <point>0.436785 0.310197</point>
+            <point>0.408089 0.322325</point>
+            <point>0.381884 0.338589</point>
+            <point>0.35858 0.35858</point>
+            <point>0.338589 0.381884</point>
+            <point>0.322325 0.408089</point>
+            <point>0.310197 0.436786</point>
+            <point>0.302619 0.46756</point>
+            <point>0.300001 0.500001</point>
+            <point>-0.500001 0.500001</point>
+          </polyline>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <geometry>
+          <polyline>
+            <height>0.1</height>
+            <point>-0.500001 0.500001</point>
+            <point>-0.486913 0.337795</point>
+            <point>-0.44902 0.183923</point>
+            <point>-0.388383 0.0404425</point>
+            <point>-0.307059 -0.0905872</point>
+            <point>-0.207107 -0.207107</point>
+            <point>-0.0905872 -0.307059</point>
+            <point>0.0404425 -0.388383</point>
+            <point>0.183923 -0.44902</point>
+            <point>0.337795 -0.486913</point>
+            <point>0.500001 -0.500001</point>
+            <point>0.500001 0.300001</point>
+            <point>0.46756 0.302619</point>
+            <point>0.436785 0.310197</point>
+            <point>0.408089 0.322325</point>
+            <point>0.381884 0.338589</point>
+            <point>0.35858 0.35858</point>
+            <point>0.338589 0.381884</point>
+            <point>0.322325 0.408089</point>
+            <point>0.310197 0.436786</point>
+            <point>0.302619 0.46756</point>
+            <point>0.300001 0.500001</point>
+            <point>-0.500001 0.500001</point>
+          </polyline>
+        </geometry>
+      </collision>
+    </link>
+    <static>1</static>
+  </model>
+</sdf>
