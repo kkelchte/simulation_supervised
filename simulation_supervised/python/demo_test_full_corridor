@@ -1,0 +1,1 @@
+python run_script.py -p params.yaml -n 2 -g --fsm oracle_drone_fsm -pe virtualenv --evaluation -ds --robot drone_sim -w corridor --extension_config primal_exp --corridor_bends 5  -t test_goal_corridor

@@ -21,3 +21,31 @@ poster:
     z_location: 0.8
     offset: 0
     texture: 'Gazebo/Blue'
+arc:
+  type: 'passway'
+  number: 2
+  type_specific:
+    name: 'arc'
+    offset: 1
+    texture: 'Gazebo/Grey'
+doorway:
+  type: 'passway'
+  number: 2
+  type_specific:
+    name: 'doorway'
+    offset: 1
+    texture: 'Gazebo/Grey'
+person_standing:
+  type: 'obstacle'
+  number: 2
+  type_specific:
+    dummy: ''
+    name: 'person_standing'
+    side_offset: 0.7
+bookshelf:
+  type: 'obstacle'
+  number: 2
+  type_specific:
+    dummy: ''
+    name: 'bookshelf'
+    side_offset: 0.9

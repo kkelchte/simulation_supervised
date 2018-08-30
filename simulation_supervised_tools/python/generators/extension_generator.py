@@ -155,9 +155,7 @@ def generate_ceiling(dummy='',
   Adjust the texture accordingly.
   """
   if tile_type in [0,4]: tile_type=1 #the start and end tile is the same as straight
-  if name == None: name=np.random.choice(['3pipes'])
-  if texture==None: texture = np.random.choice(prefab_textures)
-  
+  if name == None: name=np.random.choice(['pipes','ceiling'])
   if not model_dir: model_dir=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/models'
   if not os.path.isfile(model_dir+'/'+name+'_'+str(tile_type)+'/model.sdf'):
     print("[extension_generator]: failed to load model {0}, not in {1}".format(name, model_dir))
@@ -169,23 +167,152 @@ def generate_ceiling(dummy='',
   ceiling_models = ceiling_tree.getroot().findall('model')
 
   # adjust length of elements
-  for ceiling in ceiling_models:
-    for child in iter(['collision', 'visual']):
-      length_el=ceiling.find('link').find(child).find('geometry').find('cylinder').find('length')
-      length_el.text = str(length)
-
+  if name in ['pipes']:
+    for ceiling in ceiling_models:
+      for child in iter(['collision', 'visual']):
+        length_el=ceiling.find('link').find(child).find('geometry').find('cylinder').find('length')
+        length_el.text = str(length)
+  elif name == 'ceiling':
+    # add straight segments before the centered segment
+    extra_length = (length-1.)/2. #0.5 in case of length 2
+    for i in np.arange(0, extra_length, 1):
+      # add straight segments on correct location according to tile type
+      straight_ceiling_tree = ET.parse(model_dir+'/'+name+'_'+str(1)+'/model.sdf')
+      straight_ceiling_models = straight_ceiling_tree.getroot().findall('model')
+      for ceiling in straight_ceiling_models:
+        pose_6d=[float(v) for v in ceiling.find('pose').text.split(' ')]
+        pose_6d[1] = -1*(i+1)
+        ceiling.find('pose').text=str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+        ceiling_models.append(ceiling)
+    
+    # add straight segments before the centered segment
+    extra_length = (length-1.)/2. #0.5 in case of length 2
+    for i in np.arange(0, extra_length, 1):
+      # add straight segments on correct location according to tile type
+      straight_ceiling_tree = ET.parse(model_dir+'/'+name+'_'+str(1)+'/model.sdf')
+      straight_ceiling_models = straight_ceiling_tree.getroot().findall('model')
+      for ceiling in straight_ceiling_models:
+        pose_6d=[float(v) for v in ceiling.find('pose').text.split(' ')]
+        if tile_type == 1: 
+          pose_6d[1] = (i+1)
+        elif tile_type == 2: 
+          pose_6d[0] = (i+1)
+          pose_6d[5] = 1.57
+        elif tile_type == 3: 
+          pose_6d[0] = -(i+1)
+          pose_6d[5] = 1.57
+        ceiling.find('pose').text=str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+        ceiling_models.append(ceiling)
+    
   # adjust texture
-  for ceiling in ceiling_models:
-    material=ceiling.find('link').find('visual').find('material').find('script').find('name')
-    material.text=texture
+  if texture != None:
+    for ceiling in ceiling_models:
+      material=ceiling.find('link').find('visual').find('material').find('script').find('name')
+      material.text=texture
   return ceiling_models
 
-def generate_blocked_hole(height= 1,
-  width= 0.7,
-  z_location= 1,
-  texture= 'Gazebo/Grey',
-  tile_type=-1):
+def generate_blocked_hole(wall,
+  width,
+  height,
+  dummy='',
+  name='blocked_hole_segment.world',
+  world_dir='',
+  texture=None,
+  verbose=False):
   """
+  wall: wall has to specified
+  name: name of segment world file from which block_hole is extracted
+  modeldir: world directory
+  texture: in case of None take default defined in blocked_hole_segment
+  verbose: talk more
   """
+  if len(world_dir)==0: world_dir=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds'
+  if not os.path.isfile(world_dir+'/'+name):
+    print("[generate_blocked_hole]: failed to load model {0}, not in {1}".format(name, world_dir))
+    return -1  
+  if verbose: print("[generate_blocked_hole]: name {0}, wall {1}, texture {2}".format(name, wall, texture))
+  
+  # load model from blocked world segment
+  tree = ET.parse(world_dir+'/'+name)
+  root = tree.getroot()
+  world = root.find('world')
 
-  return ET.Element('None')
+  elements=[ m for m in world.findall('model') if m.attrib['name'].startswith('wall_'+wall) ]
+  
+  # adjust scale according to width and height
+  # wall are made in blocked_hole_segment of width 2 and height 2.5
+  # the inside wall are kept the same shape as they represent the door
+  # the front walls are adjusted to the width and height
+  for m in elements:
+    if 'front_left' in m.attrib['name'] or 'front_right' in m.attrib['name']:
+      # adjust width and height of left and right front wall
+      for e in ['collision','visual']:
+        size_element = m.find('link').find(e).find('geometry').find('box').find('size')
+        size = [float(v) for v in size_element.text.split(' ')]
+        size[0] = (width-1)/2.
+        size[2] = height
+        size_element.text=str(size[0])+' '+str(size[1])+' '+str(size[2])
+      # adjust pose according to width
+      pose_element=m.find('pose')
+      pose_6d=[float(v) for v in pose_element.text.split(' ')]
+      
+      if wall == 'right':
+        pose_6d[0] = width/2.
+        # half of the width of the front panel plus 0.5 for a door of width 1
+        pose_6d[1] = ((width-1)/2./2.+0.5)
+        pose_6d[1] = pose_6d[1] if 'front_left' in m.attrib['name'] else -pose_6d[1] #change in opposite direction on the right side
+      elif wall == 'left':
+        pose_6d[0] = -width/2.
+        pose_6d[1] = ((width-1)/2./2.+0.5)
+        pose_6d[1] = pose_6d[1] if 'front_left' in m.attrib['name'] else -pose_6d[1]
+      elif wall == 'front':
+        pose_6d[1] = width/2.
+        pose_6d[0] = ((width-1)/2./2.+0.5)
+        pose_6d[0] = pose_6d[0] if 'front_left' in m.attrib['name'] else -pose_6d[0] 
+      elif wall == 'back':
+        pose_6d[1] = -width/2.
+        pose_6d[0] = ((width-1)/2./2.+0.5)
+        pose_6d[0] = pose_6d[0] if 'front_left' in m.attrib['name'] else -pose_6d[0] 
+
+      pose_6d[2] = height/2.
+      pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+    if 'front_up' in m.attrib['name']:
+      # adjust height of up pannel
+      for e in ['collision','visual']:
+        size_element = m.find('link').find(e).find('geometry').find('box').find('size')
+        size = [float(v) for v in size_element.text.split(' ')]
+        size[2] = height-2
+        size_element.text=str(size[0])+' '+str(size[1])+' '+str(size[2])
+      # adjust pose of up panel according to width and height
+      pose_element=m.find('pose')
+      pose_6d=[float(v) for v in pose_element.text.split(' ')]
+      # in case of right wall
+      
+      if wall == 'right': pose_6d[0] = width/2.
+      elif wall == 'left': pose_6d[0] = -width/2.
+      elif wall == 'front': pose_6d[1] = width/2.
+      elif wall == 'back': pose_6d[1] = -width/2.
+      
+      
+      
+      # half of the width of the front panel plus 0.5 for a door of width 1
+      pose_6d[2] = (height-2)/2.+2
+      pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+    if 'inside' in m.attrib['name']:
+      # move the door a bit back according to the width of the corridor
+      pose_element=m.find('pose')
+      pose_6d=[float(v) for v in pose_element.text.split(' ')]
+      
+      # in case of right wall
+      if wall == 'right': pose_6d[0] = width/2.+0.25 if not 'back' in m.attrib['name'] else width/2.+0.5
+      elif wall == 'left': pose_6d[0] = -(width/2.+0.25) if not 'back' in m.attrib['name'] else -(width/2.+0.5)
+      elif wall == 'front': pose_6d[1] = width/2.+0.25 if not 'back' in m.attrib['name'] else width/2.+0.5
+      elif wall == 'back': pose_6d[1] = -(width/2.+0.25) if not 'back' in m.attrib['name'] else -(width/2.+0.5)
+      
+      pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+
+    # change texture
+    material_element= m.find('link').find('visual').find('material').find('script').find('name')
+    material_element.text = texture
+
+  return elements

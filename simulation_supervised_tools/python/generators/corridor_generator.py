@@ -203,12 +203,12 @@ class Tile(object):
     return list of elements required for the extension.
     """
     # add extensions
-    extension_models=[]
-
-    # print("corridor_generator: got {0} extensions in this tile.".format(len(self.extensions)))
+    extension_models={}
 
     # distribute extensions over different walls
+    # each wall gets maximum one specific extension (panel, blocked_hole or obstacle)
     possible_walls=self.walls[2:]
+
     # check if there is a wall specified in extension list
     for (k,arg) in self.extensions:
       if not isinstance(arg, type(None)) and 'wall' in arg.keys() :
@@ -222,22 +222,31 @@ class Tile(object):
       if k in ['panel','blocked_hole','obstacle'] and 'wall' not in arg.keys():
         try:
           arg['wall']=np.random.choice(possible_walls)
-        except ValueError:
+        except ValueError: # remove extension if there is no wall left
           self.extensions.remove(self.extensions[i])
-        else:
+        else: # remove the selected wall
           possible_walls.remove(arg['wall'])
+          if k == 'blocked_hole': #avoid building an extra wall if there is already a blocked wall
+            self.walls.remove(arg['wall'])
 
-    # in case of a ceiling element the length should be adjusted to the width
+    # in case of a ceiling/blocked_hole element 
+    # add the length of the corridor as it should be adjusted
     for (k,arg) in self.extensions:
-      if k == 'ceiling': arg['length'] = width
+      if k == 'ceiling': 
+        arg['length'] = width
+        arg['tile_type'] = self.tile_type
+      if k == 'blocked_hole':
+        arg['width'] = width
+        arg['height'] = height
         
     # generate element
     arg={}
     for k, arg in self.extensions:
       arg['verbose']=verbose
       element = self.generator_dic[k](**arg)
-      if isinstance(element, ET.Element): extension_models.append(element)
-      elif isinstance(element, list): extension_models.extend(element)
+      if k not in extension_models.keys(): extension_models[k]=[]
+      if isinstance(element, ET.Element): extension_models[k].append(element)
+      elif isinstance(element, list): extension_models[k].extend(element)
 
     # rotate and translate all extension models according to position and orientation as well as adjust width and height
     rotation_matrix={'+y':np.array([[1,0],[0,1]]),
@@ -249,27 +258,31 @@ class Tile(object):
             '-x':1.57,
             '+x':-1.57}
 
-    for m in extension_models:
-      # step 1 rotate to correct orientation
-      pose_element=m.find('pose')
-      pose_6d=[float(v) for v in pose_element.text.split(' ')]
-      # adjust width (no influence on ceiling element)
-      pose_6d[0]*=width/2.
-      pose_6d[1]*=width/2. #corridor is expected to be 2m width
-      # adjust height for panel and ceiling (no influence on obstacle or passway)
-      pose_6d[2]*=height/2. #corridor is expected to be 2m high, has to be rescaled to height
-      position=np.array([pose_6d[0], pose_6d[1]])
-      position=np.matmul(rotation_matrix[self.o], position)
-      pose_6d[5]+=thetas[self.o]
-      pose_6d[0]=position[0]
-      pose_6d[1]=position[1]
-      # step 2 translate
-      pose_6d[0]+=width*self.x
-      pose_6d[1]+=width*self.y
-      pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
+    for k in extension_models.keys():
+      for m in extension_models[k]:
+        # step 1 scale
+        pose_element=m.find('pose')
+        pose_6d=[float(v) for v in pose_element.text.split(' ')]
+        # adjust width (no influence on ceiling element)      
+        if k not in ['ceiling','blocked_hole']:
+          pose_6d[0]*=width/2.
+          pose_6d[1]*=width/2. #corridor is expected to be 2m width
+        if k not in ['obstacle','passway','blocked_hole']:
+          # adjust height for panel and ceiling (no influence on obstacle or passway)
+          pose_6d[2]*=height/2. #corridor is expected to be 2m high, has to be rescaled to height
+        
+        # step 2 rotate to correct orientation
+        position=np.array([pose_6d[0], pose_6d[1]])
+        position=np.matmul(rotation_matrix[self.o], position)
+        pose_6d[5]+=thetas[self.o]
+        pose_6d[0]=position[0]
+        pose_6d[1]=position[1]
+        # step 3 translate
+        pose_6d[0]+=width*self.x
+        pose_6d[1]+=width*self.y
+        pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
 
-    return extension_models
-
+    return [m for k in extension_models.keys() for m in extension_models[k]]
 
   def get_elements(self, width, height, texture, lights, visual, verbose):
     """Translate the tile to a corridor element parsed from segmented worlds
@@ -279,10 +292,10 @@ class Tile(object):
     Than position and orientation of all elements are adjusted.
     In the end the elements are given a better name.
     """
+    extension_models = self.get_extensions(width, height, verbose)
     wall_models=self.get_wall_models(width, height, texture, visual, verbose)
     light_models=self.get_lights(lights, width, height, verbose)
-    extension_models = self.get_extensions(width, height, verbose)
- 
+    
     # Change name attributes so gazebo does not complain
     models=wall_models+light_models+extension_models
 
@@ -299,6 +312,26 @@ class Tile(object):
   def to_string(self):
     """display fields"""
     return "tile(x={0} ,y={1}, orientation={2}, type={3}, ext={4})".format(self.x, self.y, self.o, self.tile_type,[v[0] for v in self.extensions])  
+
+def count_neighbors(tiles):
+  """Count for each tile in tiles the number of neighboring tiles.
+  Diagonal neighbors are not counted.
+  Returns list of length of tiles with number of neighbors.
+  """
+  neighbors=[0]*len(tiles)
+  for i, tile in enumerate(tiles):
+    xpos = tile.x
+    ypos = tile.y
+    for other_tile in tiles:
+      # check for +y neighbor 
+      if other_tile.x == tile.x and other_tile.y == tile.y+1: neighbors[i]+=1
+      # check for -y neighbor 
+      if other_tile.x == tile.x and other_tile.y == tile.y-1: neighbors[i]+=1
+      # check for +x neighbor 
+      if other_tile.x == tile.x+1 and other_tile.y == tile.y: neighbors[i]+=1
+      # check for -x neighbor 
+      if other_tile.x == tile.x-1 and other_tile.y == tile.y: neighbors[i]+=1
+  return neighbors
 
 def from_sequence_to_tiles(sequence):
   """Translate a sequence of types of tiles,
@@ -355,22 +388,30 @@ def generate_map(length, bends):
     feasible = is_feasible(sequence)
   return sequence
 
-def translate_map_to_element_tree(sequence, width, height, texture, lights, visual=True, extension_conf={}, verbose=False):
+def translate_map_to_element_tree(sequence, width, height, texture, lights, visual=True, extension_conf={}, verbose=True):
   """For each tile in the trajectory sequence,
   append a corresponding corridor segment on correct location.
   """
   segments=[]
   tiles=from_sequence_to_tiles(sequence)
 
+  neighbors=count_neighbors(tiles)
+  print neighbors
+
   if extension_conf:
     # spread out a number of extensions over the different tiles
     for k in extension_conf.keys():
       if extension_conf[k]['type'] in ["passway"]: # passways are only set on straight segments
         possible_tiles=[t for t in tiles if t.tile_type == 1 and "passway" not in [e[0] for e in t.extensions]]
-      elif extension_conf[k]['type'] in ["panel", "blocked_hole","obstacle"]:
-        possible_tiles=[t for t in tiles if t.tile_type in [1,2,3]]
+      elif extension_conf[k]['type'] in ["panel","obstacle"]:
+        possible_tiles=[t for t in tiles if t.tile_type in [1,2,3]]  
       elif extension_conf[k]['type'] in ["ceiling"]:
-        possible_tiles=[t for t in tiles if "ceiling" not in [e[0] for e in t.extensions]]
+        #ceiling objects are everywhere, so add them to all tiles
+        for t in tiles: t.extensions.append((extension_conf[k]['type'],extension_conf[k]['type_specific']))
+        possible_tiles=[]
+      elif extension_conf[k]['type'] == "blocked_hole":
+        # blocked holes are only assigned to tiles with only 2 neighbors
+        possible_tiles=[t for i,t in enumerate(tiles) if t.tile_type in [1,2,3] and neighbors[i] <=2 ]
       else:
         possible_tiles=tiles
       try:
@@ -385,7 +426,8 @@ def translate_map_to_element_tree(sequence, width, height, texture, lights, visu
       np.random.shuffle(indices) #sort the tile (except for final tile)
       for i in range(num):
         possible_tiles[indices[i]].extensions.append((extension_conf[k]['type'],extension_conf[k]['type_specific']))
-          
+  
+
   # Get all elements of tiles
   for tile in tiles:
     elements=tile.get_elements(width, height, texture, lights, visual, verbose)
@@ -525,7 +567,7 @@ if __name__ == '__main__':
   template_world='empty_world.world'
   tree = ET.parse(worlds_location+template_world)
   root = tree.getroot()  
-  sequence = [0,1,1,4]
+  sequence = [0,1,2,3,1,1,2,3,1,4]
   extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
   extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))  
   segments = translate_map_to_element_tree(sequence,

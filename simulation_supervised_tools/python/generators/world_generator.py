@@ -61,7 +61,8 @@ FLAGS, others = parser.parse_known_args()
 
 # make output directory an absolute path or default path
 if len(FLAGS.output_dir) == 0:
-  FLAGS.output_dir = os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds'
+  FLAGS.output_dir = os.environ['HOME']
+  # FLAGS.output_dir = os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds'
 elif not FLAGS.output_dir.startswith('/'):
   FLAGS.output_dir = os.environ['HOME']+'/'+FLAGS.output_dir
 
