@@ -1,1 +1,1 @@
-python run_script.py -p params.yaml -n 2 --fsm oracle_drone_fsm --evaluation -ds --robot drone_sim -w corridor --extension_config combined --corridor_bends 5 -t test_combined_corridor 
+python run_script.py -p params.yaml -n 2 --fsm oracle_drone_fsm --evaluation -ds --robot drone_sim -w corridor --extension_config combined --corridor_bends 5 -t test_combined_corridor --x_var 0.5 --y_var 1 --z_pos 1.5 --z_var 0.5 --yaw_or 1.57 --yaw_var 0.5233 -g

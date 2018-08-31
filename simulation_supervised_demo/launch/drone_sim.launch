@@ -23,6 +23,11 @@
   <arg name="background" default=""/> <!-- used by create_dataset node to save all recorded data -->
   <param name="background" value="$(arg background)"/>
 
+  <arg name="starting_height" default="0"/> <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
+  <param name="starting_height" value="$(arg starting_height)"/>
+  
+
+
   <arg name="full" default="false"/>
   <group if="$(arg full)">
     <!-- Load parameters for turtlesim as a full demonstration-->
@@ -50,6 +55,7 @@
   </include>
 
   <!-- Spawn simulated quadrotor uav -->
+
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
   <arg name="Yspawned" default="1.57"/>
@@ -67,6 +73,8 @@
     <arg name="goal_angle" value="-1"/>
     <arg name="speed" value="$(arg speed)"/>
   </include> -->
+  
+  
   <node name="behavior_arbitration" pkg="simulation_supervised_control" type="behavior_arbitration.py" output="screen"/>
   
   <!-- Console: simple (only overtake and go) -->

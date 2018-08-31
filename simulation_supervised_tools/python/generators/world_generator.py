@@ -114,7 +114,6 @@ for seg in segments:
 # adjust delay_evaluation according to
 env_conf= {'delay_evaluation': 5, #might have to be updated if many extensions introduce delays
         'min_depth': 0.2,
-        'starting_height': FLAGS.corridor_height/3.,
         'goal_min_x': goal[0],
         'goal_max_x': goal[1],
         'goal_min_y': goal[2],
