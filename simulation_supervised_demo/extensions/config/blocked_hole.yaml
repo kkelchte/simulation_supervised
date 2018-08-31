@@ -1,0 +1,8 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+blocked_hole:
+  type: 'blocked_hole'
+  type_specific:
+    dummy: ''
+    wall: 'left'

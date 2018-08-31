@@ -11,4 +11,4 @@ radiator:
     z_location: 0.1
     offset: 0
     wall: 'left'
-    texture: 'Gazebo/White'
+    texture: 'Gazebo/Grey'

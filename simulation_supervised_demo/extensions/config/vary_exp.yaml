@@ -1,0 +1,43 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+radiator:
+  type: 'panel'
+  number: 10
+  type_specific:
+    dummy: ''
+poster:
+  type: 'panel'
+  number: 10
+  type_specific:
+    dummy: ''
+arc:
+  type: 'passway'
+  number: 2
+  type_specific:
+    name: 'arc'
+    offset: 1
+doorway:
+  type: 'passway'
+  number: 2
+  type_specific:
+    name: 'doorway'
+    offset: 1
+floor:
+  type: 'floor'
+  type_specific:
+    name: 'floor'
+ceiling:
+  type: 'ceiling'
+  type_specific:
+    name: 'ceiling'
+    dummy: ''
+pipes:
+  type: 'ceiling'
+  type_specific:
+    name: 'pipes'
+    dummy: ''
+blocked_hole:
+  type: 'blocked_hole'
+  type_specific:
+    dummy: ''

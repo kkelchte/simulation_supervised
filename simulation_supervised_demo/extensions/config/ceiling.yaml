@@ -1,0 +1,13 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+ceiling:
+  type: 'ceiling'
+  type_specific:
+    name: 'ceiling'
+    dummy: ''
+pipes:
+  type: 'ceiling'
+  type_specific:
+    name: 'pipes'
+    dummy: ''

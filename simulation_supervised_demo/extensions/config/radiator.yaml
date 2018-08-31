@@ -10,4 +10,4 @@ radiator:
     thickness: 0.1
     z_location: 0.1
     offset: 0
-    texture: 'Gazebo/White'
+    texture: 'Gazebo/Grey'

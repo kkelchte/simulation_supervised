@@ -1,0 +1,68 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+radiator:
+  type: 'panel'
+  number: 3
+  type_specific:
+    height: 0.6
+    width: 1
+    thickness: 0.1
+    z_location: 0.1
+    offset: 0
+    texture: 'Gazebo/Grey'
+poster:
+  type: 'panel'
+  number: 5
+  type_specific:
+    height: 1
+    width: 0.7
+    thickness: 0.02
+    z_location: 0.8
+    offset: 0
+    texture: 'Gazebo/Blue'
+arc:
+  type: 'passway'
+  number: 2
+  type_specific:
+    name: 'arc'
+    texture: 'Gazebo/Grey'
+doorway:
+  type: 'passway'
+  number: 2
+  type_specific:
+    name: 'doorway'
+    texture: 'Gazebo/Grey'
+floor:
+  type: 'floor'
+  type_specific:
+    name: 'floor'
+    texture: 'Gazebo/Grey'
+ceiling:
+  type: 'ceiling'
+  type_specific:
+    name: 'ceiling'
+    dummy: ''
+pipes:
+  type: 'ceiling'
+  type_specific:
+    name: 'pipes'
+    dummy: ''
+blocked_hole:
+  type: 'blocked_hole'
+  type_specific:
+    dummy: ''
+# person_standing:
+#   type: 'obstacle'
+#   number: 2
+#   type_specific:
+#     dummy: ''
+#     name: 'person_standing'
+#     side_offset: 0.7
+# bookshelf:
+#   type: 'obstacle'
+#   number: 2
+#   type_specific:
+#     dummy: ''
+#     name: 'bookshelf'
+#     side_offset: 0.9

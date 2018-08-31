@@ -218,6 +218,7 @@ def generate_blocked_hole(wall,
   name='blocked_hole_segment.world',
   world_dir='',
   texture=None,
+  corridor_type='normal',
   verbose=False):
   """
   wall: wall has to specified
@@ -239,6 +240,11 @@ def generate_blocked_hole(wall,
 
   elements=[ m for m in world.findall('model') if m.attrib['name'].startswith('wall_'+wall) ]
   
+  # incase the corridor_type is not normal but empty, make the wall much larger
+  if corridor_type == 'empty':
+    height = 10
+
+
   # adjust scale according to width and height
   # wall are made in blocked_hole_segment of width 2 and height 2.5
   # the inside wall are kept the same shape as they represent the door
@@ -249,7 +255,11 @@ def generate_blocked_hole(wall,
       for e in ['collision','visual']:
         size_element = m.find('link').find(e).find('geometry').find('box').find('size')
         size = [float(v) for v in size_element.text.split(' ')]
-        size[0] = (width-1)/2.
+        # side with corresponds on the tile-width that influences the width of the wall
+        # the width of the tile influences both the length of the wall as the position from the center
+        # only the length should be changed (side_width) to a large value in case of empty corridor
+        side_width = width if corridor_type == 'normal' else 50
+        size[0] = (side_width-1)/2.
         size[2] = height
         size_element.text=str(size[0])+' '+str(size[1])+' '+str(size[2])
       # adjust pose according to width
@@ -259,19 +269,19 @@ def generate_blocked_hole(wall,
       if wall == 'right':
         pose_6d[0] = width/2.
         # half of the width of the front panel plus 0.5 for a door of width 1
-        pose_6d[1] = ((width-1)/2./2.+0.5)
+        pose_6d[1] = ((side_width-1)/2./2.+0.5)
         pose_6d[1] = pose_6d[1] if 'front_left' in m.attrib['name'] else -pose_6d[1] #change in opposite direction on the right side
       elif wall == 'left':
         pose_6d[0] = -width/2.
-        pose_6d[1] = ((width-1)/2./2.+0.5)
+        pose_6d[1] = ((side_width-1)/2./2.+0.5)
         pose_6d[1] = pose_6d[1] if 'front_left' in m.attrib['name'] else -pose_6d[1]
       elif wall == 'front':
         pose_6d[1] = width/2.
-        pose_6d[0] = ((width-1)/2./2.+0.5)
+        pose_6d[0] = ((side_width-1)/2./2.+0.5)
         pose_6d[0] = pose_6d[0] if 'front_left' in m.attrib['name'] else -pose_6d[0] 
       elif wall == 'back':
         pose_6d[1] = -width/2.
-        pose_6d[0] = ((width-1)/2./2.+0.5)
+        pose_6d[0] = ((side_width-1)/2./2.+0.5)
         pose_6d[0] = pose_6d[0] if 'front_left' in m.attrib['name'] else -pose_6d[0] 
 
       pose_6d[2] = height/2.
@@ -312,7 +322,42 @@ def generate_blocked_hole(wall,
       pose_element.text = str(pose_6d[0])+' '+str(pose_6d[1])+' '+str(pose_6d[2])+' '+str(pose_6d[3])+' '+str(pose_6d[4])+' '+str(pose_6d[5])
 
     # change texture
-    material_element= m.find('link').find('visual').find('material').find('script').find('name')
-    material_element.text = texture
+    if texture != None:
+      material_element= m.find('link').find('visual').find('material').find('script').find('name')
+      material_element.text = texture
 
   return elements
+
+def generate_floor(width,
+  dummy='', # used to set a dummy argument in order to avoid empty argument dictionaries
+  name=None,
+  texture=None,
+  corridor_type='normal',
+  tile_type=1,
+  verbose=False):
+  """
+  Args:
+  width of the tile
+  specific texture that has to be found in simsup_demo/extensions/textures
+  Returns model placed in centered segment.
+  """
+  # fill in randomly all that is not specified
+  if texture==None: texture = np.random.choice(prefab_textures)
+  if name==None: name = np.random.choice(['floor'])
+  
+  if verbose: print("[generate_floor]: texture {0}".format(texture))
+  # Get template
+  floor_tree = ET.parse(template_location+name+'.xml')
+  floor = floor_tree.getroot().find('world').find('model')
+  # change shape of floor according to heigth and width
+  for child in iter(['collision', 'visual']):
+    size_el=floor.find('link').find(child).find('geometry').find('box').find('size')
+    if corridor_type == 'empty' and tile_type != 4:
+      size_el.text=str(20*width)+" "+str(20*width)+" "+size_el.text.split(' ')[-1]
+    else:
+      size_el.text=str(2*width)+" "+str(2*width)+" "+size_el.text.split(' ')[-1]
+  # adjust texture
+  material=floor.find('link').find('visual').find('material').find('script').find('name')
+  material.text=texture
+  return floor
+

@@ -70,6 +70,7 @@ class Tile(object):
       'obstacle': generate_obstacle,
       'ceiling': generate_ceiling,
       'blocked_hole': generate_blocked_hole,
+      'floor': generate_floor,
     }
     self.x=x
     self.y=y
@@ -196,7 +197,7 @@ class Tile(object):
         light_models.append(lightelement)
     return light_models
 
-  def get_extensions(self, width, height, verbose=False):
+  def get_extensions(self, width, height, visual=True, verbose=False):
     """ Go over list of self.extensions.
     Distribute the extensions over the different walls avoiding overlap.
     Get elements of the models with the extension_generator.
@@ -225,9 +226,7 @@ class Tile(object):
         except ValueError: # remove extension if there is no wall left
           self.extensions.remove(self.extensions[i])
         else: # remove the selected wall
-          possible_walls.remove(arg['wall'])
-          if k == 'blocked_hole': #avoid building an extra wall if there is already a blocked wall
-            self.walls.remove(arg['wall'])
+          possible_walls.remove(arg['wall'])            
 
     # in case of a ceiling/blocked_hole element 
     # add the length of the corridor as it should be adjusted
@@ -238,6 +237,12 @@ class Tile(object):
       if k == 'blocked_hole':
         arg['width'] = width
         arg['height'] = height
+        #avoid building an extra wall if there is already a blocked wall
+        self.walls.remove(arg['wall'])
+      if k == 'floor':
+        arg['width'] = width
+        arg['tile_type'] = self.tile_type
+        self.walls.remove('bottom')
         
     # generate element
     arg={}
@@ -260,7 +265,7 @@ class Tile(object):
 
     for k in extension_models.keys():
       for m in extension_models[k]:
-        # step 1 scale
+        # step 1 change position to size of tile (shape is not scaled)
         pose_element=m.find('pose')
         pose_6d=[float(v) for v in pose_element.text.split(' ')]
         # adjust width (no influence on ceiling element)      
@@ -277,6 +282,7 @@ class Tile(object):
         pose_6d[5]+=thetas[self.o]
         pose_6d[0]=position[0]
         pose_6d[1]=position[1]
+        
         # step 3 translate
         pose_6d[0]+=width*self.x
         pose_6d[1]+=width*self.y

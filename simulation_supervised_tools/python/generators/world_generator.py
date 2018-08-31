@@ -50,7 +50,7 @@ parser.add_argument("--corridor_width", default=3, type=float, help="Defines wid
 parser.add_argument("--corridor_height", default=3, type=float, help="Defines height of the corridor (not used in case of empty type of corridor).")
 parser.add_argument("--corridor_bends", default=0, type=int, help="Defines the number of turns the corridor should make over its length. Combined with the length it specifies the density of bends.")
 parser.add_argument("--lights", default='default_light', type=str, help="Defines the type of light added in each segment of the corridor according to simsup_demo/lights/.")
-parser.add_argument("--texture", default='Gazebo/Grey', type=str, help="Defines the texture of the walls of the corridor according to gazebo.material.")
+parser.add_argument("--texture", default='Gazebo/White', type=str, help="Defines the texture of the walls of the corridor according to gazebo.material.")
 #   ------  Extension arguments --> specified with nested yaml file
 parser.add_argument("--extension_config", default='empty', type=str, help="The extensions are specified in a nested yaml file within dir simsup_demo/extensions/config/{name}.yaml. For each found extension the extension is added at random locations in the corridor.")
 #   ------  Settings

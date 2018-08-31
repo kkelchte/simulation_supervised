@@ -184,13 +184,19 @@ def gt_callback(data):
     data.pose.pose.orientation.y,
     data.pose.pose.orientation.z,
     data.pose.pose.orientation.w)
-  last_position = [data.pose.pose.position.x,
-    data.pose.pose.position.y,
-    data.pose.pose.position.z]
   # orientation of current frame relative to global frame
   T_cg = tf.transformations.quaternion_matrix(quaternion)
+  
+  r,p,yw= tf.transformations.euler_from_matrix(T_cg, 'rxyz')
+  
+  last_position = [data.pose.pose.position.x,
+    data.pose.pose.position.y,
+    data.pose.pose.position.z,
+    r,
+    p,
+    yw]
   # add position of global frame
-  T_cg[0:3,3]=last_position
+  T_cg[0:3,3]=last_position[0:3]
   if len(T_pg)!=0:
     # if previous transformation in global frame is there,
     # calculate the local transformation between the two poses relative to the global frame.

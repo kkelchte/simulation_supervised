@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='us-ascii'?>
 <sdf version='1.6'>
   <world name='default'>
     <gravity>0 0 -9.8</gravity>
@@ -34,7 +35,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -62,7 +63,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -90,7 +91,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -118,7 +119,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/DarkGrey</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -144,7 +145,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -172,7 +173,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -200,7 +201,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -226,7 +227,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -254,7 +255,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -282,7 +283,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -310,7 +311,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/DarkGrey</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -336,7 +337,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -364,7 +365,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -392,7 +393,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -418,7 +419,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -446,7 +447,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -474,7 +475,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -502,7 +503,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/DarkGrey</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -528,7 +529,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -556,7 +557,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -584,7 +585,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -610,7 +611,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -638,7 +639,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -666,7 +667,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -694,7 +695,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/DarkGrey</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -720,7 +721,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -748,7 +749,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -776,7 +777,7 @@
         <visual name='visual'>
           <material>
             <script>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
