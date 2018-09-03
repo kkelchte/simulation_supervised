@@ -8,4 +8,4 @@ arc:
   type_specific:
     dummy: ''
     name: 'arc'
-    texture: 'Gazebo/Grey'
+    texture: 'Gazebo/White'

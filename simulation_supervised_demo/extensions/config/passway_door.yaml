@@ -8,4 +8,4 @@ doorway:
   type_specific:
     dummy: ''
     name: 'doorway'
-    texture: 'Gazebo/Grey'
+    texture: 'Gazebo/White'

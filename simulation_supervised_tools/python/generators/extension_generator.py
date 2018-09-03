@@ -354,8 +354,10 @@ def generate_floor(width,
     size_el=floor.find('link').find(child).find('geometry').find('box').find('size')
     if corridor_type == 'empty' and tile_type != 4:
       size_el.text=str(20*width)+" "+str(20*width)+" "+size_el.text.split(' ')[-1]
-    else:
+    elif tile_type != 4:
       size_el.text=str(2*width)+" "+str(2*width)+" "+size_el.text.split(' ')[-1]
+    else:
+      size_el.text=str(width)+" "+str(width)+" "+size_el.text.split(' ')[-1]
   # adjust texture
   material=floor.find('link').find('visual').find('material').find('script').find('name')
   material.text=texture

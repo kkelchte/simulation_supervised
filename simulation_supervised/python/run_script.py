@@ -138,6 +138,8 @@ parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nod
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
 parser.add_argument("--evaluate_every", default=20, type=int, help="Evaluate every N runs when training.")
 parser.add_argument("-ds", "--create_dataset", action='store_true',help="In case of True, sensor data is saved.")
+parser.add_argument("--owr", action='store_true',help="Delete dataset if it is already there.")
+
 parser.add_argument("--save_only_success", action='store_true',help="In case of True, sensor data is saved.")
 parser.add_argument("--seed", type=float, help="In case of True, sensor data is saved.")
 
@@ -223,7 +225,7 @@ if FLAGS.create_dataset:
     FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.log_tag)
   else:
     FLAGS.data_location = "{0}{1}".format(FLAGS.data_root, FLAGS.data_location)
-  if os.path.isdir(FLAGS.data_location) and FLAGS.number_of_runs == 1:
+  if os.path.isdir(FLAGS.data_location) and (FLAGS.number_of_runs == 1 or FLAGS.owr):
     shutil.rmtree(FLAGS.data_location)
   if not os.path.isdir(FLAGS.data_location):
     os.makedirs(FLAGS.data_location)
@@ -431,8 +433,8 @@ while run_number < FLAGS.number_of_runs:
       start_time=time.time()
     else:
       time_spend=time.time() - start_time
-    if time_spend > 60*9 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
-      print("{0}: running more than 9minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+    if time_spend > 60*5 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
+      print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
       if crash_number < 3:
