@@ -26,7 +26,7 @@ Dependencies are:
 """
 #############
 # Initialize variables
-np.random.seed(int(time.time()))
+np.random.seed(int(time.time()*100)-1536051131*100)
 
 #############
 # Define utility functions
