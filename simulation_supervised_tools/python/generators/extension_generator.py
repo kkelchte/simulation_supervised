@@ -291,7 +291,7 @@ def generate_blocked_hole(wall,
       for e in ['collision','visual']:
         size_element = m.find('link').find(e).find('geometry').find('box').find('size')
         size = [float(v) for v in size_element.text.split(' ')]
-        size[2] = height-2
+        size[2] = max(0.01, height-2)
         size_element.text=str(size[0])+' '+str(size[1])+' '+str(size[2])
       # adjust pose of up panel according to width and height
       pose_element=m.find('pose')

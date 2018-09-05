@@ -159,7 +159,7 @@ parser.add_argument("-pp","--python_project",default='pilot/pilot', type=str, he
 #   Environment Settings
 # ==========================
 parser.add_argument("--reuse_default_world", action='store_true',help="reuse the default forest/canyon/sandbox instead of generating them on the fly.")
-parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: canyon, forest, sandbox, esat_v1, esat_v2, ... .")
+parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: corridor, canyon, forest, sandbox, esat_v1, esat_v2, ... .")
 parser.add_argument("-p","--paramfile",default='eva_params.yaml',type=str, help="Add more parameters to the command loading the DNN in tensorflow ex: eva_params.yaml or params.yaml.")
 parser.add_argument("--fsm",default='nn_turtle_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: nn_turtle_fsm, console_fsm, console_nn_db_turtle_fsm, ...")
 
@@ -167,7 +167,7 @@ parser.add_argument("--x_pos",default=0,type=float, help="Specify x position.")
 parser.add_argument("--x_var",default=0,type=float, help="Specify variation in x position.")
 parser.add_argument("--y_pos",default=0,type=float, help="Specify y position.")
 parser.add_argument("--y_var",default=0,type=float, help="Specify variation in y position.")
-parser.add_argument("--z_pos",default=0,type=float, help="Specify z position.")
+parser.add_argument("--z_pos",default=1,type=float, help="Specify z position.")
 parser.add_argument("--z_var",default=0,type=float, help="Specify variation z position.")
 parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orientation.")
 parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
