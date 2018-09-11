@@ -364,11 +364,13 @@ while run_number < FLAGS.number_of_runs:
   world_name=FLAGS.worlds[run_number%len(FLAGS.worlds)]
   command="{0} world_name:={1}".format(command, world_name)
   
-  print("\n{0}: started {3} run {1} of the {2} in {4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
+  print("\n{0}: started {3} run {1} of the {2} in {5} {4} {6}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
                                                           run_number+1, 
                                                           FLAGS.number_of_runs, 
                                                           'evaluation' if evaluate else 'training',
-                                                          world_name))
+                                                          world_name,
+                                                          bcolors.OKBLUE,
+                                                          bcolors.ENDC))
 
   # in case of saving data, increment data location in ~/pilot_data
   if FLAGS.create_dataset:
