@@ -27,6 +27,7 @@ floor:
   type: 'floor'
   type_specific:
     name: 'floor'
+    texture: 'Gazebo/DarkGrey'
 ceiling:
   type: 'ceiling'
   type_specific:

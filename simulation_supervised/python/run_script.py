@@ -38,6 +38,19 @@ import yaml
 import fnmatch
 import numpy as np
 
+class bcolors:
+  """ Colors to print in terminal with color!
+  """
+  HEADER = '\033[95m'
+  OKBLUE = '\033[94m'
+  OKGREEN = '\033[92m'
+  WARNING = '\033[93m'
+  FAIL = '\033[91m'
+  ENDC = '\033[0m'
+  BOLD = '\033[1m'
+  UNDERLINE = '\033[4m'
+
+
 # global variables for Popen objects used for terminating sessions
 ros_popen = None
 python_popen = None
@@ -351,11 +364,13 @@ while run_number < FLAGS.number_of_runs:
   world_name=FLAGS.worlds[run_number%len(FLAGS.worlds)]
   command="{0} world_name:={1}".format(command, world_name)
   
-  print("\n{0}: started {3} run {1} of the {2} in {4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
+  print("\n{0}: started {3} run {1} of the {2} in {5} {4} {6}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
                                                           run_number+1, 
                                                           FLAGS.number_of_runs, 
                                                           'evaluation' if evaluate else 'training',
-                                                          world_name))
+                                                          world_name,
+                                                          bcolors.OKBLUE,
+                                                          bcolors.ENDC))
 
   # in case of saving data, increment data location in ~/pilot_data
   if FLAGS.create_dataset:
@@ -477,7 +492,7 @@ while run_number < FLAGS.number_of_runs:
     except:
       pass
     else:
-      print("\n{0}: ended run {1} with {2}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success))
+      print("\n{0}: ended run {1} with {3}{2}{4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success, bcolors.OKGREEN if 'success' in success else bcolors.FAIL, bcolors.ENDC))
     if FLAGS.save_only_success and FLAGS.create_dataset and 'success' not in success:
       print("no success, so retry.")
       # data folder will be removed when starting up new gazebo simulation.
