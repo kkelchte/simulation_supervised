@@ -146,7 +146,7 @@ parser.add_argument("--data_root", default='pilot_data/', type=str, help="Choose
 parser.add_argument("--code_root", default='~', type=str, help="Choose the directory to which tensorflow should save the summaries.")
 parser.add_argument("-t", "--log_tag", default='testing_online', type=str, help="LOGTAG: tag used to name logfolder.")
 parser.add_argument("--data_location", default='', type=str, help="Datalocation is by default the log_tag but than in data_root instead of summary_dir, otherwise FLAG should indicate relative path to data_root.")
-parser.add_argument("-n", "--number_of_runs", default=2, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated.")
+parser.add_argument("-n", "--number_of_runs", default=2, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated. n=1 avoids a hard stop after 5minutes.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
 parser.add_argument("--evaluate_every", default=20, type=int, help="Evaluate every N runs when training.")
