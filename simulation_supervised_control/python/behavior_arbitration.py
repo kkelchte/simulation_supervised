@@ -39,7 +39,7 @@ go_wait = 20 # wait for some time while sending 'go'
 
 # Control params
 starting_height = 0 # get from ros param dependent on environment defines the height at which drone is flying
-adjust_height = 1 # used to adjust the height and keep it at starting_height 
+adjust_height = 0 # used to adjust the height and keep it at starting_height 
 adjust_yaw = 0 # define in which direction to fly
 
 # BA params
@@ -135,17 +135,17 @@ def image_callback(data):
   """Use the frame rate of the images to update the states as well as send the correct control."""
   global current_state, counter
   control = get_control()
-  if current_state == 0:
+  if current_state == 0: # wait to start up => do nothing
     action_pub.publish(control)
     counter += 1
     if counter > init_wait:
       print("[behavior_arbitration]: {}: State set to 1".format(rospy.get_time()))
       counter = 0
       current_state = 1
-  elif current_state == 1:
+  elif current_state == 1: # take off by publishing take_off and adjust height
     action_pub.publish(control)
     take_off_pub.publish(Empty())
-    if adjust_height <= 0 : #drone is at correct height so switch to state 2
+    if adjust_height < 0 : # drone is at correct height so switch to state 2
       print("[behavior_arbitration]: {}: State set to 2".format(rospy.get_time()))
       current_state = 2
   elif current_state == 2:

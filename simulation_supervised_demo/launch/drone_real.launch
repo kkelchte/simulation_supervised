@@ -1,47 +1,53 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- Load parameters with topics of turtlebot -->
-  <include file="$(find simulation_supervised)/launch/load_params.launch">
-    <arg name="global_param" value="debug_param.yaml"/> 
-    <arg name="drone_config" value="turtlebot.yaml"/>
-  </include>
+  <!-- Define parameters from arguments -->
+  <arg name="log_folder" default="tmp"/> <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
+  <param name="log_folder" value="$(arg log_folder)"/>
 
-  <!-- start joy node with big ben config -->
-  <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
-    <arg name="joy_config" value="bigben_turtlebot"/>
-  </include>
+  <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
+  <param name="evaluate" value="$(arg evaluate)"/>
 
-  <!-- map control to right topics -->
-  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+  <arg name="graphics" default="false"/> 
+  <param name="graphics" value="$(arg graphics)"/>
+  
+  <arg name="data_location" default="tmp"/> <!-- used by create_dataset node to save all recorded data -->
+  <param name="data_location" value="$(arg data_location)"/>
+  
+  <arg name="save_images" default="false"/>
+  <param name="save_images" value="$(arg save_images)"/>
+  
+  <arg name="full" default="false"/>
+  <group if="$(arg full)">
+    <!-- Load parameters for turtlesim as a full demonstration-->
+    <include file="$(find simulation_supervised)/launch/load_params.launch">
+      <arg name="robot_config" value="drone_real.yaml"/>
+    </include>
+  </group>
+  
+  <!-- start node for comunication with bebop -->
+  <include file="$(find bebop_driver)/launch/bebop_node.launch"/>
+
+  <!-- Load parameters for fsm-->
+  <arg name="fsm_config" default="console_fsm"/>
+  <rosparam command="load" file="$(find simulation_supervised)/config/fsm/$(arg fsm_config).yaml"/> 
+  
+  <!-- FSM node -->
+  <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/>
+
+  <!-- KeyBoard node -->
+  <node name="teleop_twist_keyboard" pkg="simulation_supervised_tools" type="teleop_twist_keyboard.py" output="screen"/>
+
+  <!-- Create data -->
+  <node name="create_dataset" pkg="simulation_supervised_tools" type="create_dataset.py" output="screen"/>
+
+  <!-- Keep position by listening to gt_info-topic -->
+  <node name="ground_truth_listener" pkg="simulation_supervised_tools" type="ground_truth_listener.py" output="screen"/>
+
 
   <!-- display control and depth predictions-->
-  <arg name="graphics" default="true"/>
   <group if="$(arg graphics)">
     <!-- display control -->
     <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
-    <!-- display depth prediction -->
-    <!-- <node name="show_depth_prediction" pkg="simulation_supervised_tools" type="show_depth_prediction.py" output="screen"/> -->
   </group>
 
-  <!-- <include file="$(find turtlebot_rviz_launchers)/launch/view_robot.launch"/> -->
-
-   <!-- start creation of dataset-->
-  <arg name="saving_location" default="$(find simulation_supervised_tools)/data"/>
-  <param name="saving_location" value="$(arg saving_location)"/>
-  <node name="create_dataset" pkg="simulation_supervised_tools" type="create_dataset_turtle.py" output="screen"/>
-
-    <!-- start evaluation node -->
-  <arg name="log_folder" default="$(find simulation_supervised_tools)/log"/>
-  <include file="$(find simulation_supervised_tools)/launch/evaluate.launch">
-    <arg name="starting_height" value="-1"/>
-    <arg name="log_folder" value="$(arg log_folder)"/> 
-    <arg name="eva_dis" value="-1"/>
-  </include>
-
-  <!-- map depth to control with heuristic -->
-  <!-- <node name="depth_heuristic" pkg="simulation_supervised_control" type="depth_heuristic.py" output="screen"/> -->
-
-  <!-- map depth to control with heuristic for driving back to collision free area-->
-  <node name="drive_back" pkg="simulation_supervised_control" type="drive_back.py" output="screen"/>
-  
 </launch>

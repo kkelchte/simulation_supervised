@@ -1,0 +1,3 @@
+# debug is loaded to avoid the evaluation code to cut down the experiment too early.
+# Maximum duration and distance is not defined, avoiding the experiment to stop too soon.
+delay_evaluation: 10

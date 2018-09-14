@@ -37,7 +37,7 @@
   </include>
   
   <!-- Control Mapping -->
-  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+  <!-- <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/> -->
 
   <!-- FSM node -->
   <node name="fsm" pkg="simulation_supervised_tools" type="fsm.py" output="screen"/>

@@ -60,7 +60,6 @@ def con_cb(data):
   if superviser=="CON":
     sup_pub.publish(data)
 
-
 def ba_cb(data):
   """Callback on the control coming from behavior_arbitration."""
   # check if currently the behavior_arbitration can define the robots command
@@ -72,7 +71,6 @@ def ba_cb(data):
   # check if currently the behavior_arbitration can define the supervision command
   if superviser=="BA":
     sup_pub.publish(data)
-
 
 def dh_cb(data):
   """Callback on the control coming from depth_heuristic."""
@@ -86,7 +84,6 @@ def dh_cb(data):
   if superviser=="DH":
     sup_pub.publish(data)
 
-
 def nn_cb(data):
   """Callback on the control coming from neural_network."""
   # check if currently the neural_network can define the robots command
@@ -99,7 +96,6 @@ def nn_cb(data):
   if superviser=="NN":
     sup_pub.publish(data)
 
-
 def db_cb(data):
   """Callback on the control coming from drive_back."""
   # check if currently the drive_back can define the robots command
@@ -111,7 +107,6 @@ def db_cb(data):
   # check if currently the drive_back can define the supervision command
   if superviser=="DB":
     sup_pub.publish(data)
-
 
 def fsm_cb(data):
   """Callback on the control configuration coming from FSM."""

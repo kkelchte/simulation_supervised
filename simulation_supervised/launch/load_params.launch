@@ -4,4 +4,6 @@
  	<!-- {drone/turtle}_{real/sim}.yaml -->
 	<arg name="robot_config" default="turtle_sim.yaml"/>
 	<rosparam command="load" file="$(find simulation_supervised)/config/robot/$(arg robot_config)" />  
+  <!-- Control Mapping -->
+  <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
 </launch>

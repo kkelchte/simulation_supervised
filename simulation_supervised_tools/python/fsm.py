@@ -313,6 +313,7 @@ if __name__=="__main__":
   
   print("[fsm.py]: states: {}".format(state_sequence))
   print("[fsm.py]: controls: {}".format(control_sequence))
+  print("[fsm.py]: supervisions: {}".format(supervision_sequence))
   print("[fsm.py]: saving images: {}".format(save_images))
 
   # get goal location if params are specified:
@@ -343,6 +344,7 @@ if __name__=="__main__":
   elif len(state_sequence) > 1: 
     # subscribe to topic /go in case there is more than 1 state, to change from state 0/2 to state 1
     rospy.Subscriber('/go', Empty, go_cb)
+    rospy.Subscriber('/overtake', Empty, overtake_cb)
   # NN: switch between running and idle where NN computes gradients in case of learning
   if 'NN' in control_sequence.values() or 'NN' in supervision_sequence.values():
     start_nn_pub = rospy.Publisher('/nn_start', Empty, queue_size=10)
@@ -370,7 +372,7 @@ if __name__=="__main__":
 
   
   
-  # set initial state --> done after time > delay_evaluation
+  # set initial state (also done after time > start_time + evaluation_time in case the gt_info is published)
   # current_state = state_sequence[0]
   # state_pub.publish(current_state)
 
@@ -410,6 +412,9 @@ if __name__=="__main__":
     else:
       rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_cb)
 
+  time.sleep(1)
+  init() 
+  
   # spin() simply keeps python from exiting until this node is stopped  
   rospy.spin()
 

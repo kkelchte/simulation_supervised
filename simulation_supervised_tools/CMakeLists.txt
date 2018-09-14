@@ -31,6 +31,7 @@ include_directories(
 catkin_package()
 
 catkin_install_python(PROGRAMS
+    python/teleop_twist_keyboard.py
     python/create_dataset.py
     python/create_dataset_turtle.py
     python/visualizers/show_control.py
