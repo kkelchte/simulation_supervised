@@ -3,6 +3,7 @@ land: /bebop/land
 emergency: /bebop/emergency
 flattrim: /bebop/flattrim
 control: /bebop/cmd_vel
+aggressiveness: 1
 # ready: /bebop/ready
 # overtake: /bebop/overtake
 rgb_image: /bebop/image_raw
@@ -11,3 +12,26 @@ gt_info: /odom
 # rec_off: /bebop/rec_off
 # ps3_top: /bebop/ps3_vel
 # tweak_roll: 50
+# the network/heuristic should skip a number of frames.
+# this forces a control rate that is small enough for the drone to stabilize
+# between different control steps
+# skip_frames = camera_rate / control_rate - 1 or camera_rate * stabilization_periode - 1
+# lowering till 4 means that there is only 0.1s to stabilize
+skip_frames: 23
+# avoid stabilization in the roll_pitch_yaw (default 0)
+/bebop/bebop_driver/PictureSettingsVideoStabilizationModeMode: 3
+# 24 (0), 25 (1), 30 (2) FPS
+/bebop/bebop_driver/PictureSettingsVideoFramerateFramerate: 0
+# 1080x480(0), 720x720 (1)
+/bebop/bebop_driver/PictureSettingsVideoResolutionsType: 1
+# off (0), on (1)
+/bebop/bebop_driver/SpeedSettingsHullProtectionPresent: 0
+/bebop/bebop_driver/SpeedSettingsOutdoorOutdoor: 0
+/bebop/bebop_driver/PilotingSettingsAbsolutControlOn: 0
+# no clear influence...
+/bebop/bebop_driver/SpeedSettingsMaxPitchRollRotationSpeedCurrent: 300
+# 100 corresponds to 7 to 8 steps of 0.1s with speed 1 for crossing 90degrees
+# 50 corresponds to 17 steps of 0.1s with speed 1 for crossing 90degrees
+/bebop/bebop_driver/SpeedSettingsMaxRotationSpeedCurrent: 100
+/bebop/bebop_driver/SpeedSettingsMaxVerticalSpeedCurrent: 1
+

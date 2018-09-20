@@ -241,11 +241,11 @@ def finished_callback(msg):
   if ready and not finished:
     ready=False
     finished = True
-    # print('[create_dataset]: finished: {0}. RGB callback rate: {1:0.3f}({2:0.2f}) and RGB write rate: {3:0.3f}({4:0.2f})'.format(rospy.get_time(), 
-    #                                                                                                           np.mean(rgb_cb_rate),
-    #                                                                                                           np.var(rgb_cb_rate),
-    #                                                                                                           np.mean(rgb_write_rate),
-    #                                                                                                           np.var(rgb_write_rate)))
+    print('[create_dataset]: finished: {0}. RGB callback rate: {1:0.3f}({2:0.2f}) and RGB write rate: {3:0.3f}({4:0.2f})'.format(rospy.get_time(), 
+                                                                                                              np.mean(rgb_cb_rate),
+                                                                                                              np.var(rgb_cb_rate),
+                                                                                                              np.mean(rgb_write_rate),
+                                                                                                              np.var(rgb_write_rate)))
 
 def write_info(image_type, index):
   """For each image (lowest rate) save information regarding the position, control or scan readings."""

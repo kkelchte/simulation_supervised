@@ -1,0 +1,5 @@
+load_config: True
+continue_training: True
+dont_show_depth: True
+speed: 1
+action_bound: 1

@@ -48,10 +48,13 @@ current_time = 0. # last time step got from gazebo or time
 control_time = 0. # time in seconds of moment of last send control
 clk_sub = None
 
+aggressiveness=1. # define how direct the yaw turn is put on control
+
 def con_cb(data):
   """Callback on the control coming from console."""
   # check if currently the console can define the robots command
   global control_time, max_time
+  data.angular.z*=aggressiveness
   if pilot=="CON":
     cmd_pub.publish(data)
     control_time=current_time
@@ -64,6 +67,7 @@ def ba_cb(data):
   """Callback on the control coming from behavior_arbitration."""
   # check if currently the behavior_arbitration can define the robots command
   global control_time, max_time
+  data.angular.z*=aggressiveness
   if pilot=="BA":
     cmd_pub.publish(data)
     control_time=current_time
@@ -76,10 +80,11 @@ def dh_cb(data):
   """Callback on the control coming from depth_heuristic."""
   # check if currently the depth_heuristic can define the robots command
   global control_time, max_time
+  data.angular.z*=aggressiveness
   if pilot=="DH":
     cmd_pub.publish(data)
     control_time=current_time
-    max_time=1/5. # 5FPS < /scan
+    max_time = 1/5. # 5FPS < /scan
   # check if currently the depth_heuristic can define the supervision command
   if superviser=="DH":
     sup_pub.publish(data)
@@ -88,10 +93,13 @@ def nn_cb(data):
   """Callback on the control coming from neural_network."""
   # check if currently the neural_network can define the robots command
   global control_time, max_time
+  print("[control_mapping] changed angular from {}".format(data.angular.z))
+  data.angular.z*=aggressiveness
+  print("[control_mapping] to {}".format(data.angular.z))
   if pilot=="NN":
     cmd_pub.publish(data)
     control_time=current_time
-    max_time=1/10. # 10FPS < /kinect
+    max_time = 1/10. # 10FPS < /kinect
   # check if currently the neural_network can define the supervision command
   if superviser=="NN":
     sup_pub.publish(data)
@@ -100,10 +108,11 @@ def db_cb(data):
   """Callback on the control coming from drive_back."""
   # check if currently the drive_back can define the robots command
   global control_time, max_time
+  data.angular.z*=aggressiveness
   if pilot=="DB":
     cmd_pub.publish(data)
     control_time=current_time
-    max_time=1/5. # 5FPS < /scan
+    max_time = 1/5. # 5FPS < /scan
   # check if currently the drive_back can define the supervision command
   if superviser=="DB":
     sup_pub.publish(data)
@@ -123,6 +132,10 @@ def clock_cb(data):
   
 if __name__=="__main__":
   rospy.init_node('control_mapping', anonymous=True)
+
+  # adjust aggressiveness of turn with by rosparam aggressiveness
+  if rospy.has_param('aggressiveness'):
+    aggressiveness=rospy.get_param('aggressiveness')
 
   # initialize fsm subscriber
   fsm_sub = rospy.Subscriber('control_config', String, fsm_cb)
