@@ -17,6 +17,9 @@ f --> flat_trim
 e --> emergency
 g --> go
 o --> overtake
+x --> turn left TODO
+c --> straight TODO
+v --> turn right TODO
 CTRL-C to quit
 """
 
