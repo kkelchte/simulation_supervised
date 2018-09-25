@@ -6,6 +6,7 @@ import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 
 from std_msgs.msg import Empty
+from geometry_msgs.msg import Twist
 
 import sys, select, termios, tty
 
@@ -42,34 +43,18 @@ keyPubs = {
 }
 
 moveBindings = {
-    'i':(1,0,0,0),
-    'o':(1,0,0,-1),
-    'j':(0,0,0,1),
-    'l':(0,0,0,-1),
-    'u':(1,0,0,1),
-    ',':(-1,0,0,0),
-    '.':(-1,0,0,1),
-    'm':(-1,0,0,-1),
-    'O':(1,-1,0,0),
-    'I':(1,0,0,0),
-    'J':(0,1,0,0),
-    'L':(0,-1,0,0),
-    'U':(1,1,0,0),
-    '<':(-1,0,0,0),
-    '>':(-1,-1,0,0),
-    'M':(-1,1,0,0),
-    't':(0,0,1,0),
-    'b':(0,0,-1,0),
-         }
+    'x':(0,0,0,0,0,1),
+    'c':(1,0,0,0,0,0),
+    'v':(0,0,0,0,0,-1)}
 
-speedBindings={
-    'q':(1.1,1.1),
-    'z':(.9,.9),
-    'w':(1.1,1),
-    'x':(.9,1),
-    'e':(1,1.1),
-    'c':(1,.9),
-        }
+# speedBindings={
+#     'q':(1.1,1.1),
+#     'z':(.9,.9),
+#     'w':(1.1,1),
+#     'x':(.9,1),
+#     'e':(1,1.1),
+#     'c':(1,.9),
+#         }
 
 def getKey():
   tty.setraw(sys.stdin.fileno())
@@ -90,11 +75,11 @@ if __name__=="__main__":
   keyPubs['go']=rospy.Publisher('/go', Empty, queue_size =1)
   keyPubs['overtake']=rospy.Publisher('/overtake', Empty, queue_size =1)
   
+  vel_pub = rospy.Publisher('key_vel', Twist, queue_size=1)
   for k in keyPubs.keys():
     if rospy.has_param(k):
       keyPubs[k] = rospy.Publisher(rospy.get_param(k), Empty, queue_size = 1)
 
-  # import pdb; pdb.set_trace()
 
   try:
     print(msg)
@@ -106,6 +91,15 @@ if __name__=="__main__":
           keyPubs[keyBindings[key]].publish()
         else:
           print("[teleop_twist_keyboard]: could not find {} publisher".format(keyBindings[key]))
+      if key in moveBindings.keys():
+        twist=Twist()
+        twist.linear.x=moveBindings[key][0]
+        twist.linear.y=moveBindings[key][1]
+        twist.linear.z=moveBindings[key][2]
+        twist.angular.x=moveBindings[key][3]
+        twist.angular.y=moveBindings[key][4]
+        twist.angular.z=moveBindings[key][5]
+        vel_pub.publish(twist)
       # if key in moveBindings.keys():
       #   x = moveBindings[key][0]
       #   y = moveBindings[key][1]

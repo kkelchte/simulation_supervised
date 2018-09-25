@@ -334,12 +334,14 @@ def generate_floor(width,
   texture=None,
   corridor_type='normal',
   tile_type=1,
+  wide_tile=True, 
   verbose=False):
   """
   Args:
   width of the tile
   specific texture that has to be found in simsup_demo/extensions/textures
   Returns model placed in centered segment.
+  Wide_tile if true: the floor is made bigger (used for covering floor of blocked hole)
   """
   # fill in randomly all that is not specified
   if texture==None: texture = np.random.choice(prefab_textures)
@@ -352,9 +354,9 @@ def generate_floor(width,
   # change shape of floor according to heigth and width
   for child in iter(['collision', 'visual']):
     size_el=floor.find('link').find(child).find('geometry').find('box').find('size')
-    if corridor_type == 'empty' and tile_type != 4:
+    if corridor_type == 'empty' and tile_type != 4 and wide_tile:
       size_el.text=str(20*width)+" "+str(20*width)+" "+size_el.text.split(' ')[-1]
-    elif tile_type != 4:
+    if tile_type != 4 and wide_tile:
       size_el.text=str(2*width)+" "+str(2*width)+" "+size_el.text.split(' ')[-1]
     else:
       size_el.text=str(width)+" "+str(width)+" "+size_el.text.split(' ')[-1]

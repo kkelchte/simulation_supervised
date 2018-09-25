@@ -40,6 +40,7 @@ ba_sub = None # behavior arbitration subscriber
 dh_sub = None # depth heuristic subscriber
 nn_sub = None # neural network subscriber
 db_sub = None # drive back subscriber
+key_sub = None # drive back subscriber
 
 # define variables for keeping the start time and current time
 # in order to stop control after maximum time
@@ -117,6 +118,19 @@ def db_cb(data):
   if superviser=="DB":
     sup_pub.publish(data)
 
+def key_cb(data):
+  """Callback on the control coming from drive_back."""
+  # check if currently the drive_back can define the robots command
+  global control_time, max_time
+  data.angular.z*=aggressiveness
+  if pilot=="KEY":
+    cmd_pub.publish(data)
+    control_time=current_time
+    max_time = 1/5. # 5FPS < /scan
+  # check if currently the drive_back can define the supervision command
+  if superviser=="KEY":
+    sup_pub.publish(data)
+
 def fsm_cb(data):
   """Callback on the control configuration coming from FSM."""
   global superviser, pilot
@@ -150,6 +164,7 @@ if __name__=="__main__":
   dh_sub = rospy.Subscriber('dh_vel', Twist, dh_cb)
   nn_sub = rospy.Subscriber('nn_vel', Twist, nn_cb)
   db_sub = rospy.Subscriber('db_vel', Twist, db_cb) 
+  key_sub = rospy.Subscriber('key_vel', Twist, key_cb) 
 
   # subscribe to the clock of gazebo if gazebo is running
   # else initialize clock of python time

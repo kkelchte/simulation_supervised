@@ -6,3 +6,4 @@ floor:
   type_specific:
     name: 'floor'
     texture: 'Gazebo/DarkGrey'
+    wide_tile: False

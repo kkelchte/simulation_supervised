@@ -17,7 +17,7 @@ gt_info: /odom
 # between different control steps
 # skip_frames = camera_rate / control_rate - 1 or camera_rate * stabilization_periode - 1
 # lowering till 4 means that there is only 0.1s to stabilize
-skip_frames: 23
+skip_frames: 10
 # avoid stabilization in the roll_pitch_yaw (default 0)
 /bebop/bebop_driver/PictureSettingsVideoStabilizationModeMode: 3
 # 24 (0), 25 (1), 30 (2) FPS
@@ -32,6 +32,6 @@ skip_frames: 23
 /bebop/bebop_driver/SpeedSettingsMaxPitchRollRotationSpeedCurrent: 300
 # 100 corresponds to 7 to 8 steps of 0.1s with speed 1 for crossing 90degrees
 # 50 corresponds to 17 steps of 0.1s with speed 1 for crossing 90degrees
-/bebop/bebop_driver/SpeedSettingsMaxRotationSpeedCurrent: 100
+/bebop/bebop_driver/SpeedSettingsMaxRotationSpeedCurrent: 250
 /bebop/bebop_driver/SpeedSettingsMaxVerticalSpeedCurrent: 1
 

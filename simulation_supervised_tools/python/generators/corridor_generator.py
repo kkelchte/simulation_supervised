@@ -269,10 +269,10 @@ class Tile(object):
         pose_element=m.find('pose')
         pose_6d=[float(v) for v in pose_element.text.split(' ')]
         # adjust width (no influence on ceiling element)      
-        if k not in ['ceiling','blocked_hole']:
+        if k not in ['ceiling','blocked_hole','floor']:
           pose_6d[0]*=width/2.
           pose_6d[1]*=width/2. #corridor is expected to be 2m width
-        if k not in ['obstacle','passway','blocked_hole']:
+        if k not in ['obstacle','passway','blocked_hole','floor']:
           # adjust height for panel and ceiling (no influence on obstacle or passway)
           pose_6d[2]*=height/2. #corridor is expected to be 2m high, has to be rescaled to height
         

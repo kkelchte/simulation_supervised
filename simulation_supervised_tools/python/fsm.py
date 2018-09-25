@@ -158,7 +158,8 @@ def overtake_cb(data):
   if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())
   if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
 
-  if "NN" not in [control_sequence['0'], supervision_sequence['0']] and stop_nn_pub: stop_nn_pub.publish(Empty())
+  if "NN" not in [control_sequence['0']] and stop_nn_pub: stop_nn_pub.publish(Empty())
+  # if "NN" not in [control_sequence['0'], supervision_sequence['0']] and stop_nn_pub: stop_nn_pub.publish(Empty())
   if "DH" not in [control_sequence['0'], supervision_sequence['0']] and stop_dh_pub: stop_dh_pub.publish(Empty())
 
   init()
