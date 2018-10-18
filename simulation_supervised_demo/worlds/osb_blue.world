@@ -64,7 +64,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -90,7 +90,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -116,7 +116,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -142,7 +142,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -168,7 +168,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -194,7 +194,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -220,7 +220,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/OSB</name>
+              <name>Gazebo/Blue</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>

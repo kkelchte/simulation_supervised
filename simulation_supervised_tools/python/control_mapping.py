@@ -85,7 +85,7 @@ def dh_cb(data):
   if pilot=="DH":
     cmd_pub.publish(data)
     control_time=current_time
-    max_time = 1/5. # 5FPS < /scan
+    max_time = 1 #1/5. # 5FPS < /scan: keep same control longer otherwise heuristic gets stuck.
   # check if currently the depth_heuristic can define the supervision command
   if superviser=="DH":
     sup_pub.publish(data)

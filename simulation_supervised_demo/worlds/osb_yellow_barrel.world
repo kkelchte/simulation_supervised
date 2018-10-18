@@ -22,7 +22,7 @@
         <linear>0.5</linear>
         <quadratic>0.1</quadratic>
       </attenuation>
-    </light>    
+    </light>
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
@@ -50,7 +50,34 @@
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
-    <model name="wall_1">
+    <model name="yellow_barrel">
+      <static>1</static>
+      <pose>0 0 0.3 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.185</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Yellow</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <cylinder>
+              <radius>0.185</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+        </visual>
+      </link>
+    </model><model name="wall_1">
       <static>1</static>
       <pose>-0.03 -0.91 0.24 0 0 0</pose>
       <link name="link">

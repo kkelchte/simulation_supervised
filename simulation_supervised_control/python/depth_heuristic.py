@@ -25,11 +25,11 @@ import matplotlib.animation as animation
 #
 #--------------------------------------------------------------------------------------------------------------
 
-clip_distance = 3 #5 tweak for doshico
+clip_distance = 0.5 #3 #5 tweak for doshico
 front_width=40 #50 # define the width of free space in before driving forward
-field_of_view=80 #90 #100
-scale_yaw=0.4 #1 
-turn_speed=0 #0.3 #0.6 #0.1
+field_of_view=100 #80
+scale_yaw=0.6 #0.4 #1 
+turn_speed=0. #0.3 #0.6 #0.1
 speed=0.3 
 
 # Instantiate CvBridge
