@@ -10,4 +10,4 @@
 state_sequence: ['running']
 # Choose which control is commanding or supervising in the corresponding states
 control_sequence: {'0': 'DH'}
-supervision_sequence: {'0': 'NULL'}
+supervision_sequence: {'0': 'NN'}
