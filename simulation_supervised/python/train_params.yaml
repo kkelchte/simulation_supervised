@@ -1,0 +1,5 @@
+epsilon: 0.5
+learning_rate: 0.1
+speed: 0.3
+action_bound: 0.6
+discrete: True
