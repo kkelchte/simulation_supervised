@@ -14,8 +14,10 @@
   <arg name="save_images" default="false"/>
   <param name="save_images" value="$(arg save_images)"/>
 
+<!--   <arg name="world_name" default="debug">
   <param name="world_name" value="$(arg world_name)"/>
-  <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> <!-- worldfile defines the actual gazebo world file loaded -->
+  <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/>
+ -->
 
   <arg name="full" default="false"/>
   <group if="$(arg full)">
@@ -56,10 +58,12 @@
 
   <!-- Visualizations -->
   <!-- Show control -->
+  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
+
   <!-- Show depth prediction -->
   
   <!-- Show scan prediction -->
-  <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/>
+  <!-- <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/> -->
   
   <!-- Debugging -->
   <!-- add RQT to visualize the changes and avoid the launch to quit -->
