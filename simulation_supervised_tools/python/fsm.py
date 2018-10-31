@@ -263,9 +263,10 @@ def gt_cb(data):
               data.pose.pose.position.y,
               data.pose.pose.position.z]
   positions.append(current_pos)
-  # if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance and not shuttingdown:
-  if max_distance != -1 and travelled_distance > max_distance and not shuttingdown:
-    print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, travelled_distance, max_distance))
+  if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance**2 and not shuttingdown:
+  # if max_distance != -1 and travelled_distance > max_distance and not shuttingdown:
+    print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, np.sqrt((current_pos[0]**2+current_pos[1]**2)), max_distance))
+    # print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, travelled_distance, max_distance))
     success = True
     shutdown()
 

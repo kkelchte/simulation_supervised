@@ -154,7 +154,7 @@ parser.add_argument("-ds", "--create_dataset", action='store_true',help="In case
 parser.add_argument("--owr", action='store_true',help="Delete dataset if it is already there.")
 
 parser.add_argument("--save_only_success", action='store_true',help="In case of True, sensor data is saved.")
-parser.add_argument("--seed", type=float, help="In case of True, sensor data is saved.")
+parser.add_argument("--random_seed", type=int, help="In case of True, sensor data is saved.")
 
 # ==========================
 #   Robot Settings
@@ -214,7 +214,7 @@ else: #worlds are appended in a nested list... so get them out.
   for w in FLAGS.worlds: worlds.append(w[0])
   FLAGS.worlds = worlds[:]
 
-if FLAGS.seed: np.random.seed(FLAGS.seed)
+if FLAGS.random_seed: np.random.seed(FLAGS.random_seed)
 FLAGS.params=load_param_file(FLAGS.paramfile) if FLAGS.paramfile else ""
 
 # check if robot configuration exists is there:
@@ -493,11 +493,14 @@ while run_number < FLAGS.number_of_runs:
       pass
     else:
       print("\n{0}: ended run {1} with {3}{2}{4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, success, bcolors.OKGREEN if 'success' in success else bcolors.FAIL, bcolors.ENDC))
-    if FLAGS.save_only_success and FLAGS.create_dataset and 'success' not in success:
-      print("no success, so retry.")
+    # if FLAGS.save_only_success and FLAGS.create_dataset and 'success' not in success:
+    #   print("no success, so retry.")
       # data folder will be removed when starting up new gazebo simulation.
-    else:
-      run_number+=1
+    # else:
+    #   run_number+=1
+  # increment also in case of crash as drone has zero turning speed:
+  run_number+=1
+
   # continue with next run if gazebo if fully killed:
   wait_for_gazebo()
   # wait_for_create_dataset()
