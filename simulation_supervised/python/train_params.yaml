@@ -1,5 +1,13 @@
-epsilon: 0.5
-learning_rate: 0.1
+network: tiny_v2
+epsilon: 0.
+learning_rate: 0.01
+optimizer: gradientdescent
 speed: 0.3
 action_bound: 0.6
 discrete: True
+empty_buffer: True
+buffer_size: -1
+batch_size: -1
+break_and_turn: True
+epsilon: 0.5
+epsilon_decay: 0.9

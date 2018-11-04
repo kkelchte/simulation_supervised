@@ -309,7 +309,7 @@ def start_python():
   FLAGS.params="{0} --log_tag {1[0]}{1[1]}".format(FLAGS.params, FLAGS.log_folder.partition(FLAGS.log_tag)[1:])
   if not '--online' in FLAGS.params: FLAGS.params="{0} --online".format(FLAGS.params)
   if FLAGS.checkpoint_path: FLAGS.params="{0} --checkpoint_path {1}".format(FLAGS.params, FLAGS.checkpoint_path)  
-  if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
+  # if not FLAGS.graphics and 'dont_show_depth' not in FLAGS.params: FLAGS.params="{0} --dont_show_depth".format(FLAGS.params)
 
   # Create command
   command="{0}/scripts/launch_python/{1}.sh {2}/tensorflow/{3}/main.py {4}".format(simulation_supervised_dir,

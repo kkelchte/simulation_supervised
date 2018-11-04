@@ -1,0 +1,11 @@
+network: tiny_v2
+epsilon: 0.
+learning_rate: 0.01
+optimizer: adadelta
+speed: 0.3
+action_bound: 0.6
+discrete: True
+empty_buffer: False
+buffer_size: 2000
+batch_size: 32
+break_and_turn: True
