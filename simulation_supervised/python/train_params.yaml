@@ -1,5 +1,4 @@
 network: tiny_v2
-epsilon: 0.
 learning_rate: 0.01
 optimizer: gradientdescent
 speed: 0.3

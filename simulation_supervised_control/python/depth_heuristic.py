@@ -135,7 +135,7 @@ if __name__=="__main__":
     supervision_sequence=rospy.get_param('supervision_sequence')
   
   if rospy.has_param('graphics') and ('DH' in control_sequence.values() or 'DH' in supervision_sequence.values()):
-    if rospy.get_param('graphics'):
+    if rospy.get_param('graphics') and False:
       print("[depth_heuristic]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()
