@@ -11,6 +11,6 @@ break_and_turn: True
 epsilon: 0.5
 epsilon_decay: 0.9
 lifelonglearning: True
-minimum_collision_free_duration: 10
+minimum_collision_free_duration: 30
 hard_replay_buffer: True
 hard_batch_size: 100
