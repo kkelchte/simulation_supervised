@@ -9,4 +9,6 @@ buffer_size: 2000
 batch_size: 32
 break_and_turn: True
 epsilon: 0.5
-epsilon_decay: 0.9
+epsilon_decay: 0.1
+update_importance_weights: True
+minimum_collision_free_duration: 30

@@ -1,23 +1,37 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Define parameters from arguments -->
-  <arg name="log_folder" default="tmp"/> <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
+
+  <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
+  <arg name="log_folder" default="tmp"/> 
   <param name="log_folder" value="$(arg log_folder)"/>
   
-  <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
+  <!-- worldname is used to load correct config, name logging and find modified logname -->
+  <arg name="world_name" default="debug"/>
+  <param name="world_name" value="$(arg world_name)"/>
+  
+  <!-- worldfile defines the actual gazebo world file loaded -->
+  <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> 
+  <param name="world_file" value="$(arg world_file)"/>
+  <!-- yaml with extra ros params to load -->
+  <arg name="world_config" default="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+  
+  <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
+  <arg name="evaluate" default="false"/> 
   <param name="evaluate" value="$(arg evaluate)"/>
+  
   <arg name="graphics" default="false"/> 
   <param name="graphics" value="$(arg graphics)"/>
   
-  <arg name="data_location" default="tmp"/> <!-- used by create_dataset node to save all recorded data -->
+  <!-- used by create_dataset node to save all recorded data -->
+  <arg name="data_location" default="tmp"/>
   <param name="data_location" value="$(arg data_location)"/>
   <arg name="save_images" default="false"/>
   <param name="save_images" value="$(arg save_images)"/>
 
-<!--   <arg name="world_name" default="debug">
-  <param name="world_name" value="$(arg world_name)"/>
-  <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/>
- -->
+
+
+  
 
   <arg name="full" default="false"/>
   <group if="$(arg full)">
@@ -27,18 +41,39 @@
     </include>
   </group>
   
-  <rosparam command="load" file="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> 
+  <!-- Load parameters for environment-->
+  <rosparam command="load" file="$(arg world_config)"/> 
 
   <!-- Load parameters for fsm-->
   <arg name="fsm_config" default="console_fsm"/>
   <rosparam command="load" file="$(find simulation_supervised)/config/fsm/$(arg fsm_config).yaml"/> 
   
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <!-- Console: simple (only overtake and go) -->
   <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">
     <arg name="joy_config" value="simple_console"/> 
   </include>
   
-  <!-- Control Mapping -->
+  <!-- Control Mapping: send to load_params of ros -->
   <!-- <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/> -->
 
   <!-- FSM node -->
@@ -61,7 +96,6 @@
   <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
 
   <!-- Show depth prediction -->
-  
   <!-- Show scan prediction -->
   <!-- <node name="show_scan_prediction" pkg="simulation_supervised_tools" type="show_scan_prediction.py" output="screen"/> -->
   

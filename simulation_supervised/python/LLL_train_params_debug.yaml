@@ -9,8 +9,10 @@ buffer_size: -1
 batch_size: -1
 break_and_turn: True
 epsilon: 0.5
-epsilon_decay: 0.9
-lifelonglearning: True
-minimum_collision_free_duration: 10
+epsilon_decay: 0.1
 hard_replay_buffer: True
 hard_batch_size: 100
+lifelonglearning: True
+update_importance_weights: True
+minimum_collision_free_duration: 30
+continue_training: True

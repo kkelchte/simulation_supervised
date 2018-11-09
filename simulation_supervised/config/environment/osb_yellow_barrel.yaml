@@ -1,5 +1,5 @@
 # debug is loaded to avoid the evaluation code to cut down the experiment too early.
 # Maximum duration and distance is not defined, avoiding the experiment to stop too soon.
-delay_evaluation: 1 
+delay_evaluation: 4 
 min_depth: 0.2 #0.15
-max_duration: 200
+# max_duration: 200

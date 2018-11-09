@@ -452,7 +452,8 @@ while run_number < FLAGS.number_of_runs:
       print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
-      if crash_number < 3:
+      # if crash_number < 3:
+      if crash_number < 20: #after 20 crashes its maybe time to restart everything
         kill_popen('gazebo', gazebo_popen)
       else:
         print("{0}: crashed for third time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))

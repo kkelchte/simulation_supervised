@@ -101,6 +101,7 @@ def nn_cb(data):
     cmd_pub.publish(data)
     control_time=current_time
     max_time = 1/10. # 10FPS < /kinect
+    # max_time = 1/5. # 10FPS < /kinect
   # check if currently the neural_network can define the supervision command
   if superviser=="NN":
     sup_pub.publish(data)
