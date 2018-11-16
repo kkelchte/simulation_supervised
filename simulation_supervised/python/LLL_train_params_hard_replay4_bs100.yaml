@@ -1,8 +1,9 @@
 network: tiny_v2
 learning_rate: 0.001
 optimizer: gradientdescent
-random_seed: 456
-max_episodes: 500
+random_seed: 123
+max_episodes: 401
+real: True
 # POLICY
 speed: 0.3
 action_bound: 0.6
@@ -13,7 +14,7 @@ epsilon_decay: 0.1
 # TRAINING
 empty_buffer: True
 buffer_size: 100
-batch_size: 30
+batch_size: 100
 max_gradient_steps: 2
 backward_pass_every: batch
 # VALIDATE ON OFFLINE DATASET
@@ -26,12 +27,12 @@ scratch: True
 # continue_training: True
 # load_config: True
 # LLL
-# lifelonglearning: True
-# update_importance_weights: True
-# lll_omage_update: running_average
-# lll_weight: 10
-# loss_window_length: 3
-# loss_peak_threshold: 1.15
+lifelonglearning: True
+update_importance_weights: True
+lll_omage_update: running_average
+lll_weight: 10
+loss_window_length: 3
+loss_peak_threshold: 1.15
 # HARD REPLAY BUFFER
-# hard_replay_buffer: True
-# hard_batch_size: 30
+hard_replay_buffer: True
+hard_batch_size: 30

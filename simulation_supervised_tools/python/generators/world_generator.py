@@ -18,8 +18,7 @@ Steps:
 1. parse recipe from arguments and yaml configuration file
 2. pull in template world file
 3. In case of corridor: add a corridor coming from corridor_generator
-4. Add extensions according to recipe
-5. write world and config file to destination folder
+4. write world and config file to destination folder
 
 Dependencies are:
 

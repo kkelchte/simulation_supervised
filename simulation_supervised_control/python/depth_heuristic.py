@@ -25,11 +25,19 @@ import matplotlib.animation as animation
 #
 #--------------------------------------------------------------------------------------------------------------
 
-clip_distance = 0.5 #3 #5 tweak for doshico
+# new
+# clip_distance = 2 #0.5 #3 #5 tweak for doshico (from 0.5 --> 2 10/11/19)
+# front_width=40 #50 # define the width of free space in before driving forward
+# field_of_view=80 #100 #80
+# scale_yaw=0.6 #0.4 #1 
+
+# original
+clip_distance = 3 #1.5 #0.5 #3 #5 tweak for doshico (from 0.5 --> 2 10/11/19)
 front_width=40 #50 # define the width of free space in before driving forward
 field_of_view=100 #80
 scale_yaw=0.6 #0.4 #1 
-turn_speed=0. #0.3 #0.6 #0.1
+
+turn_speed=0.0 #0.3 #0.6 #0.1 (from 0. --> 0.1 10/11/19)
 speed=0.3 
 
 # Instantiate CvBridge
@@ -52,7 +60,7 @@ def animate(n):
     b.set_height(x[i])
 
 def depth_callback(data):
-  global action_pub, x
+  global action_pub, x, turn_speed, speed
   if not ready or finished: return
   # Preprocess depth:
   ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
@@ -73,8 +81,16 @@ def depth_callback(data):
             1:0., # drive straight
             2:-1.} # turn right
 
-  # speed_dict={0:0.1, 1:0.3, 2:0.1}  
-  speed_dict={0:turn_speed, 1:speed, 2:turn_speed}  
+  # speed_dict={0:0.1, 1:0.3, 2:0.1}
+
+  if turn_speed ==0: 
+    speed_dict={0:speed*np.random.binomial(1, 0.1), 
+                1:speed, 
+                2:speed*np.random.binomial(1, 0.1)} 
+  else:
+    speed_dict={0:turn_speed, 
+                1:speed, 
+                2:turn_speed} 
 
   # print("[depth_heuristic]: min x: {0}, {1}, {2}, max index: {3}, turn: {4}, speed: {5}".format(x[0],x[1],x[2], index, yaw_dict[index],speed_dict[index]))
   msg = Twist()

@@ -11,6 +11,10 @@ import cv2
 # messages
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
+
+from sensor_msgs.msg import CompressedImage
+import skimage.transform as sm
+
 from std_msgs.msg import Empty
 from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
 from std_msgs.msg import String
@@ -60,16 +64,16 @@ def build_image():
   view=current_view
   xs=int(view.shape[1]/2)
   ys=int(view.shape[0]/2)  
-  # draw center bar
-  cv2.line(view, (xs, ys-5), (xs,ys+20),(0,0,0), 3)
-  if cmd_ctr: # draw applied control  
-    cv2.line(view, (xs, ys), (int(xs-150*cmd_ctr.angular.z),ys),(250,250,250), 9)
-    # draw speed
-    cv2.line(view, (20, view.shape[0]-35), (20,int(view.shape[0]-35-150*cmd_ctr.linear.x)),(250,250,250), 9)
-    cv2.putText(view,"linear X",(5,view.shape[0]-10), font, 1,(250,250,250),1)
+  # # draw center bar
+  # cv2.line(view, (xs, ys-5), (xs,ys+20),(0,0,0), 3)
+  # if cmd_ctr: # draw applied control  
+  #   cv2.line(view, (xs, ys), (int(xs-150*cmd_ctr.angular.z),ys),(250,50,50), 9)
+  #   # draw speed
+  #   cv2.line(view, (20, view.shape[0]-35), (20,int(view.shape[0]-35-150*cmd_ctr.linear.x)),(250,50,50), 9)
+  #   cv2.putText(view,"linear X",(5,view.shape[0]-10), font, 1,(250,50,50),1)
   
-  if sup_ctr: # draw supervised control  
-    cv2.line(view, (xs, ys+15), (int(xs-150*sup_ctr.angular.z),ys+15),(0,250,0), 9)
+  # if sup_ctr: # draw supervised control  
+  #   cv2.line(view, (xs, ys+15), (int(xs-150*sup_ctr.angular.z),ys+15),(0,250,0), 9)
   return current_view
 
 def animate(*args):
@@ -134,7 +138,7 @@ def animate(*args):
 #     # if recording :
 #     #   cv2.imwrite(saving_location+'/'+'{0:010d}.jpg'.format(count),img)
 #     #   count+=1
-    
+
 def image_cb(data):
   """Callback on image, saved in current_view field"""
   global current_view
@@ -145,7 +149,20 @@ def image_cb(data):
   except CvBridgeError, e:
     print(e)
   else:
-    current_view = img
+    # current_view = img
+    current_view = img[::2,::2,:]
+    
+def compressed_image_cb(data):
+  """Callback on image, saved in current_view field"""
+  global current_view
+  # print('received image')
+  try:
+    img = bridge.compressed_imgmsg_to_cv2(data, desired_encoding='passthrough')
+  except CvBridgeError, e:
+    print(e)
+  else:
+    # 308x410 to 128x128
+    current_view = img[::2,::3,:]
     # current_view = img[::2,::2,:]
 
 def con_cb(data):
@@ -211,7 +228,11 @@ if __name__=="__main__":
   
   # subscribe to image topic, if not found exit.
   if rospy.has_param('rgb_image'):
-    rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_cb)
+    image_topic=rospy.get_param('rgb_image')
+    if 'compressed' in image_topic:
+      rospy.Subscriber(image_topic, CompressedImage, compressed_image_cb)
+    else:
+      rospy.Subscriber(image_topic, Image, image_cb)
   else:
     raise IOError('SHOWCONTROL: help I have no image input!')
   

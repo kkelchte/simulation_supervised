@@ -2,3 +2,4 @@ control: /cmd_vel
 rgb_image: /wa/camera/image_raw
 depth_image: /scan
 gt_info: /odom
+skip_frames: 3

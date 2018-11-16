@@ -130,7 +130,7 @@ if __name__=="__main__":
     supervision_sequence=rospy.get_param('supervision_sequence')
   
   if rospy.has_param('graphics') and ('DB' in control_sequence.values() or 'DB' in supervision_sequence.values()):
-    if rospy.get_param('graphics'):
+    if rospy.get_param('graphics') and False:
       print("[drive_back]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()

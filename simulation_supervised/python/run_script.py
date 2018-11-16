@@ -448,6 +448,17 @@ while run_number < FLAGS.number_of_runs:
       start_time=time.time()
     else:
       time_spend=time.time() - start_time
+
+    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+    # automatically start with /go after 10s
+    if 10.05 <= time_spend<10.15: 
+      go_popen=subprocess.Popen(shlex.split("rostopic pub /go std_msgs/Empty"))
+    elif 11.15 <= time_spend < 11.25 and go_popen.poll()==None:
+      kill_popen('go', go_popen)
+    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+    
     if time_spend > 60*5 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
       print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True

@@ -394,7 +394,14 @@ def generate_map(length, bends):
     feasible = is_feasible(sequence)
   return sequence
 
-def translate_map_to_element_tree(sequence, width, height, texture, lights, visual=True, extension_conf={}, verbose=True):
+def translate_map_to_element_tree(sequence, 
+                                  width=2, 
+                                  height=2,
+                                  texture='Gazebo/White',
+                                  lights='default_light', 
+                                  visual=True, 
+                                  extension_conf={}, 
+                                  verbose=True):
   """For each tile in the trajectory sequence,
   append a corresponding corridor segment on correct location.
   """
@@ -569,30 +576,63 @@ if __name__ == '__main__':
 
   ########
   # Test 5: generate straight corridor with passway
-  worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
-  template_world='empty_world.world'
-  tree = ET.parse(worlds_location+template_world)
-  root = tree.getroot()  
-  sequence = [0,1,2,3,1,1,2,3,1,4]
-  extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
-  extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))  
-  segments = translate_map_to_element_tree(sequence,
-                                        width=3,
-                                        height=3,
-                                        texture='Gazebo/White',
-                                        lights='default_light',
-                                        visual=True,
-                                        extension_conf=extension_conf,
-                                        verbose=True)
-  # append segments to world and write world
-  world=root.find('world')
-  for seg in segments:
-    pretty_append(world, seg)
-  tree.write(os.environ['HOME']+'/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
+  # worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+  # template_world='empty_world.world'
+  # tree = ET.parse(worlds_location+template_world)
+  # root = tree.getroot()  
+  # sequence = [0,1,2,3,1,1,2,3,1,4]
+  # extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
+  # extension_conf = yaml.load(open(extension_location+'config/test.yaml', 'r'))  
+  # segments = translate_map_to_element_tree(sequence,
+  #                                       width=3,
+  #                                       height=3,
+  #                                       texture='Gazebo/White',
+  #                                       lights='default_light',
+  #                                       visual=True,
+  #                                       extension_conf=extension_conf,
+  #                                       verbose=True)
+  # # append segments to world and write world
+  # world=root.find('world')
+  # for seg in segments:
+  #   pretty_append(world, seg)
+  # tree.write(os.environ['HOME']+'/new.world', encoding="us-ascii", xml_declaration=True, method="xml")
 
   # save image
   # save_location=os.environ['HOME']+'/corridors'
   # if not os.path.isdir(save_location): os.makedirs(save_location)
   # visualize(sequence,save_location+'/'+time.strftime("%Y-%m-%d_%I-%M-%S")+'_new.jpg')
+
+  ########
+  # Test 6: generate circular corridor
+  
+  for domain in ["domain_A", "domain_B", "domain_C"]:
+    worlds_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'
+    template_world='empty_world.world'
+    tree = ET.parse(worlds_location+template_world)
+    root = tree.getroot()  
+    sequence = [1,1,2,3,1,2,1,1,2,3,2,3,2,1,3,2,2,3,2,1,1,1,1,3,2,2,1,1]
+      
+    extension_location=os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/extensions/'
+    extension_conf = yaml.load(open(extension_location+'config/'+domain+'.yaml', 'r'))  
+    segments = translate_map_to_element_tree(sequence,
+                                          width=3,
+                                          height=3,
+                                          texture='Gazebo/White',
+                                          lights='default_light',
+                                          visual=True,
+                                          extension_conf=extension_conf,
+                                          verbose=True)
+    
+    #append segments to world and write world
+    world=root.find('world')
+    for seg in segments:
+      pretty_append(world, seg)
+    tree.write(os.environ['HOME']+'/simsup_ws/src/simulation_supervised/simulation_supervised_demo/worlds/'+domain+'.world', encoding="us-ascii", xml_declaration=True, method="xml")
+
+    # save a top down viez
+    save_location=os.environ['HOME']+'/corridors'
+    if not os.path.isdir(save_location): os.makedirs(save_location)
+    visualize(sequence,save_location+'/'+domain+'.jpg')
+
 
   print 'done'

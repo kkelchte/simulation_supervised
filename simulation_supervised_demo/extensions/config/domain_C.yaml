@@ -1,0 +1,25 @@
+# Offset is between -1:1
+# z-location is between 0:1
+# everything that is not specified is randomly selected.
+---
+blocked_hole:
+  type: 'blocked_hole'
+  number: 15
+  type_specific:
+    dummy: ''
+pipes:
+  type: 'ceiling'
+  type_specific:
+    name: 'pipes'
+    dummy: ''
+arc:
+  type: 'passway'
+  number: 10
+  type_specific:
+    name: 'arc'
+    texture: 'Gazebo/Grey'
+floor:
+  type: 'floor'
+  type_specific:
+    name: 'floor'
+    texture: 'Gazebo/Black'

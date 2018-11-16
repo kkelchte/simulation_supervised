@@ -114,7 +114,7 @@ def init():
   if "DH" in [control_sequence['0'], supervision_sequence['0']] and start_dh_pub: start_dh_pub.publish(Empty())
   if "DB" in [control_sequence['0'], supervision_sequence['0']] and start_db_pub: start_db_pub.publish(Empty())
     
-  print("[fsm.py] current state: {}".format(current_state))
+  print("[fsm.py]:{0}: current state: {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),current_state))
   # in case there is only 1 state and save images
   if len(state_sequence)==1: 
     # start saving images
@@ -151,7 +151,7 @@ def go_cb(data):
     if save_images and run_number > 1 and len(data_location) != 0: update_data_location() # increment data location 
     if save_images and start_createds_pub: start_createds_pub.publish(Empty())
     if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
-  print("[fsm.py] current state: {}".format(current_state))
+  print("[fsm.py]:{0}: current state: {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),current_state))
 
 def overtake_cb(data):
   """Callback on /overtake to change from state 1 or 2 to state 0."""
@@ -190,16 +190,16 @@ def shutdown():
     control_map_pub.publish(control_sequence['2']+"_"+supervision_sequence['2']) 
     current_state = state_sequence[2]
     state_pub.publish(current_state)
-    print("[fsm.py] current state: {}".format(current_state))
+    print("[fsm.py]:{0}: current state: {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),current_state))
 
 
 
   # Log away
   write(log_folder+'/log', '{0} \n'.format('success' if success else 'bump'))
   write(log_folder+'/log_named', '{0} {1} \n'.format('success' if success else 'bump', world_name))
-  msg = ""
-  for pos in positions: msg = msg + '{0} {1} {2}\n'.format(pos[0],pos[1],pos[2])
-  write(log_folder+'/log_positions',msg)
+  # msg = ""
+  # for pos in positions: msg = msg + '{0} {1} {2}\n'.format(pos[0],pos[1],pos[2])
+  # write(log_folder+'/log_positions',msg)
 
   # Kill simulator from pidfile in log folder.
   pidfile=log_folder+'/.pid'
@@ -214,7 +214,7 @@ def time_check():
   """Keep track of the time. If the duration is longer than max_duration shutdown with succes."""
   global start_time, success
   if (int(rospy.get_time()-start_time)) > (max_duration+delay_evaluation) and not shuttingdown:
-    print('[fsm.py]: current time {0} > max_duration {1}----------success!'.format(int(rospy.get_time()-start_time),(max_duration+delay_evaluation)))
+    print('[fsm.py]:{2}: current time {0} > max_duration {1}----------success!'.format(int(rospy.get_time()-start_time),(max_duration+delay_evaluation),time.strftime("%Y-%m-%d_%I:%M:%S")))
     success=True
     shutdown()
       
@@ -262,7 +262,7 @@ def gt_cb(data):
   current_pos=[data.pose.pose.position.x,
               data.pose.pose.position.y,
               data.pose.pose.position.z]
-  positions.append(current_pos)
+  # positions.append(current_pos)
   if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance**2 and not shuttingdown:
   # if max_distance != -1 and travelled_distance > max_distance and not shuttingdown:
     print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, np.sqrt((current_pos[0]**2+current_pos[1]**2)), max_distance))
@@ -352,9 +352,9 @@ if __name__=="__main__":
     start_nn_pub = rospy.Publisher('/nn_start', Empty, queue_size=10)
     stop_nn_pub = rospy.Publisher('/nn_stop', Empty, queue_size=10)
   # BA: has its own fsm that counts down, takes off, adjusts height and start OA
-  # if 'BA' in control_sequence.values() or 'BA' in supervision_sequence.values():
-  #   start_ba_pub = rospy.Publisher('/ba_start', Empty, queue_size=10)
-  #   stop_ba_pub = rospy.Publisher('/ba_stop', Empty, queue_size=10)
+  if 'BA' in control_sequence.values() or 'BA' in supervision_sequence.values():
+    start_ba_pub = rospy.Publisher('/ba_start', Empty, queue_size=10)
+    stop_ba_pub = rospy.Publisher('/ba_stop', Empty, queue_size=10)
   # DH: turn on and off with publisehrs
   if 'DH' in control_sequence.values() or 'DH' in supervision_sequence.values():
     start_dh_pub = rospy.Publisher('/dh_start', Empty, queue_size=10)

@@ -86,12 +86,12 @@ def process_rgb_compressed(msg, index):
 def compressed_image_callback(msg):
   """If saving the compressed image worked out, write the log information and increment index."""
   global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate
-  if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
+  # if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
   rgb_cb_ts = time.time()
   if process_rgb_compressed(msg, index):
     if index > skip_first: write_info('RGB', index)
     index+=1
-    if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
+    # if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
     rgb_write_ts=time.time()
 
 def process_rgb(msg, index):
@@ -113,12 +113,12 @@ def image_callback(msg):
   """If saving the image worked out, write the log information and increment index."""
   global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate
   # print "[create_dataset]: {2} : received image. index: {0} skip_first: {1}".format(index, skip_first, rospy.get_time())
-  if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
+  # if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
   rgb_cb_ts = time.time()
   if process_rgb(msg, index):
     if index > skip_first: write_info('RGB', index)
     index+=1
-    if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
+    # if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
     rgb_write_ts=time.time()
 
 def process_depth(msg, index):

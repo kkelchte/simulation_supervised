@@ -40,6 +40,8 @@ log_folder = '/tmp/log'
 run_file = 'runs.png'
 data_location = None
 
+write_every = 10 #frames
+
 def transform(x,y):
   a,b,c,d=transformations[img_type]
   return (a*x+b, c*y+d)
@@ -76,14 +78,18 @@ def finished_cb(data):
     finished = True
     draw_positions(log_folder+'/'+run_file)
     if data_location: draw_positions(data_location+'/runs.png')
-    
-
 
 def gt_callback(data):
   global current_pos
   if not ready: return
-  current_pos.append(transform(data.pose.pose.position.x,data.pose.pose.position.y))
+  if len(current_pos) % write_every == 0:
+    (x,y)=transform(data.pose.pose.position.x,data.pose.pose.position.y)
+    current_pos.append((x,y))
+    with open(log_folder+'/pos.txt','a') as f: 
+      f.write("{0}, {1}\n".format(x,y))
+  
   # else: current_pos.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
+  if len(current_pos) > 10**4: current_pos.pop(0) #avoid memory leakage
 
 
 if __name__=="__main__":
