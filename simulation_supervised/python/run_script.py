@@ -111,9 +111,6 @@ def wait_for_ros_to_start():
     time.sleep(1)
     p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
 
-
-
-
 def kill_popen(process_name, process_popen):
   """Check status, terminate popen and wait for it to stop."""
   print("{0}: terminate {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), process_name))
@@ -171,6 +168,7 @@ parser.add_argument("-pp","--python_project",default='pilot/pilot', type=str, he
 # ==========================
 #   Environment Settings
 # ==========================
+parser.add_argument("--auto_go", action='store_true',help="Publish /go signal after few launching gazebo to start experiment automatically")
 parser.add_argument("--reuse_default_world", action='store_true',help="reuse the default forest/canyon/sandbox instead of generating them on the fly.")
 parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help="Define different worlds: corridor, canyon, forest, sandbox, esat_v1, esat_v2, ... .")
 parser.add_argument("-p","--paramfile",default='eva_params.yaml',type=str, help="Add more parameters to the command loading the DNN in tensorflow ex: eva_params.yaml or params.yaml.")
@@ -371,13 +369,6 @@ while run_number < FLAGS.number_of_runs:
                                                           world_name,
                                                           bcolors.OKBLUE,
                                                           bcolors.ENDC))
-
-  # in case of saving data, increment data location in ~/pilot_data
-  if FLAGS.create_dataset:
-    # remove if saving location already exists (probably due to crash previously)
-    if os.path.isdir("{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name)): shutil.rmtree("{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name))
-    command="{0} data_location:={1}/{2:05d}_{3} save_images:=true".format(command, FLAGS.data_location,run_number,world_name)
-
   # save current status of tensorflow log to compare afterwards
   if os.path.isfile(FLAGS.log_folder+'/tf_log'):
     prev_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
@@ -387,10 +378,12 @@ while run_number < FLAGS.number_of_runs:
     sys.exit(3)
 
   # generate world if it is possible and allowed, this also changes the loaded world file location from the default simsup_demo/worlds to log_folder
+  world_file=''
   if world_name in ['canyon', 'forest', 'sandbox'] and not FLAGS.reuse_default_world:
     generator_file="{0}/python/generators/{1}_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1],world_name)
     subprocess.Popen(shlex.split("python "+generator_file+" "+FLAGS.log_folder)).wait()
-    command="{0} background:={1} world_file:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world')
+    world_file=FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world'
+    command="{0} background:={1} world_file:={2}".format(command, world_file)
   elif world_name in ['canyon', 'corridor', 'different_corridor'] and FLAGS.reuse_default_world:
     # reuse default 10 evaluation canyons or corridors
     world_file='{0}/../simulation_supervised_demo/worlds/{2}_evaluation/{1:05d}_{2}.world'.format(simulation_supervised_dir,run_number%10, world_name)
@@ -404,9 +397,23 @@ while run_number < FLAGS.number_of_runs:
     generator_file="{0}/python/generators/world_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1])
     generator_command="python "+generator_file+" --output_dir "+FLAGS.log_folder+" --output_file "+world_name
     for p in others: generator_command="{0} {1}".format(generator_command, p)
-    subprocess.call(shlex.split(generator_command))
-    command="{0} world_file:={1} world_config:={2}".format(command, FLAGS.log_folder+'/'+world_name+'.world', FLAGS.log_folder+'/'+world_name+'.yaml')
+    return_val=subprocess.call(shlex.split(generator_command))
+    if return_val != 0:
+      kill_combo()
+      print("Failed to create env {0}, return value: {1}".format(world_name, return_val))
+      sys.exit(2)
+    world_file=FLAGS.log_folder+'/'+world_name+'.world'
+    command="{0} world_file:={1} world_config:={2}".format(command, world_file, FLAGS.log_folder+'/'+world_name+'.yaml')
   
+  # in case of saving data, increment data location in ~/pilot_data
+  if FLAGS.create_dataset:
+    # remove if saving location already exists (probably due to crash previously)
+    data_folder="{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name)
+    if os.path.isdir(data_folder): shutil.rmtree(data_folder)
+    os.makedirs(data_folder)
+    command="{0} data_location:={1} save_images:=true".format(command, data_folder)
+    if world_file != '': shutil.copyfile(world_file, data_folder+'/'+os.path.basename(world_file))
+
   # clean up gazebo ros folder every now and then
   if run_number%50 == 0 : shutil.rmtree("{0}/.gazebo/log".format(os.environ['HOME']),ignore_errors=True)
     
@@ -449,15 +456,12 @@ while run_number < FLAGS.number_of_runs:
     else:
       time_spend=time.time() - start_time
 
-    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
     # automatically start with /go after 10s
-    if 10.05 <= time_spend<10.15: 
-      go_popen=subprocess.Popen(shlex.split("rostopic pub /go std_msgs/Empty"))
-    elif 11.15 <= time_spend < 11.25 and go_popen.poll()==None:
-      kill_popen('go', go_popen)
-    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
-    # HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+    if FLAGS.auto_go:
+      if 10.05 <= time_spend<10.15: 
+        go_popen=subprocess.Popen(shlex.split("rostopic pub /go std_msgs/Empty"))
+      elif 11.15 <= time_spend < 11.25 and go_popen.poll()==None:
+        kill_popen('go', go_popen)
     
     if time_spend > 60*5 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
       print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))

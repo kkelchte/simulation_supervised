@@ -72,7 +72,7 @@
   </include>
    -->
   
-  <!-- <node name="behavior_arbitration" pkg="simulation_supervised_control" type="behavior_arbitration.py" output="screen"/> -->
+  <node name="behavior_arbitration" pkg="simulation_supervised_control" type="behavior_arbitration.py" output="screen"/>
   
   <!-- Console: simple (only overtake and go) -->
   <include file="$(find simulation_supervised_tools)/launch/joy_teleop.launch">

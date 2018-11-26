@@ -1,0 +1,26 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+radiator:
+  type: 'panel'
+  number: 35
+  type_specific:
+    height: 0.6
+    width: 1
+    thickness: 0.1
+    z_location: 0.1
+    offset: 0
+    texture: 'Gazebo/Black'
+human:
+  type: 'obstacle'
+  number: 15
+  type_specific:
+    dummy: ''
+    name: 'person_standing'
+    side_offset: 0.9
+floor:
+  type: 'floor'
+  type_specific:
+    name: 'floor'
+    texture: 'Gazebo/White'
+

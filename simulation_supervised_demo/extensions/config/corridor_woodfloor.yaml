@@ -1,0 +1,31 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+radiator:
+  type: 'panel'
+  number: 30
+  type_specific:
+    height: 0.6
+    width: 1
+    thickness: 0.1
+    z_location: 0.1
+    offset: 0
+    texture: 'Gazebo/Green'
+doorway:
+  type: 'passway'
+  number: 20
+  type_specific:
+    name: 'doorway'
+    offset: 1
+    texture: 'Gazebo/Blue'
+ceiling:
+  type: 'ceiling'
+  type_specific:
+    name: 'ceiling'
+    dummy: ''
+floor:
+  type: 'floor'
+  type_specific:
+    name: 'floor'
+    texture: 'Gazebo/Grey'
+

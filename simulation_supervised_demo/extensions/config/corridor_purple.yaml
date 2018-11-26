@@ -1,0 +1,38 @@
+#Offset is between -1:1
+#z-location is between 0:1
+---
+poster:
+  type: 'panel'
+  number: 40
+  type_specific:
+    height: 1
+    width: 0.7
+    thickness: 0.02
+    z_location: 0.8
+    offset: 0
+    wall: 'right'
+    texture: 'Gazebo/White'
+arc:
+  type: 'passway'
+  number: 20
+  type_specific:
+    name: 'arc'
+    offset: 1
+    texture: 'Gazebo/Black'
+pipes:
+  type: 'ceiling'
+  type_specific:
+    name: 'pipes'
+    dummy: ''
+bookshelf:
+  type: 'obstacle'
+  number: 30
+  type_specific:
+    dummy: ''
+    name: 'bookshelf'
+    side_offset: 0.9
+floor:
+  type: 'floor'
+  type_specific:
+    name: 'floor'
+    texture: 'Gazebo/White'
