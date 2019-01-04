@@ -382,8 +382,9 @@ while run_number < FLAGS.number_of_runs:
   if world_name in ['canyon', 'forest', 'sandbox'] and not FLAGS.reuse_default_world:
     generator_file="{0}/python/generators/{1}_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1],world_name)
     subprocess.Popen(shlex.split("python "+generator_file+" "+FLAGS.log_folder)).wait()
-    world_file=FLAGS.log_folder+'/'+world_name+'.png', FLAGS.log_folder+'/'+world_name+'.world'
-    command="{0} background:={1} world_file:={2}".format(command, world_file)
+    background=FLAGS.log_folder+'/'+world_name+'.png'
+    world_file=FLAGS.log_folder+'/'+world_name+'.world'
+    command="{0} world_file:={1} background:={2}".format(command, world_file, background)
   elif world_name in ['canyon', 'corridor', 'different_corridor'] and FLAGS.reuse_default_world:
     # reuse default 10 evaluation canyons or corridors
     world_file='{0}/../simulation_supervised_demo/worlds/{2}_evaluation/{1:05d}_{2}.world'.format(simulation_supervised_dir,run_number%10, world_name)
@@ -392,7 +393,6 @@ while run_number < FLAGS.number_of_runs:
     command="{0} background:={1}".format(command, world_image)
     if 'corridor' in world_name:
       command="{0} world_config:={1}/config/environment/{2:05d}_{3}.yaml".format(command, simulation_supervised_dir,run_number%10, world_name)
-
   elif world_name in ['corridor'] and not FLAGS.reuse_default_world:
     generator_file="{0}/python/generators/world_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1])
     generator_command="python "+generator_file+" --output_dir "+FLAGS.log_folder+" --output_file "+world_name
