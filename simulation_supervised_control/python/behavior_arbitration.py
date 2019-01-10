@@ -56,6 +56,9 @@ action_pub = None
 take_off_pub = None
 go_pub = None
 
+ready = False
+finished = False
+
 # Fields used for animating the control
 fig=plt.figure(figsize=(10,5))
 plt.title('Behavior_arbitration')
@@ -120,44 +123,35 @@ def gt_callback(data):
 def get_control():
   """Return control conform the current state."""
   control = Twist()
-  # adjust height in following states
-  if current_state in [1, 2, 3]:
-    control.linear.z = adjust_height
-  # do obstacle avoidance
-  if current_state == 3:
-    if adjust_yaw == 0:
-      control.linear.x = 1.3
-    else:
-      control.angular.z = adjust_yaw
+  if adjust_yaw == 0:
+    control.linear.x = 1.3
+  else:
+    control.angular.z = adjust_yaw
   return control
+
+def ready_callback(data):
+  """Start node 
+  """
+  global ready, finished
+  if not ready or finished:
+    print('BA activated.')
+    ready = True
+    finished = False
+
+def finished_callback(data):
+  """Put node in idle state 
+  """
+  global ready, finished
+  if ready or not finished:
+    print('BA deactivated.')
+    ready = False
+    finished = True
 
 def image_callback(data):
   """Use the frame rate of the images to update the states as well as send the correct control."""
   global current_state, counter
-  control = get_control()
-  if current_state == 0: # wait to start up => do nothing
-    action_pub.publish(control)
-    counter += 1
-    if counter > init_wait:
-      print("[behavior_arbitration]: {}: State set to 1".format(rospy.get_time()))
-      counter = 0
-      current_state = 1
-  elif current_state == 1: # take off by publishing take_off and adjust height
-    action_pub.publish(control)
-    take_off_pub.publish(Empty())
-    if adjust_height < 0 : # drone is at correct height so switch to state 2
-      print("[behavior_arbitration]: {}: State set to 2".format(rospy.get_time()))
-      current_state = 2
-  elif current_state == 2:
-    action_pub.publish(control)
-    go_pub.publish(Empty())
-    counter += 1
-    if counter > go_wait:
-      print("[behavior_arbitration]: {}: State set to 3".format(rospy.get_time()))
-      counter = 0
-      current_state = 3
-  elif current_state == 3:
-    action_pub.publish(control)
+  if not ready or finished: return
+  action_pub.publish(get_control())
 
 def scan_callback(data):
   """Callback of lidar scan.
@@ -195,21 +189,23 @@ if __name__=="__main__":
     rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback)
   else:
     raise IOError('[behavior_arbitration.py] did not find any depth image topic!')
+  
+
+  rospy.Subscriber('/ba_start', Empty, ready_callback)
+  rospy.Subscriber('/ba_stop', Empty, finished_callback)
+
+  rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback)
   if rospy.has_param('rgb_image'): 
-    rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback)
+      rospy.Subscriber(rospy.get_param('rgb_image'), Image, image_callback)
   else:
     raise IOError('[behavior_arbitration.py] did not find any rgb image topic!')
-  if rospy.has_param('gt_info'):
-    rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
-  
-  # extract initial height
-  if rospy.has_param('starting_height'): 
-    starting_height = rospy.get_param('starting_height')
+
+  # if rospy.has_param('gt_info'):
+  #   rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
   
   # make action publisher
   action_pub = rospy.Publisher('ba_vel', Twist, queue_size=1)
   take_off_pub = rospy.Publisher(rospy.get_param('takeoff'), Empty, queue_size=1)
-  go_pub = rospy.Publisher('/go', Empty, queue_size=1)
 
   # only display if depth heuristic is in control or supervision sequence
   control_sequence = {}
@@ -220,7 +216,7 @@ if __name__=="__main__":
     supervision_sequence=rospy.get_param('supervision_sequence')
   
   if rospy.has_param('graphics') and ('BA' in control_sequence.values() or 'BA' in supervision_sequence.values()):
-    if rospy.get_param('graphics'):
+    if rospy.get_param('graphics') and False:
       print("[depth_heuristic]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()

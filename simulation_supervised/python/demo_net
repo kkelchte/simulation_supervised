@@ -1,1 +1,0 @@
-python run_script.py -t test -pe virtualenv -m all_factors/mobile -w corridor --reuse_default_world -p eva_params.yaml -n 1 --robot drone_sim --fsm oracle_nn_drone_fsm -e -g

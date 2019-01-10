@@ -4,6 +4,10 @@
   <arg name="log_folder" default="tmp"/> <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
   <param name="log_folder" value="$(arg log_folder)"/>
   
+
+  <arg name="random_seed" default="1234"/> 
+  <param name="random_seed" value="$(arg random_seed)"/>
+
   <arg name="world_name" default="objects"/> <!-- worldname is used to load correct config, name logging and find modified logname -->
   <param name="world_name" value="$(arg world_name)"/>
   <arg name="world_file" default="$(find simulation_supervised_demo)/worlds/$(arg world_name).world"/> <!-- worldfile defines the actual gazebo world file loaded -->
@@ -11,7 +15,7 @@
   <arg name="world_config" default="$(find simulation_supervised)/config/environment/$(arg world_name).yaml"/> <!-- yaml with extra ros params to load -->
   
   <arg name="evaluate" default="false"/> <!-- this parameter is used by rosinterface to ensure the evaluation model is used -->
-  <param name="evaluate" value="$(arg evaluate)"/>
+  <param name="/evaluate" value="$(arg evaluate)"/>
   <arg name="graphics" default="false"/> 
   <param name="graphics" value="$(arg graphics)"/>
   
@@ -23,9 +27,6 @@
   <arg name="background" default=""/> <!-- used by create_dataset node to save all recorded data -->
   <param name="background" value="$(arg background)"/>
 
-  <arg name="starting_height" default="0"/>
-  <param name="starting_height" value="$(arg starting_height)"/>
-  
   <arg name="full" default="false"/>
   <group if="$(arg full)">
     <!-- Load parameters for turtlesim as a full demonstration-->
@@ -47,21 +48,30 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!--use line for spawning world from .dae mesh in gz model folder-->
     <arg name="world_name" value="$(arg world_file)"/>
-    <arg name="gui" value="false"/>
-    <!-- <arg name="gui" value="$(arg graphics)"/> -->
+    <!-- <arg name="gui" value="false"/> -->
+    <arg name="gui" value="$(arg graphics)"/>
     <arg name="headless" default="true"/>
+    <arg name="extra_gazebo_args" default="--seed $(arg random_seed)"/>
+    <!-- <arg name="paused" default="true"/>     -->
   </include>
 
   <!-- Spawn simulated quadrotor uav -->
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
+  <arg name="z" default="0.1"/>
   <arg name="Yspawned" default="1.57"/>
   <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
     <!-- Note: do not change quadrotor model with model argument as then pose estimation fails to start and /ground_truth/state will not be published on which fsm.py depends to start the simulation.-->
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
+    <arg name="z" value="$(arg z)"/>
     <arg name="Y" default="$(arg Yspawned)"/>
   </include>
+
+  <!-- UAV flies at a certain height -->
+  <arg name="starting_height" default="1"/>
+  <param name="starting_height" value="$(arg starting_height)"/>
+  
 
   <!-- start behavior arbitration -->
   <!-- <arg name="starting_height" default="0.5"/> -->
@@ -90,6 +100,6 @@
 
   <!-- Visualizations -->
   <!-- Show control -->
-  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
+  <!-- <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/> -->
 
 </launch>

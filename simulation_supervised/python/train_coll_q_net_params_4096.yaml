@@ -1,4 +1,0 @@
-network: coll_q_net
-epsilon: 0.5
-learning_rate: 0.01
-fc2_nodes: 4096

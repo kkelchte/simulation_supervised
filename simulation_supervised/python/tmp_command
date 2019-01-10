@@ -1,1 +1,0 @@
-for m in ds100_2 ds200_0 ds500_1 ds500_2 ds700_0 ds700_1 ds700_2 ds900_0 ds900_1 ds900_2; do echo "----------------------------$m"; python run_script.py -e -n 20 --reuse_default_world -p eva_params.yaml -m coll_q_net/$m -t coll_q_net/${m}_eva; sleep 120; done

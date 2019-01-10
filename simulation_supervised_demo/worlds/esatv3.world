@@ -35,7 +35,7 @@
     </spherical_coordinates>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>0 0 1.8 0 0.26 1.57</pose>
+        <pose>-30 -35 51.15 0 0.788 1.57</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
@@ -143,19 +143,6 @@
       <direction>0.5 0.1 -0.9</direction>
       <pose>-10 37 1.5 0 -0.5 0.8</pose>
     </light>
-    <light name='lightball3d' type='diffuse'>
-      <cast_shadows>1</cast_shadows>
-      <diffuse>0.8 0.8 0.8 1</diffuse>
-      <!-- <specular>0.2 0.2 0.2 1</specular> -->
-      <attenuation>
-        <range>1000</range>
-        <constant>0.3</constant>
-        <linear>0.1</linear>
-        <quadratic>0.001</quadratic>
-      </attenuation>
-      <direction>-0.5 0.1 1.7</direction>
-      <pose>-23 35 2 0.1 0.5 0</pose>
-    </light>
     <light name='lightball4' type='diffuse'>
       <cast_shadows>1</cast_shadows>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -167,7 +154,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-30 36 2 0 -0 0</pose>
+      <pose>-31 36 2 0 -0 0</pose>
     </light>
     <light name='lightball4a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -375,7 +362,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-34 -3.5 2 0 -0 0</pose>
+      <pose>-34 -3.6 2 0 -0 0</pose>
     </light>
     <light name='lightball8a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -388,7 +375,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-30 -3.5 2 0 -0 0</pose>
+      <pose>-30 -3.78 2 0 -0 0</pose>
     </light>
     <light name='lightball8b' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -401,7 +388,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-27 -3.5 2 0 -0 0</pose>
+      <pose>-27 -3.92 2 0 -0 0</pose>
     </light>
     <light name='lightball8c' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -414,7 +401,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-24 -3.5 2 0 -0 0</pose>
+      <pose>-24 -4.06 2 0 -0 0</pose>
     </light>
     <light name='lightball8d' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -427,7 +414,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-20 -3.5 2 0 -0 0</pose>
+      <pose>-20 -4.2 2 0 -0 0</pose>
     </light>
     <light name='lightball9a' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -440,7 +427,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-17 -3.5 2 0 -0 0</pose>
+      <pose>-17 -4.34 2 0 -0 0</pose>
     </light>
     <light name='lightball9b' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -453,7 +440,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-14 -3.5 2 0 -0 0</pose>
+      <pose>-14 -4.48 2 0 -0 0</pose>
     </light>
     <light name='lightball9c' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -466,7 +453,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-10 -3.5 2 0 -0 0</pose>
+      <pose>-10 -4.62 2 0 -0 0</pose>
     </light>
     <light name='lightball9d' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -479,7 +466,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-7 -3.5 2 0 -0 0</pose>
+      <pose>-7 -4.76 2 0 -0 0</pose>
     </light>
     <light name='lightball9e' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -492,7 +479,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-4 -3.5 2 0 -0 0</pose>
+      <pose>-4 -4.9 2 0 -0 0</pose>
     </light>
     <light name='lightball9f' type='diffuse'>
       <cast_shadows>1</cast_shadows>
@@ -505,7 +492,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <pose>-1 -3.5 2 0 -0 0</pose>
+      <pose>-1 -5.1 2 0 -0 0</pose>
     </light>
   </world>
 </sdf>

@@ -9,6 +9,15 @@ from sensor_msgs.msg import Image
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 
+# Used for changing pose of model in Gazebo
+from geometry_msgs.msg import Pose
+from gazebo_msgs.srv import SetModelState
+from gazebo_msgs.srv import SetModelStateRequest
+from gazebo_msgs.msg import ModelState
+from std_srvs.srv import Empty as Emptyservice
+from std_srvs.srv import EmptyRequest # for pausing and unpausing physics engine
+
+
 import numpy as np
 import subprocess,shlex
 
@@ -47,6 +56,9 @@ import cv2
 #
 #--------------------------------------------------------------------------------------------------------------
 
+model_state_gazebo_service=None
+pause_physics_client=None 
+
 # configuration variables
 state_sequence = None
 control_sequence = None
@@ -74,6 +86,10 @@ stop_nn_pub = None
 start_dh_pub = None
 stop_dh_pub = None
 
+# ba: depth heuristic (oracle for turtlebot)
+start_ba_pub = None
+stop_ba_pub = None
+
 # db: drive back
 start_db_pub = None
 
@@ -86,7 +102,6 @@ goal={}
 delay_evaluation = -1
 min_depth = -1
 world_name='unk'
-positions = []
 travelled_distance=0
 current_pos=[0,0] #! NOTE: assumption robots spawns at (0,0)
 log_folder='~/tensorflow/log/tmp'
@@ -99,18 +114,32 @@ run_number = 0 # in case a 3 or 2 fase fsm is running, this counter keeps track 
 evaluate_every=20
 data_location = ''
 shuttingdown = False
+model_name=''
 
+starting_height=-100
 
+def reset():
+  """Add entrance of idle state all field variables are reset
+  """
+  global start_time, current_pos, success, travelled_distance, starting_height
+  start_time=-1
+  current_pos=[0,0]
+  travelled_distance=0
+  success=None
+  if rospy.has_param('starting_height'):
+    starting_height=rospy.get_param('starting_height')
 
 def init():
   """Initialize state 0 which is IDLE or RUNNING depending on the number of states."""
   """When current time > start time  + delay evaluation, control nodes of state '0' should start as well as control mapping."""
   global current_state
+  reset()
   current_state = state_sequence[0]
   state_pub.publish(current_state)
   control_map_pub.publish(control_sequence['0']+"_"+supervision_sequence['0'])
 
   if "NN" in [control_sequence['0'], supervision_sequence['0']] and start_nn_pub: start_nn_pub.publish(Empty())
+  if "BA" in [control_sequence['0'], supervision_sequence['0']] and start_ba_pub: start_ba_pub.publish(Empty())
   if "DH" in [control_sequence['0'], supervision_sequence['0']] and start_dh_pub: start_dh_pub.publish(Empty())
   if "DB" in [control_sequence['0'], supervision_sequence['0']] and start_db_pub: start_db_pub.publish(Empty())
     
@@ -135,22 +164,23 @@ def update_data_location():
 def go_cb(data):
   """Callback on /go to change from 0 or 2 to 1 state"""
   global current_state, shuttingdown, run_number
-  if len(state_sequence) >= 2: #if there is only 1 state, the 'go' signal is not used
-    shuttingdown = False 
-    run_number+=1
-    current_state = state_sequence[1]
-    state_pub.publish(current_state)
-    control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
+  shuttingdown = False 
+  run_number+=1
+  current_state = state_sequence[1]
+  state_pub.publish(current_state)
+  control_map_pub.publish(control_sequence['1']+"_"+supervision_sequence['1'])
+  if len(state_sequence) > 2:
     if (run_number%evaluate_every)== 0:
       print("[fsm.py]: EVALUATE")
       rospy.set_param('evaluate',True)
     else:
       rospy.set_param('evaluate',False)
-    if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
-    if "DH" in [control_sequence['1'], supervision_sequence['1']] and start_dh_pub: start_dh_pub.publish(Empty())
-    if save_images and run_number > 1 and len(data_location) != 0: update_data_location() # increment data location 
-    if save_images and start_createds_pub: start_createds_pub.publish(Empty())
-    if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
+  if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
+  if "BA" in [control_sequence['1'], supervision_sequence['1']] and start_ba_pub: start_ba_pub.publish(Empty())
+  if "DH" in [control_sequence['1'], supervision_sequence['1']] and start_dh_pub: start_dh_pub.publish(Empty())
+  if save_images and run_number > 1 and len(data_location) != 0: update_data_location() # increment data location 
+  if save_images and start_createds_pub: start_createds_pub.publish(Empty())
+  if start_gt_listener_pub: start_gt_listener_pub.publish(Empty())
   print("[fsm.py]:{0}: current state: {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),current_state))
 
 def overtake_cb(data):
@@ -164,24 +194,27 @@ def overtake_cb(data):
 
   init()
   
-  
-def shutdown():
-  global shuttingdown, current_state
+def shutdown(message):
+  global shuttingdown, current_state, start_time
   """Shutdown is called from any evaluation method, bringing the fsm potentially in state 2.
   It first writes log information away and shut the process down unless it is a three-state fsm."""
   shuttingdown = True # used to pause other callback functions
 
+  # Pause simulator not to cause any strange flying away.
+  pause_physics_client(EmptyRequest())
+
+
   # Warn other process transition from state 0 or 1 to shutdown or state 2
-  finished_pub.publish(Empty()) # DEPRECATED
+  # finished_pub.publish(Empty()) # DEPRECATED
   
   # Pause the saving of images.
-  if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())
+  if save_images and stop_createds_pub: stop_createds_pub.publish(Empty())  
   
   # Create a new image with the trajectory
   if stop_gt_listener_pub: stop_gt_listener_pub.publish(Empty())
 
-
   if stop_nn_pub: stop_nn_pub.publish(Empty())
+  if stop_ba_pub: stop_ba_pub.publish(Empty())
   if stop_dh_pub: stop_dh_pub.publish(Empty())
 
   # Go to state 2
@@ -191,24 +224,31 @@ def shutdown():
     current_state = state_sequence[2]
     state_pub.publish(current_state)
     print("[fsm.py]:{0}: current state: {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),current_state))
+  else:
+    init()
 
 
-
+  
   # Log away
-  write(log_folder+'/log', '{0} \n'.format('success' if success else 'bump'))
-  write(log_folder+'/log_named', '{0} {1} \n'.format('success' if success else 'bump', world_name))
+  # write(log_folder+'/log', '{0} \n'.format('success' if success else 'bump'))
+  # write(log_folder+'/log_named', '{0} {1} \n'.format('success' if success else 'bump', world_name))
+  
   # msg = ""
   # for pos in positions: msg = msg + '{0} {1} {2}\n'.format(pos[0],pos[1],pos[2])
   # write(log_folder+'/log_positions',msg)
 
   # Kill simulator from pidfile in log folder.
-  pidfile=log_folder+'/.pid'
-  if os.path.isfile(pidfile) and len(state_sequence) <= 2:
-    with open(pidfile, 'r') as pf:
-      pid=pf.read()
-    print("[fsm.py]: killing pid {}".format(pid))
-    time.sleep(3) #changed from 1
-    subprocess.Popen(shlex.split("kill "+pid)).wait()
+  # pidfile=log_folder+'/.pid'
+  # if os.path.isfile(pidfile) and len(state_sequence) <= 2:
+  #   with open(pidfile, 'r') as pf:
+  #     pid=pf.read()
+  #   print("[fsm.py]: killing pid {}".format(pid))
+  #   time.sleep(3) #changed from 1
+  #   subprocess.Popen(shlex.split("kill "+pid)).wait()
+
+  # End run by writing to log file
+  write(log_folder+'/fsm_log','{0} \n'.format(message))
+  shuttingdown = False
 
 def time_check():
   """Keep track of the time. If the duration is longer than max_duration shutdown with succes."""
@@ -216,7 +256,7 @@ def time_check():
   if (int(rospy.get_time()-start_time)) > (max_duration+delay_evaluation) and not shuttingdown:
     print('[fsm.py]:{2}: current time {0} > max_duration {1}----------success!'.format(int(rospy.get_time()-start_time),(max_duration+delay_evaluation),time.strftime("%Y-%m-%d_%I:%M:%S")))
     success=True
-    shutdown()
+    shutdown('success')
       
 def depth_cb(msg):
   """Read in depth image from kinect and check the minimum value to detect a bump used by the drone."""
@@ -231,7 +271,7 @@ def depth_cb(msg):
     if min_depth != -1 and np.nanmin(de) < min_depth and not shuttingdown and current_state != 'idle':
       print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
       success=False
-      shutdown()
+      shutdown('bump')
       # in case of the drone < kinect readings there is never the situation that you go to state 2 after a bump
 
 def scan_cb(data):
@@ -247,33 +287,44 @@ def scan_cb(data):
   if min_depth != -1 and min(ranges) < min_depth and not shuttingdown and current_state != 'idle':
     print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
     success=False
-    shutdown()
+    shutdown('BUMP DEPTH')
 
 def gt_cb(data):
   """Check the traveled distance over the maximum travelled distance before shutdown and keep track of positions for logging.
   This callback has also the special function to start the clock (start_time) of this node and in the same way initialize the controlmapping for the first time. 
   If the gt_cb is not used, the other callbacks will never start as they can't check there delay evaluation."""
-  global current_pos, success, positions, start_time, current_state, travelled_distance
-  if start_time == -1: start_time=rospy.get_time()
-  if rospy.get_time() > start_time+delay_evaluation and current_state == None: init()
+  global current_pos, success, start_time, current_state, travelled_distance
+  if shuttingdown: return
+  if start_time == -1: 
+    start_time=rospy.get_time()
+  
+  # if rospy.get_time() > start_time+delay_evaluation and current_state == None: init()
+
   if max_duration != -1: time_check()
-  travelled_distance+=np.sqrt((current_pos[0]-data.pose.pose.position.x)**2+(current_pos[1]-data.pose.pose.position.y)**2)
+  
+  if current_pos != [0,0]:
+    travelled_distance+=np.sqrt((current_pos[0]-data.pose.pose.position.x)**2+(current_pos[1]-data.pose.pose.position.y)**2)
+  
   # print('[fsm.py]: {0}: travelled: {1} <--> pos: {2}  =: {3}.'.format(rospy.get_time(), travelled_distance, np.sqrt(data.pose.pose.position.x**2+data.pose.pose.position.y**2), np.abs(np.sqrt(data.pose.pose.position.x**2+data.pose.pose.position.y**2)-travelled_distance)))
   current_pos=[data.pose.pose.position.x,
               data.pose.pose.position.y,
               data.pose.pose.position.z]
-  # positions.append(current_pos)
+  
+  if rospy.get_time() > start_time+delay_evaluation and current_state == 'idle' and current_pos[2] >= starting_height-0.1: 
+    # print("Go")
+    go_cb('')
+
   if max_distance != -1 and (current_pos[0]**2+current_pos[1]**2) > max_distance**2 and not shuttingdown:
   # if max_distance != -1 and travelled_distance > max_distance and not shuttingdown:
     print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, np.sqrt((current_pos[0]**2+current_pos[1]**2)), max_distance))
     # print('[fsm.py]: {0}: travelled distance ({2}) > max distance ({3})-----------success after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, travelled_distance, max_distance))
     success = True
-    shutdown()
+    shutdown('success')
 
   if goal and goal["goal_min_x"] < data.pose.pose.position.x < goal["goal_max_x"] and goal["goal_min_y"] < data.pose.pose.position.y < goal["goal_max_y"] and not shuttingdown:
     print('[fsm.py]: {0}: ({1:0.3f},{2:0.3f}) reached goal tile ({3}) -----------success after {4}s'.format(rospy.get_time(), data.pose.pose.position.x, data.pose.pose.position.y, goal, rospy.get_time()-start_time))
     success = True
-    shutdown()
+    shutdown('success')
 
 def wrench_cb(data):
   """
@@ -285,7 +336,7 @@ def wrench_cb(data):
   if data.wrench.force.z < 1:
     print('[fsm.py]: {0}: {2} drag force detected after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time, data.wrench.force.z))
     success = False
-    shutdown()
+    shutdown('BUMP UPSIDEDOWN')
 
 def write(filename, message):
   """Write some message to some file with error."""
@@ -318,6 +369,10 @@ if __name__=="__main__":
   print("[fsm.py]: supervisions: {}".format(supervision_sequence))
   print("[fsm.py]: saving images: {}".format(save_images))
 
+  # model_state_gazebo_service=rospy.ServiceProxy('/gazebo/set_model_state',SetModelState)
+  pause_physics_client=rospy.ServiceProxy('/gazebo/pause_physics',Emptyservice)
+
+
   # get goal location if params are specified:
   for p in ["goal_max_x","goal_min_x","goal_max_y","goal_min_y"]:
     if rospy.has_param(p):
@@ -337,7 +392,7 @@ if __name__=="__main__":
   control_map_pub = rospy.Publisher('control_config', String, queue_size=10)
   # publish when episode is finished and everything is shutting down (although this value topic is DEPRECATED)
   finished_pub = rospy.Publisher('/finished', Empty, queue_size=10)
-    
+  
   # initialize subscribers & publishers according to all potential controllers
   # add topic publishers/subscribers specific for control modules
   if 'CON' in control_sequence.values():
@@ -391,6 +446,11 @@ if __name__=="__main__":
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_cb)
   if rospy.has_param('evaluate_every'):
     evaluate_every=rospy.get_param('evaluate_every')
+  if rospy.has_param('model_name'):
+    model_name=rospy.get_param('model_name')
+  if rospy.has_param('starting_height'):
+    starting_height=rospy.get_param('starting_height')
+  
   # used to detect whether motors are still running as they shutdown on flipover.
   rospy.Subscriber("/command/wrench", WrenchStamped, wrench_cb)
 
@@ -417,6 +477,8 @@ if __name__=="__main__":
   time.sleep(1)
   init() 
   
+  # if not rospy.has_param('gazebo/time_step'): shutdown('CRASH')
+
   # spin() simply keeps python from exiting until this node is stopped  
   rospy.spin()
 

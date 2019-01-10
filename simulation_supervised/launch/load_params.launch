@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <launch>
- 	<!-- Load the correct topics names dependent on the robot -->
+  <arg name="random_seed" default="1234"/>
+  <param name="random_seed" value="$(arg random_seed)"/>
+  <!-- Load the correct topics names dependent on the robot -->
  	<!-- {drone/turtle}_{real/sim}.yaml -->
 	<arg name="robot_config" default="turtle_sim.yaml"/>
 	<rosparam command="load" file="$(find simulation_supervised)/config/robot/$(arg robot_config)" />  
   <!-- Control Mapping -->
   <node name="control_mapping" pkg="simulation_supervised_tools" type="control_mapping.py" output="screen"/>
+  <!-- Environment config -->
+  <arg name="world_config" default="$(find simulation_supervised)/config/environment/default.yaml"/> <!-- yaml with extra ros params to load -->
+  <rosparam command="load" file="$(arg world_config)"/> 
 </launch>

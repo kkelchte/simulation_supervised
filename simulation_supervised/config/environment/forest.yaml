@@ -1,4 +1,4 @@
-delay_evaluation: 1
+delay_evaluation: 3
 #max_duration: 150
 min_depth: 0.2
 starting_height: 1

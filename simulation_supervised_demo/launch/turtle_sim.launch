@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Define parameters from arguments -->
-
   <!-- logfolder defines where .pid file is saved for fsm to kill in ~/tensorflow/log-->
   <arg name="log_folder" default="tmp"/> 
   <param name="log_folder" value="$(arg log_folder)"/>

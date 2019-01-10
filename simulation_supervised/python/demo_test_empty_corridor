@@ -1,1 +1,0 @@
-python run_script.py -p params.yaml -n 1 --fsm oracle_drone_fsm --corridor_length 1 --corridor_type empty --extension_config poster_left -pe virtualenv --evaluation -ds -t test_empty --robot drone_sim -w corridor --x_pos -0.5 --y_pos +0.5 --yaw_or 2 -g

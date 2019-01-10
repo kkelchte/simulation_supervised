@@ -1,3 +1,4 @@
+model_name: turtlebot3_burger
 control: /cmd_vel
 rgb_image: /wa/camera/image_raw
 depth_image: /scan
