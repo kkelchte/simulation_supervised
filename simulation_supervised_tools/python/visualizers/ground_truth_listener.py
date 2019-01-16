@@ -24,7 +24,7 @@ img_type = "unknown"
 current_pos = []
 ready = False
 finished = True
-transformations={'unknown':(10,200,-10,200),
+transformations={'unknown':(2,1,-2,1),
     'corridor':(5,300,-5,400),
     'different_corridor':(5,300,-5,400),
     'forest':(6.5, 438.0, -6.6, 418.0),
@@ -32,6 +32,7 @@ transformations={'unknown':(10,200,-10,200),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
     'esatv1':(16.947783251231524, 63.724137931034484, -16.548448275862071, 590.18620689655177),
     'esatv2':(17.22058089465456, 1065.4257425742574, -17.138477795147935, 843.90099009900985),
+    'esatv3':(2,1,-2,1),
     'forest_real':(17.2170726,785,-17.07010944,487)}
     # 'canyon':(15.5, 424.0, -10.6, 809),
     # 'esat_v2':(16.321360645256139, 1006.9433962264151, -16.180586914582452, 789.40251572327043)}
@@ -39,8 +40,6 @@ transformations={'unknown':(10,200,-10,200),
 log_folder = '/tmp/log'
 run_file = 'runs.png'
 data_location = None
-
-write_every = 10 #frames
 
 def transform(x,y):
   a,b,c,d=transformations[img_type]
@@ -52,6 +51,7 @@ def draw_positions(file_name):
   # for pos in current_pos:
   #   f.write('{0}\n'.format(str(pos)))
   # f.close()
+  print(len(current_pos))
   fig = plt.figure(figsize=(10, 10))
   imgplot = plt.imshow(img)
   x = [p[0] for p in current_pos]
@@ -67,7 +67,7 @@ def ready_cb(data):
   if not ready: 
     ready = True
     finished = False
-    run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f ]), img_type)
+    run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f and f.endswith('.png') ]), img_type)
     current_pos = []
     # img = np.zeros(size)
 
@@ -82,11 +82,11 @@ def finished_cb(data):
 def gt_callback(data):
   global current_pos
   if not ready: return
-  if len(current_pos) % write_every == 0:
-    (x,y)=transform(data.pose.pose.position.x,data.pose.pose.position.y)
-    current_pos.append((x,y))
-    with open(log_folder+'/pos.txt','a') as f: 
-      f.write("{0}, {1}\n".format(x,y))
+  (x,y)=transform(data.pose.pose.position.x,data.pose.pose.position.y)
+  current_pos.append((x,y))
+  # with open(log_folder+'/pos.txt','a') as f: 
+  with open(log_folder+'/'+run_file.replace('png','txt'),'a') as f: 
+    f.write("{0}, {1}\n".format(x,y))
   
   # else: current_pos.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
   if len(current_pos) > 10**4: current_pos.pop(0) #avoid memory leakage

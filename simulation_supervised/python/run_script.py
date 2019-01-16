@@ -155,7 +155,7 @@ parser.add_argument("--data_location", default='', type=str, help="Datalocation 
 parser.add_argument("-n", "--number_of_runs", default=-1, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated. n=1 avoids a hard stop after 5minutes.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
-parser.add_argument("--evaluate_every", default=100, type=int, help="Evaluate every N runs when training.")
+parser.add_argument("--evaluate_every", default=20, type=int, help="Evaluate every N runs when training.")
 parser.add_argument("-ds", "--create_dataset", action='store_true',help="In case of True, sensor data is saved.")
 parser.add_argument("--owr", action='store_true',help="Delete dataset if it is already there.")
 
@@ -337,12 +337,19 @@ def start_python():
   # Wait for creation of tensorflow log file to know the python node is running
   start_time = time.time()
 
-  while(not os.path.isfile(FLAGS.log_folder+'/tf_log')):
-    time.sleep(1)
-    if time.time()-start_time > 5*60:
-      print("{0}: Waited for 5minutes on tf_log in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder))
-      kill_combo()
-      sys.exit(2)
+  if os.path.isfile(FLAGS.log_folder+'/nn_ready'):
+    prev_stat_nn_ready=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
+    while prev_stat_nn_ready == subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready')):
+      if time.time()-start_time > 5*60:
+        print("{0}: Waited for 5minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder))
+      time.sleep(1)
+  else:
+    while(not os.path.isfile(FLAGS.log_folder+'/nn_ready')):
+      time.sleep(1)
+      if time.time()-start_time > 5*60:
+        print("{0}: Waited for 5minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder))
+        kill_combo()
+        sys.exit(2)
 
 start_python()
 
@@ -430,18 +437,16 @@ if not os.path.isfile(fsm_file):
     f.write('{0}: {1}\n'.format(time.strftime("%Y-%m-%d_%I-%M-%S"), FLAGS.log_folder))
 
 
+crashed=False 
 while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
   
   ######################################
   # 4.1 Prepare Run
   world_name = FLAGS.worlds[run_number%len(FLAGS.worlds)]
 
-  # on this moment the run is not crashed (yet).
-  crashed=False 
-
-  # save current status of NN tf_log to compare afterwards
-  if os.path.isfile(FLAGS.log_folder+'/tf_log'):
-    prev_stat_nn_log=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
+  # save current status of NN nn_ready to compare afterwards
+  if os.path.isfile(FLAGS.log_folder+'/nn_ready'):
+    prev_stat_nn_log=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
   else: # we have last communication with our log folder so exit with code 2
     print("{2}: lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
     kill_combo()
@@ -474,7 +479,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
   else:
     starting_positions = []
 
-  if new_environment_arguments == prev_environment_arguments or len(new_environment_arguments) == 0:
+  if (new_environment_arguments == prev_environment_arguments or len(new_environment_arguments) == 0) and not crashed:
     # 4.2.1 Reset environment for next run if possible
     # 4.2.1a Ensure correct settings
     # if ((run_number%FLAGS.evaluate_every) == 1 and run_number != 1) or FLAGS.evaluation: 
@@ -531,6 +536,9 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
 
   ######################################
   # 4.3 Wait for run to finish
+  # on this moment the run is not crashed (yet).
+  crashed=False 
+
   prev_stat_fsm_log=subprocess.check_output(shlex.split("stat -c %Y "+fsm_file))
   time.sleep(0.1)
   print("\n{0}: started run {1} of the {2} in {4} {3} {5}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
@@ -560,8 +568,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       elif 11.15 <= time_spend < 11.25 and go_popen.poll()==None:
         kill_popen('go', go_popen)
     
-    if time_spend > 60*5 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
-      print("{0}: running more than 5minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+    if time_spend > 60*10 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
+      print("{0}: running more than 10minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       crashed=True
       crash_number+=1
       if crash_number < 10: #after 20 crashes its maybe time to restart everything
@@ -579,16 +587,16 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
   # 4.4 Clean up run
   # 4.4.1 Wait for NN framework if it is running
   if not crashed and 'nn' in FLAGS.fsm:
-    # wait for tf_log and stop in case of no tensorflow communication
-    if os.path.isfile(FLAGS.log_folder+'/tf_log'):
-      current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
+    # wait for nn_ready and stop in case of no tensorflow communication
+    if os.path.isfile(FLAGS.log_folder+'/nn_ready'):
+      current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
       start_time=time.time()
-      print("{0}: waiting for tf_log.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+      print("{0}: waiting for nn_ready.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       while current_stat == prev_stat_nn_log:
-        current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/tf_log'))
+        current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
         time.sleep(1)
         if time.time()-start_time > 8*60:
-          print("{0}: waited for 8minutes on tf_log to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
+          print("{0}: waited for 8minutes on nn_ready to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
           kill_combo()
           sys.exit(2)
     else:
@@ -601,7 +609,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     # increment also in case of crash as drone has zero turning speed:
     run_number+=1
     if message == 'FINISHED': # make this the final run for evaluation
-      FLAGS.number_of_runs=run_number+1
+      FLAGS.number_of_runs=run_number+5
+      FLAGS.evaluation=True
       # run_number = FLAGS.number_of_runs-1
   time.sleep(2)
 

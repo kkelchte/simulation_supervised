@@ -203,6 +203,9 @@ def shutdown(message):
   # Pause simulator not to cause any strange flying away.
   pause_physics_client(EmptyRequest())
 
+  # End run by writing to log file
+  print("[fsm]:{0}: {1} ".format(time.strftime("%Y-%m-%d_%I:%M:%S"), message))
+  write(log_folder+'/fsm_log','{0} \n'.format(message))
 
   # Warn other process transition from state 0 or 1 to shutdown or state 2
   # finished_pub.publish(Empty()) # DEPRECATED
@@ -227,33 +230,15 @@ def shutdown(message):
   else:
     init()
 
-
-  
-  # Log away
-  # write(log_folder+'/log', '{0} \n'.format('success' if success else 'bump'))
-  # write(log_folder+'/log_named', '{0} {1} \n'.format('success' if success else 'bump', world_name))
-  
-  # msg = ""
-  # for pos in positions: msg = msg + '{0} {1} {2}\n'.format(pos[0],pos[1],pos[2])
-  # write(log_folder+'/log_positions',msg)
-
-  # Kill simulator from pidfile in log folder.
-  # pidfile=log_folder+'/.pid'
-  # if os.path.isfile(pidfile) and len(state_sequence) <= 2:
-  #   with open(pidfile, 'r') as pf:
-  #     pid=pf.read()
-  #   print("[fsm.py]: killing pid {}".format(pid))
-  #   time.sleep(3) #changed from 1
-  #   subprocess.Popen(shlex.split("kill "+pid)).wait()
-
-  # End run by writing to log file
-  write(log_folder+'/fsm_log','{0} \n'.format(message))
   shuttingdown = False
+
 
 def time_check():
   """Keep track of the time. If the duration is longer than max_duration shutdown with succes."""
   global start_time, success
-  if (int(rospy.get_time()-start_time)) > (max_duration+delay_evaluation) and not shuttingdown:
+  # if int(rospy.get_time())%60 == 0:
+  #   print("[fsm]: current time {0} from start_time {1} vs max_duration {2} plus delay_evaluation {3}".format(rospy.get_time(),start_time,max_duration,delay_evaluation))
+  if start_time != -1 and (int(rospy.get_time()-start_time)) > (max_duration+delay_evaluation) and not shuttingdown:
     print('[fsm.py]:{2}: current time {0} > max_duration {1}----------success!'.format(int(rospy.get_time()-start_time),(max_duration+delay_evaluation),time.strftime("%Y-%m-%d_%I:%M:%S")))
     success=True
     shutdown('success')
@@ -271,7 +256,7 @@ def depth_cb(msg):
     if min_depth != -1 and np.nanmin(de) < min_depth and not shuttingdown and current_state != 'idle':
       print('[fsm.py]: {0}: bump after {1}s'.format(rospy.get_time(), rospy.get_time()-start_time))
       success=False
-      shutdown('bump')
+      shutdown('BUMP DEPTH')
       # in case of the drone < kinect readings there is never the situation that you go to state 2 after a bump
 
 def scan_cb(data):
@@ -296,12 +281,10 @@ def gt_cb(data):
   global current_pos, success, start_time, current_state, travelled_distance
   if shuttingdown: return
   if start_time == -1: 
+    print("fsm: set start time to: {0}".format(rospy.get_time()))
     start_time=rospy.get_time()
   
   # if rospy.get_time() > start_time+delay_evaluation and current_state == None: init()
-
-  if max_duration != -1: time_check()
-  
   if current_pos != [0,0]:
     travelled_distance+=np.sqrt((current_pos[0]-data.pose.pose.position.x)**2+(current_pos[1]-data.pose.pose.position.y)**2)
   
@@ -480,5 +463,10 @@ if __name__=="__main__":
   # if not rospy.has_param('gazebo/time_step'): shutdown('CRASH')
 
   # spin() simply keeps python from exiting until this node is stopped  
-  rospy.spin()
+  # rospy.spin()
 
+  rate = rospy.Rate(100)  
+  while not rospy.is_shutdown():
+    if max_duration != -1: 
+      time_check()
+    rate.sleep()

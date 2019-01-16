@@ -211,13 +211,13 @@ if __name__=="__main__":
   # subscribe to the clock of gazebo if gazebo is running
   # else initialize clock of python time
   # if rospy.has_param('gazebo/time_step'): # could be that gazebo is starting up slowly...
-  # clk_sub = rospy.Subscriber('clock', Clock, clock_cb)
+  clk_sub = rospy.Subscriber('clock', Clock, clock_cb)
 
   # rospy.spin()
   # Ensure node is spinning fast enough, reducing delays between time updates
   rate = rospy.Rate(100)  
   while not rospy.is_shutdown():
-    current_time = rospy.get_time()  
+    # current_time = rospy.get_time()  
     # check how long last control is already send
     # in case it is longer than maximum time
     if (current_time - control_time) > max_time:
