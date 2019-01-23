@@ -155,7 +155,7 @@ parser.add_argument("--data_location", default='', type=str, help="Datalocation 
 parser.add_argument("-n", "--number_of_runs", default=-1, type=int, help="NUMBER_OF_RUNS: define the number of runs the robot will be trained/evaluated. n=1 avoids a hard stop after 5minutes.")
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
-parser.add_argument("--evaluate_every", default=20, type=int, help="Evaluate every N runs when training.")
+parser.add_argument("--evaluate_every", default=10, type=int, help="Evaluate every N runs when training.")
 parser.add_argument("-ds", "--create_dataset", action='store_true',help="In case of True, sensor data is saved.")
 parser.add_argument("--owr", action='store_true',help="Delete dataset if it is already there.")
 
@@ -191,10 +191,12 @@ parser.add_argument("--y_var",default=0,type=float, help="Specify variation in y
 parser.add_argument("--z_pos",default=0,type=float, help="Specify z position.")
 parser.add_argument("--z_var",default=0,type=float, help="Specify variation z position.")
 parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orientation.")
-parser.add_argument("--yaw_var",default=2*3.14,type=float, help="Specify variation in yaw orientation.")
+# parser.add_argument("--yaw_var",default=2*3.14,type=float, help="Specify variation in yaw orientation.")
+parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
 
 FLAGS, others = parser.parse_known_args()
 # FLAGS=parser.parse_args()
+
 
 # get simulation_supervised dir
 simulation_supervised_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised"))[:-1]
@@ -269,7 +271,7 @@ if FLAGS.create_dataset:
 
 # display and save all settings
 print("\nSettings:")
-for f in FLAGS.__dict__: print("{0}: {1}".format( f, FLAGS.__dict__[f]))
+for f in sorted(FLAGS.__dict__): print("{0}: {1}".format( f, FLAGS.__dict__[f]))
 
 with open("{0}{1}/run_conf".format(FLAGS.summary_dir, FLAGS.log_tag),'w') as c:
   c.write("Settings of Run_simulation_scripts:\n\n")
@@ -364,7 +366,6 @@ def create_environment(run_number, world_name):
   world_file=''
   world_config=''
   background=''
-
   # don't create a new world if one_world is on
   if FLAGS.one_world and run_number > 0: return ''
   
@@ -389,8 +390,8 @@ def create_environment(run_number, world_name):
       print("Failed to create env {0}, return value: {1}".format(world_name, return_val))
       sys.exit(2)
     world_file=FLAGS.log_folder+'/'+world_name+'.world'
-    world_config=FLAGS.log_folder+'/'+world_name+'.yaml'
-  
+    world_config=FLAGS.log_folder+'/'+world_name+'.yaml'  
+
   arguments='world_name:='+world_name
   for arg in ["world_file", "world_config", "background"]:
     if len(eval(arg)) != 0:  arguments=arguments+" "+arg+":="+eval(arg)
@@ -452,37 +453,29 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     kill_combo()
     sys.exit(3)
 
-  # in case of saving data, increment data location in ~/pilot_data
-  if FLAGS.create_dataset:
-    # remove if saving location already exists (probably due to crash previously)
-    data_folder="{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name)
-    if os.path.isdir(data_folder): shutil.rmtree(data_folder)
-    os.makedirs(data_folder)
-    command="{0} data_location:={1} save_images:=true".format(command, data_folder)
-    if world_file != '': shutil.copyfile(world_file, data_folder+'/'+os.path.basename(world_file))
-
   # clean up gazebo ros folder every now and then
   if run_number%50 == 0 : shutil.rmtree("{0}/.gazebo/log".format(os.environ['HOME']),ignore_errors=True)
   
-  evaluate=(((run_number%FLAGS.evaluate_every) == 1 and run_number != 1) or run_number==FLAGS.number_of_runs-1) or FLAGS.evaluation
+  evaluate=(((run_number%FLAGS.evaluate_every) == 0 and run_number != 0 and FLAGS.evaluate_every != -1) or run_number==FLAGS.number_of_runs-1) or FLAGS.evaluation
+  
+  # if evaluate:
+  #   rospy.set_param('max_duration', 120)
+  # else:
+  #   rospy.set_param('max_duration', 5)
+
+  new_environment_arguments=create_environment(run_number, world_name)
   
   ######################################
   # 4.2 Create environment and perform next run
-  new_environment_arguments=create_environment(run_number, world_name)
 
-  # if "world_config" in new_environment_arguments: 
-  #   rosparam load starting_positions
-  # el
   if rospy.has_param('/starting_positions'):
     starting_positions = rospy.get_param('starting_positions')
-    # print("[run_script] found {0} positions".format(len(starting_positions)))
   else:
     starting_positions = []
 
-  if (new_environment_arguments == prev_environment_arguments or len(new_environment_arguments) == 0) and not crashed:
+  if (new_environment_arguments == prev_environment_arguments or len(new_environment_arguments) == 0) and not crashed and gazebo_popen != None:
     # 4.2.1 Reset environment for next run if possible
     # 4.2.1a Ensure correct settings
-    # if ((run_number%FLAGS.evaluate_every) == 1 and run_number != 1) or FLAGS.evaluation: 
     rospy.set_param('/evaluate',evaluate)
     
     # 4.2.1b Reset environment ==> causes gt_node to freeze for more than a minute...
@@ -491,6 +484,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     # 4.2.1c Change position of drone according to new selected starting position
     pose=Pose()
     pose.position.x, pose.position.y, starting_height, yaw = sample_new_position(starting_positions)
+    # pose.position.x, pose.position.y, starting_height, yaw=0,0,1,0
+    
     print("[run_script]: x: {0}, y: {1}, z: {2}, yaw:{3}".format(pose.position.x, pose.position.y, starting_height, yaw))
     # some yaw to quaternion re-orientation code:
     pose.orientation.z=np.sin(yaw)
@@ -505,7 +500,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     rospy.set_param('starting_height', starting_height)
     
     print("Changed pose with return values: {0}".format(retvals))
-    time.sleep(2)
+    time.sleep(1) #CHANGED
     unpause_physics_client(EmptyRequest())
 
   else:
@@ -515,9 +510,24 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       kill_popen('gazebo', gazebo_popen)
       wait_for_gazebo()
 
-    # 4.2.2b Build command with correct settings
-    x,y,z,yaw=sample_new_position(starting_positions)
     prev_environment_arguments = new_environment_arguments
+    
+    # 4.2.2b Build command with correct settings
+    # remove if saving location already exists (probably due to crash previously)
+    if FLAGS.create_dataset:
+      data_location="{0}/{1:05d}_{2}".format(FLAGS.data_location,run_number,world_name)
+      if os.path.isdir(data_location): shutil.rmtree(data_location)
+      os.makedirs(data_location)
+      new_environment_arguments+=" save_images:=true"
+      new_environment_arguments+=" data_location:={0}".format(data_location)
+      if 'world_file' in new_environment_arguments:
+        world_file=[a for a in new_environment_arguments.split(' ') if 'world_file' in a][0].split(':=')[1]
+        print("[runscript] world_file ",world_file)
+        shutil.copyfile(world_file, data_location+'/'+os.path.basename(world_file))
+
+    x,y,z,yaw=sample_new_position(starting_positions)
+    # x,y,z,yaw=-54, -4, 1, -3.14
+
     command="roslaunch simulation_supervised_demo {0}.launch fsm_config:={1} log_folder:={2} evaluate:={3} {4} graphics:={5} x:={6} y:={7} Yspawned:={9} starting_height:={8} {10}".format(FLAGS.robot,
             FLAGS.fsm,
             FLAGS.log_folder,
@@ -534,10 +544,16 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     gazebo_popen = subprocess.Popen(args)
     pid_gazebo = gazebo_popen.pid
 
+
   ######################################
   # 4.3 Wait for run to finish
   # on this moment the run is not crashed (yet).
   crashed=False 
+  crash_checked=False
+  
+  #print starting positions for visualizing later.
+  with open(FLAGS.log_folder+'/starting_positions.txt','a') as f:
+    f.write('{0}, {1}, {2}\n'.format(x,y,yaw))
 
   prev_stat_fsm_log=subprocess.check_output(shlex.split("stat -c %Y "+fsm_file))
   time.sleep(0.1)
@@ -568,19 +584,27 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       elif 11.15 <= time_spend < 11.25 and go_popen.poll()==None:
         kill_popen('go', go_popen)
     
-    if time_spend > 60*10 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
-      print("{0}: running more than 10minutes so crash.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-      crashed=True
-      crash_number+=1
-      if crash_number < 10: #after 20 crashes its maybe time to restart everything
-        kill_popen('gazebo', gazebo_popen)
-      else:
-        print("{0}: crashed for 10the time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
-        kill_combo()
-        start_ros()
-        start_python()
-        crash_number = 0
-      break # get out of this loop
+    # if False:
+    # if time_spend > 60*10 and FLAGS.number_of_runs != 1: #don't interupt if this is a single run
+    if time_spend > 5 and not crash_checked:
+      crash_checked = True
+      # check for crash
+      with open(xterm_log_file, 'r') as f:
+        for l in f.readlines():
+          if 'process has died' in l:
+            print("[run_script] {0}: found gz crash in {1}: {2}.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), os.path.basename(xterm_log_file),l[:50]))
+            crashed=True
+            crash_number+=1
+      if crashed:
+        if crash_number < 10: #after 20 crashes its maybe time to restart everything
+          kill_popen('gazebo', gazebo_popen)
+        else:
+          print("{0}: crashed for 10the time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+          kill_combo()
+          start_ros()
+          start_python()
+          crash_number = 0
+        break # get out of this loop
     time.sleep(0.1)
 
   ######################################
@@ -612,7 +636,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       FLAGS.number_of_runs=run_number+5
       FLAGS.evaluation=True
       # run_number = FLAGS.number_of_runs-1
-  time.sleep(2)
+  time.sleep(3) 
+  # extra second needed to save image in gt_listener
 
 # after all required runs are finished
 kill_combo()

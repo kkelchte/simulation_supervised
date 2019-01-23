@@ -80,13 +80,11 @@ def animate(*args):
   implot.set_array(build_image())
   return implot,
 
-
-
-# def print_dur(start_time, end_time):
-#   duration = (end_time-start_time)
-#   m, s = divmod(duration, 60)
-#   h, m = divmod(m, 60)
-#   return "%02dm:%02ds" % (m, s)
+def print_dur(start_time, end_time):
+  duration = (end_time-start_time)
+  m, s = divmod(duration, 60)
+  h, m = divmod(m, 60)
+  return "%02dm:%02ds" % (m, s)
 
 # def image_callback(msg):
 #   global end_time, count

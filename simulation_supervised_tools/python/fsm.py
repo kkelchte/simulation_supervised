@@ -157,13 +157,15 @@ def update_data_location():
   """
   global data_location
   # parse previous run from name
-  prev_num=data_location.split('/')[-1].split('_')[0]
-  data_location=data_location.replace(prev_num,"{0:05d}".format(int(prev_num)+1))
-  rospy.set_param('data_location',data_location)
-    
+  try:
+    prev_num=data_location.split('/')[-1].split('_')[0]
+    data_location=data_location.replace(prev_num,"{0:05d}".format(int(prev_num)+1))
+    rospy.set_param('data_location',data_location)
+  except:
+    print("[fsm]: failed to create new data location from current location {0}".format(data_location))
 def go_cb(data):
   """Callback on /go to change from 0 or 2 to 1 state"""
-  global current_state, shuttingdown, run_number
+  global current_state, shuttingdown, run_number, max_duration
   shuttingdown = False 
   run_number+=1
   current_state = state_sequence[1]
@@ -175,6 +177,11 @@ def go_cb(data):
       rospy.set_param('evaluate',True)
     else:
       rospy.set_param('evaluate',False)
+
+  if rospy.has_param('max_duration'): 
+    max_duration=rospy.get_param('max_duration')
+    print("[fsm] set max duration to {0}".format(max_duration))
+
   if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
   if "BA" in [control_sequence['1'], supervision_sequence['1']] and start_ba_pub: start_ba_pub.publish(Empty())
   if "DH" in [control_sequence['1'], supervision_sequence['1']] and start_dh_pub: start_dh_pub.publish(Empty())
@@ -261,6 +268,7 @@ def depth_cb(msg):
 
 def scan_cb(data):
   """Read in depth scan and check the minimum value to detect a bump used by the turtle."""
+  # print("received scan")
   if shuttingdown or (rospy.get_time()-start_time < delay_evaluation): return
   # Preprocess depth:
   ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]

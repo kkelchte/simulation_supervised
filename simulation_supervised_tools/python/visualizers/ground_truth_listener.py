@@ -1,14 +1,22 @@
 #!/usr/bin/env python
 import rospy
 import numpy as np
-import os
+from numpy.linalg import inv
+import os, sys, time
+
+import tf
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import matplotlib.animation as animation
+import matplotlib.patches as patches
 
 from std_msgs.msg import Empty
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
+
+import subprocess, shlex
+
 
 #--------------------------------------------------------------------------------------------------------------------------------
 #
@@ -21,7 +29,7 @@ turtle=False
 size = (200,200,3)
 img = np.ones(size)
 img_type = "unknown"
-current_pos = []
+positions = []
 ready = False
 finished = True
 transformations={'unknown':(2,1,-2,1),
@@ -32,8 +40,12 @@ transformations={'unknown':(2,1,-2,1),
     'sandbox':(38.676923076923075, 438.0, -39.876923076923077, 418.0),
     'esatv1':(16.947783251231524, 63.724137931034484, -16.548448275862071, 590.18620689655177),
     'esatv2':(17.22058089465456, 1065.4257425742574, -17.138477795147935, 843.90099009900985),
-    'esatv3':(2,1,-2,1),
-    'forest_real':(17.2170726,785,-17.07010944,487)}
+    'forest_real':(17.2170726,785,-17.07010944,487),
+    # 'esatv3':(0,25.76,10,-22,0,4)}
+    # 'esatv3':(0,25.76,10,-22,0,4)}
+    # 'esatv3':(-22.03,0,88.13,0,25.76,257.6)}
+    'esatv3':(-20.66,0,82.625,0,20.76,207.57)}
+
     # 'canyon':(15.5, 424.0, -10.6, 809),
     # 'esat_v2':(16.321360645256139, 1006.9433962264151, -16.180586914582452, 789.40251572327043)}
 
@@ -41,21 +53,88 @@ log_folder = '/tmp/log'
 run_file = 'runs.png'
 data_location = None
 
-def transform(x,y):
-  a,b,c,d=transformations[img_type]
-  return (a*x+b, c*y+d)
+graphics=False
 
+# Create figure and axes
+fig,ax = plt.subplots(1)
+
+# fig=plt.figure(figsize=(30,30))
+# plt.title('Position Display')
+ax.set_title('Position Display')
+
+
+
+current_position=[0,0,0] # x, y, yaw
+# current_position=[1322,1069,0] # x, y, yaw
+
+minimum_distance_gazebo=0.7
+previous_position_gazebo=[] # x,y, yaw
+new_position_flag=False
+
+# Create a Rectangle patch
+# current_pose = patches.Rectangle((50,100),40,30,linewidth=1,edgecolor='r',facecolor='None')
+origin_arrow_map = np.asarray([[5,0],[0,-2],[0,-1],[-2.,-1],[-2.,1],[0,1],[0,2]])
+transformed_arrow = origin_arrow_map[:]
+
+# rotation_gazebo_map = np.asarray([[-1,0,1],[0,1,0],[0,0,-1]])
+rotation_gazebo_map = np.asarray([[-1,0],[0,1]])
+
+# implot=plt.imshow(current_image,animated=True)
+current_image = np.zeros((1069,1322))
+implot=ax.imshow(current_image,animated=True)
+
+current_color=[0,0,0]
+color_transition='rb' #One of ['rb','rg','bg','br','gb','gr']
+index_translation={'r':0, 'b':1, 'g':2}
+  
+
+def update_color():
+  """Update color according to following fields:
+  current_color
+
+  color_transition
+  
+  """
+  global current_color, color_transition
+  current_color[index_translation[color_transition[0]]]-=1/20.
+  current_color[index_translation[color_transition[1]]]+=1/20.
+  if max(current_color) >= 1:
+    color_transition=color_transition[1]+color_transition[0]
+    current_color[index_translation[color_transition[0]]]-=1/20.
+    current_color[index_translation[color_transition[1]]]+=1/20.
+  return current_color
+  # return (1,1,1)
+
+def animate(*args):
+  global new_position_flag
+  # implot.set_array(current_image)
+  # plt.plot(current_position[0],current_position[1], 'bo')
+  # Add the patch to the Axes
+  if new_position_flag and not finished:
+    ax.add_patch(patches.Polygon(transformed_arrow,linewidth=1,edgecolor=update_color(),facecolor='None'))
+    new_position_flag=False
+
+  return implot,
+
+
+def transform(x,y):
+  if len(transformations[img_type]) == 4:
+    a,b,c,d=transformations[img_type]
+    return (a*x+b, c*y+d)
+  else:
+    a,b,c,d,e,f=transformations[img_type]
+    return (a*x+b*y+c, d*x+e*y+f)
 
 def draw_positions(file_name):
   # f=open('/home/klaas/gt.txt', 'w')
-  # for pos in current_pos:
+  # for pos in positions:
   #   f.write('{0}\n'.format(str(pos)))
   # f.close()
-  print(len(current_pos))
+  print(len(positions))
   fig = plt.figure(figsize=(10, 10))
   imgplot = plt.imshow(img)
-  x = [p[0] for p in current_pos]
-  y = [p[1] for p in current_pos]
+  x = [p[0] for p in positions]
+  y = [p[1] for p in positions]
   plt.plot(x,y, 'v',ms=1)
   plt.axis('off')
   # plt.show()
@@ -63,49 +142,114 @@ def draw_positions(file_name):
   plt.savefig(file_name, bbox_inches='tight')
   
 def ready_cb(data):
-  global ready, finished, run_file, current_pos, img
+  global ready, finished, run_file, positions, img, color_transition, current_color
   if not ready: 
+    # reset color variables
+    color_transition=np.random.choice(['rb','rg','bg','br','gb','gr'])
+    current_color=[0,0,0]
+    current_color[index_translation[color_transition[0]]]=1
+
     ready = True
     finished = False
     run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f and f.endswith('.png') ]), img_type)
-    current_pos = []
-    # img = np.zeros(size)
+    positions = []
 
+    
 def finished_cb(data):
-  global ready, finished
+  global ready, finished, fig
   if not finished:
     ready = False
     finished = True
-    draw_positions(log_folder+'/'+run_file)
-    if data_location: draw_positions(data_location+'/runs.png')
+    time.sleep(0.5)
+
+    # if not graphics:
+    fig.savefig(log_folder+'/'+run_file)
+
+    # draw_positions(log_folder+'/'+run_file)
+    # if data_location: draw_positions(data_location+'/runs.png')
+    
+
 
 def gt_callback(data):
-  global current_pos
-  if not ready: return
-  (x,y)=transform(data.pose.pose.position.x,data.pose.pose.position.y)
-  current_pos.append((x,y))
-  # with open(log_folder+'/pos.txt','a') as f: 
-  with open(log_folder+'/'+run_file.replace('png','txt'),'a') as f: 
-    f.write("{0}, {1}\n".format(x,y))
+  global positions, current_position, transformed_arrow,previous_position_gazebo, new_position_flag
+  if not ready: return 
   
-  # else: current_pos.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
-  if len(current_pos) > 10**4: current_pos.pop(0) #avoid memory leakage
+  # draw traingle only if distance is far enough
+  (x,y)=transform(data.pose.pose.position.x,data.pose.pose.position.y)
+  
+  if len(previous_position_gazebo)==0: 
+    previous_position_gazebo=[data.pose.pose.position.x,data.pose.pose.position.y]
+
+  if np.sqrt((data.pose.pose.position.x-previous_position_gazebo[0])**2+(data.pose.pose.position.y-previous_position_gazebo[1])**2) > minimum_distance_gazebo:
+    previous_position_gazebo=[data.pose.pose.position.x,data.pose.pose.position.y]
+
+    # obtain drone_to_gazebo_rotation
+    quaternion = (data.pose.pose.orientation.x,
+        data.pose.pose.orientation.y,
+        data.pose.pose.orientation.z,
+        data.pose.pose.orientation.w)
+    roll, pitch, yaw = tf.transformations.euler_from_quaternion(quaternion)
+
+    drone_gazebo_orientation = np.asarray([[np.cos(yaw), -np.sin(yaw)],[np.sin(yaw), np.cos(yaw)]])
+    # combine with rotation gazebo_map to get orientation from drone to map
+    # combine with translation
+    transformation_map_to_drone = np.zeros((3,3))
+    transformation_map_to_drone[2,2] = 1
+    transformation_map_to_drone[0:2,2] = [x,y]
+    transformation_map_to_drone[0:2,0:2] = inv(np.matmul(rotation_gazebo_map, drone_gazebo_orientation))
+    # transformation_map_to_drone[0:2,0:2] = np.identity(2)
+    # apply transformation to points in arrow
+    transformed_arrow=np.transpose(np.matmul(transformation_map_to_drone,np.concatenate([np.transpose(origin_arrow_map),np.ones((1,origin_arrow_map.shape[0]))],axis=0)))
+    transformed_arrow=transformed_arrow[:,:2]
+    new_position_flag=True
+
+    positions.append((x,y, yaw))
+
+    # if not graphics:
+    animate()
+      
+    # # with open(log_folder+'/pos.txt','a') as f: 
+    with open(log_folder+'/'+run_file.replace('png','txt'),'a') as f: 
+      f.write("{0}, {1}, {2}\n".format(x,y,yaw))
+    
+
+  # # if graphics:
+  # #   current_position=[x,y,0]
+
+  # # else: positions.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
+  # if len(positions) > 10**4: positions.pop(0) #avoid memory leakage
+
+
+def cleanup():
+  """Get rid of the animation on shutdown"""
+  plt.close(fig)
+  plt.close()
 
 
 if __name__=="__main__":
   rospy.init_node('gt_listener', anonymous=True)
-  if rospy.has_param('background') and rospy.get_param('background') != '':
-    img_file=rospy.get_param('background')
-    try:
-      img=mpimg.imread(img_file)
-    except Exception as e:
-      print('[gt_listener]: failed to load background image: '+img_file+'. '+str(e))
+
+  simulation_supervised_demo_dir=subprocess.check_output(shlex.split("rospack find simulation_supervised_demo"))[:-1]
+
   if rospy.has_param('world_name') :
     world = rospy.get_param('world_name')
     if world in transformations.keys(): 
       img_type=world
+    img_file = simulation_supervised_demo_dir+'/worlds/'+world+'.png'
+    print("[gt_listener]: world: {}".format(img_type))
 
-  print("[gt_listener]: img_type: {}".format(img_type))
+  if rospy.has_param('background') and rospy.get_param('background') != '':
+    if len(rospy.get_param('background')) != 0:
+      img_file=rospy.get_param('background')
+  
+  try:
+    current_image=mpimg.imread(img_file)
+  except Exception as e:
+    print('[gt_listener]: failed to load background image: '+img_file+'. '+str(e))
+  else:
+    implot=plt.imshow(current_image,animated=True)
+    print("[gt_listener]: image shape: {}".format(current_image.shape))
+    # print("[gt_listener]: bg shape: {}".format(current_image.shape))
 
   log_folder = '/tmp/log'
   if rospy.has_param('log_folder'):
@@ -134,6 +278,14 @@ if __name__=="__main__":
     print('[gt_listener]: no gt_topic found so switch off.')
     exit(1)
 
+  # if rospy.has_param('graphics'):
+  #   if rospy.get_param('graphics'):
+  #     graphics=True
+  #     print("[ground_truth_listener]: showing graphics.")
+  #     anim=animation.FuncAnimation(fig,animate)
+  #     plt.show()
+  # rospy.on_shutdown(cleanup)
 
-  rospy.spin()
-  
+  r = rospy.Rate(30) # 10hz
+  while not rospy.is_shutdown():  
+      r.sleep()  

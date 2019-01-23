@@ -1,5 +1,13 @@
 # debug is loaded to avoid the evaluation code to cut down the experiment too early.
 # Maximum duration and distance is not defined, avoiding the experiment to stop too soon.
 delay_evaluation: 1
-min_depth: 0.2
+max_duration: 120
+min_depth: 0.25
 starting_height: 1
+max_distance: 150
+ba_params: behavior_arbitration_no_goal.xml
+# starting_positions: [[0,0],[0,12],[0,24],[0,36],[-5,37],[-15,37],[-23,37],[-10,37],[-31,36],[-37,36],[-45,36],[-55,36],[-56,24],[-57,12],[-57,7],[-57,3],[-57,0],[-57,-2],[-53,-3.5],[-50,-3.5],[-47,-3.5],[-44,-3.5],[-40,-3.5],[-37,-3.5],[-34,-3.6],[-30,-3.78],[-27,-3.92],[-24,-4.06],[-20,-4.2],[-17,-4.34],[-14,-4.48],[-10,-4.62],[-7,-4.76],[-4,-4.9],[-1,-5.1]]
+# starting_positions: [[0,0,1.57]]
+starting_positions: [[-5,-2,0]]
+waypoints: [[0,0], [0,-5], [-5,-5], [-5,-2]]
+# starting_positions: [[0,0,-1.57]]

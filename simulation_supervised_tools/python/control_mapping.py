@@ -112,8 +112,8 @@ def nn_cb(data):
     control_time=current_time
     # max_time = 1/10. # 10FPS < /kinect (previous)
     # max_time = 1/5. # 10FPS < /kinect
-    max_time = 1/10. # 10FPS < /ras pi cam
-    # max_time = 1/3. # 10FPS < /ras pi cam
+    # max_time = 1/10. # 10FPS < /ras pi cam
+    max_time = 1 # NO stopping
   # check if currently the neural_network can define the supervision command
   if superviser=="NN":
     sup_pub.publish(data)

@@ -16,6 +16,7 @@ from sensor_msgs.msg import LaserScan
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+import tf
 
 #--------------------------------------------------------------------------------------------------------------
 #
@@ -40,16 +41,27 @@ go_wait = 20 # wait for some time while sending 'go'
 # Control params
 starting_height = 0 # get from ros param dependent on environment defines the height at which drone is flying
 adjust_height = 0 # used to adjust the height and keep it at starting_height 
-adjust_yaw = 0 # define in which direction to fly
 
 # BA params
+## collision avoidance
+straight_threshold=0.3 # define from which yaw, we can apply the straight speed vs the turning speed
 clip_distance = 5 # tweak for doshico
 front_width=40 # define the width of free space in percentage for going straight
 horizontal_field_of_view=100 # define percentage of width of depth image used to extract collision
 vertical_field_of_view=60 # define percentage of width of depth image used to extract collision
 scale_yaw=0.4 #1 
-turn_speed=0 # define the forward speed when turning
-speed=1.3 
+turn_speed=0.8 # define the forward speed when turning
+speed=0.8 
+avoidance_weight = 1 # how much weight is put to avoidance behavior 
+adjust_yaw_collision_avoidance = 0 # define in which direction to fly
+
+## waypoint following
+goto_weight = 0 # how much weight is put to folowing weigh point
+adjust_yaw_goto = 0 # define in which direction to fly
+waypoints=[] # list all waypoints in tuples
+current_waypoint_index=0
+goto_yaw_amplifier=2
+waypoint_reached=0.5 # distance to next waypoint to say drone has reached waypoint
 
 # Publisher fields
 action_pub = None
@@ -76,9 +88,128 @@ def cleanup():
   plt.close(fig)
   plt.close()
 
+def gt_callback(data):
+  """The ground truth pose is used to adjust the height and goto behavior"""
+  global adjust_height, adjust_yaw_goto, current_waypoint_index
+  # adjust height
+  if data.pose.pose.position.z < (starting_height - 0.1):
+    adjust_height = +1
+  elif data.pose.pose.position.z > (starting_height + 0.1):
+    adjust_height = -1
+  else:
+    adjust_height = 0
+  
+  stime=time.time()
+  # adjust orientation towards current_waypoint
+  quaternion = (data.pose.pose.orientation.x,
+        data.pose.pose.orientation.y,
+        data.pose.pose.orientation.z,
+        data.pose.pose.orientation.w)
+  _, _, yaw_drone = tf.transformations.euler_from_quaternion(quaternion)
+  dy=(waypoints[current_waypoint_index][1]-data.pose.pose.position.y)
+  dx=(waypoints[current_waypoint_index][0]-data.pose.pose.position.x)
+  
+  # if np.sqrt(dx**2+dy**2) < waypoint_reached:
+  #   # update to next waypoint:
+  #   current_waypoint_index+=1
+  #   current_waypoint_index=current_waypoint_index%len(waypoints)
+  #   print("[behavior_arbitration]: reached waypoint: {0}, next waypoint: {1}.".format(waypoints[current_waypoint_index-1],
+  #                                                                                     waypoints[current_waypoint_index]))
+
+  #   return
+  # else:
+  # adjust for quadrants...
+  print("\n\n\ndx {0}, dy {1}".format(dx, dy))
+  yaw_goal=np.arctan(dy/dx)
+  print("yaw_goal {0}".format(yaw_goal))
+  if np.sign(dx)==-1 and np.sign(dy) ==-1:
+    yaw_goal+=3.14
+    print("adjusted yaw_goal to 3th quadrant: {0}".format(yaw_goal))
+  
+  if np.sign(dx)==-1 and np.sign(dy) ==1:
+    yaw_goal-=3.14
+    print("adjusted yaw_goal to 2th quadrant: {0}".format(yaw_goal))
+
+  angle_difference=yaw_goal-yaw_drone
+  print("angle_difference: {0} = {1} - {2}".format(angle_difference, yaw_goal, yaw_drone))
+
+  while np.abs(angle_difference) > 2*3.14:
+    angle_difference-=np.sign(angle_difference)*3.14
+  print("angle_difference adjusted: {0}".format(angle_difference))
+
+  adjust_yaw_goto = goto_yaw_amplifier*np.sin(yaw_goal-yaw_drone)
+  print("yaw goto : {0}".format(adjust_yaw_goto))
+  if yaw_goal-yaw_drone > 1.57:
+    adjust_yaw_goto = goto_yaw_amplifier*np.sign(angle_difference)
+    print("yaw goto adjusted: {0}".format(adjust_yaw_goto))
+
+    # print("[behavior_arbitration]: goto_update time: {0:0.2f}, drone yaw: {1}, goal yaw: {2}, adjust_yaw: {3}.".format(time.time()-stime,
+    #                                                                                                               yaw_drone,
+    #                                                                                                               yaw_goal,
+    #                                                                                                               adjust_yaw_goto))
+
+
+def get_control():
+  """Return control conform the current state."""
+  control = Twist()
+  adjust_yaw=goto_weight*adjust_yaw_goto+avoidance_weight*adjust_yaw_collision_avoidance
+  control.angular.z = adjust_yaw
+  if adjust_yaw < straight_threshold:
+    control.linear.x = speed
+  else:
+    control.linear.x = turn_speed
+  return control
+
+def ready_callback(data):
+  """Start node 
+  """
+  global ready, finished
+  if not ready or finished:
+    print('[BA] activated.')
+    ready = True
+    finished = False
+
+def finished_callback(data):
+  """Put node in idle state 
+  """
+  global ready, finished
+  if ready or not finished:
+    print('[BA] deactivated.')
+    ready = False
+    finished = True
+
+def image_callback(data):
+  """Use the frame rate of the images to update the states as well as send the correct control."""
+  global current_state, counter
+  if not ready or finished: return
+  action_pub.publish(get_control())
+
+def scan_callback(data):
+  """Callback of lidar scan.
+  Defines the adjust_yaw of the send control."""
+  global adjust_yaw_collision_avoidance, depths
+  # Preprocess depth:
+  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
+
+  # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
+  ranges=list(reversed(ranges[:horizontal_field_of_view/2]))+list(reversed(ranges[-horizontal_field_of_view/2:]))
+
+  # turn away from the minimum (non-zero) depth reading
+  # discretize 3 bins (:-front_width/2:front_width/2:)
+  # range that covers going straight.
+  depths=[np.nanmin(ranges[0:horizontal_field_of_view/2-front_width/2]),
+          np.nanmin(ranges[horizontal_field_of_view/2-front_width/2:horizontal_field_of_view/2+front_width/2]),
+          np.nanmin(ranges[horizontal_field_of_view/2+front_width/2:])]
+  
+  # choose one discrete action [left, straight, right] according to maximum depth 
+  if depths[np.argmax(depths)] == depths[1]: # incase straight is as good as the best, go straight
+    adjust_yaw_collision_avoidance = 0
+  else:    
+    adjust_yaw_collision_avoidance = -1*(np.argmax(depths)-1) #as a yaw turn of +1 corresponds to turning left and -1 to turning right
+
 def depth_callback(data):
-  """Extract correct turning direction from the depth image and save it in adjust_yaw."""
-  global adjust_yaw, depths
+  """Extract correct turning direction from the depth image and save it in adjust_yaw_collision_avoidance."""
+  global adjust_yaw_collision_avoidance, depths
 
   try:
     # Convert your ROS Image message to OpenCV2
@@ -105,77 +236,10 @@ def depth_callback(data):
             np.amin(de[:,-bound_index:])]
     # choose one discrete action [left, straight, right] according to maximum depth 
     if depths[np.argmax(depths)] == depths[1]: # incase straight is as good as the best, go straight
-      adjust_yaw = 0
+      adjust_yaw_collision_avoidance = 0
     else:    
-      adjust_yaw = -1*(np.argmax(depths)-1) #as a yaw turn of +1 corresponds to turning left and -1 to turning right
-  # adjust_yaw = -1
-
-def gt_callback(data):
-  """The ground truth pose is used to adjust the height"""
-  global adjust_height
-  if data.pose.pose.position.z < (starting_height - 0.1):
-    adjust_height = +1
-  elif data.pose.pose.position.z > (starting_height + 0.1):
-    adjust_height = -1
-  else:
-    adjust_height = 0
-
-def get_control():
-  """Return control conform the current state."""
-  control = Twist()
-  if adjust_yaw == 0:
-    control.linear.x = 1.3
-  else:
-    control.angular.z = adjust_yaw
-  return control
-
-def ready_callback(data):
-  """Start node 
-  """
-  global ready, finished
-  if not ready or finished:
-    print('BA activated.')
-    ready = True
-    finished = False
-
-def finished_callback(data):
-  """Put node in idle state 
-  """
-  global ready, finished
-  if ready or not finished:
-    print('BA deactivated.')
-    ready = False
-    finished = True
-
-def image_callback(data):
-  """Use the frame rate of the images to update the states as well as send the correct control."""
-  global current_state, counter
-  if not ready or finished: return
-  action_pub.publish(get_control())
-
-def scan_callback(data):
-  """Callback of lidar scan.
-  Defines the adjust_yaw of the send control."""
-  global adjust_yaw, depths
-  # Preprocess depth:
-  ranges=[min(r,clip_distance) if r!=0 else np.nan for r in data.ranges]
-
-  # clip left 45degree range from 0:45 reversed with right 45degree range from the last 45:
-  ranges=list(reversed(ranges[:horizontal_field_of_view/2]))+list(reversed(ranges[-horizontal_field_of_view/2:]))
-
-  # turn away from the minimum (non-zero) depth reading
-  # discretize 3 bins (:-front_width/2:front_width/2:)
-  # range that covers going straight.
-  depths=[np.nanmin(ranges[0:horizontal_field_of_view/2-front_width/2]),
-          np.nanmin(ranges[horizontal_field_of_view/2-front_width/2:horizontal_field_of_view/2+front_width/2]),
-          np.nanmin(ranges[horizontal_field_of_view/2+front_width/2:])]
-  
-  # choose one discrete action [left, straight, right] according to maximum depth 
-  if depths[np.argmax(depths)] == depths[1]: # incase straight is as good as the best, go straight
-    adjust_yaw = 0
-  else:    
-    adjust_yaw = -1*(np.argmax(depths)-1) #as a yaw turn of +1 corresponds to turning left and -1 to turning right
-
+      adjust_yaw_collision_avoidance = -1*(np.argmax(depths)-1) #as a yaw turn of +1 corresponds to turning left and -1 to turning right
+  # adjust_yaw_collision_avoidance = -1
 
 if __name__=="__main__":
   rospy.init_node('Behavior_arbitration', anonymous=True)
@@ -200,9 +264,6 @@ if __name__=="__main__":
   else:
     raise IOError('[behavior_arbitration.py] did not find any rgb image topic!')
 
-  # if rospy.has_param('gt_info'):
-  #   rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
-  
   # make action publisher
   action_pub = rospy.Publisher('ba_vel', Twist, queue_size=1)
   take_off_pub = rospy.Publisher(rospy.get_param('takeoff'), Empty, queue_size=1)
@@ -220,6 +281,28 @@ if __name__=="__main__":
       print("[depth_heuristic]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()
-  rospy.on_shutdown(cleanup)
+    rospy.on_shutdown(cleanup)
+
+  if rospy.has_param('gt_info'):
+    rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
+
+  # if go_to behavior is used.
+  if rospy.has_param('waypoints') and rospy.has_param('gt_info'):
+    waypoints=rospy.get_param('waypoints')
+    print("[behavior_arbitration]: found following waypoints:{0}.".format(waypoints))
+    if rospy.has_param('goto_weight'):
+      goto_weight=rospy.get_param('goto_weight')
+      avoidance_weight=1-goto_weight 
+    else:
+      goto_weight=0.5
+      avoidance_weight=0.5
+
+    #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+    #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+    goto_weight=1
+    avoidance_weight=0.0
+    #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+    #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+
 
   rospy.spin()

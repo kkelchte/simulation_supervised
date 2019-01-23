@@ -150,7 +150,6 @@ def scan_callback(msg):
     # Clip at 5m and put zeros at 5m 
     last_scan=[5 if r > 5 or r==0 else r for r in msg.ranges]
 
-
 def control_callback(data):
   """Save /cmd_vel info in last_control field."""
   global last_control
@@ -217,8 +216,10 @@ def gt_callback(data):
 
 def ready_callback(msg):
   """ callback function that makes create_ds start saving images and toggles ready"""
-  global ready, finished, data_location, index
-  if not ready and finished:
+  global ready, finished, data_location, index, last_supervised_control, last_control, last_scan, last_gt, last_position, last_odom, T_pg  
+  
+  if not ready and finished:  
+    print("[create_dataset]: Start saving images.")
     ready=True
     finished = False
 
@@ -232,6 +233,14 @@ def ready_callback(msg):
       if not os.path.exists(data_location+'/RGB'): os.makedirs(data_location+'/RGB')
       if not os.path.exists(data_location+'/Depth'): os.makedirs(data_location+'/Depth')
       index=0
+      last_supervised_control=[0,0,0,0,0,0]
+      last_control=[0,0,0,0,0,0]
+      last_scan=[]
+      last_gt=[0,0,0]
+      last_position=[]
+      last_odom=[]
+      T_pg=[] # transformation of previous pose in global coordinates
+
 
     print('[create_dataset]: ready: {0}: {1}'.format(rospy.get_time(), data_location))
 
@@ -241,11 +250,11 @@ def finished_callback(msg):
   if ready and not finished:
     ready=False
     finished = True
-    print('[create_dataset]: finished: {0}. RGB callback rate: {1:0.3f}({2:0.2f}) and RGB write rate: {3:0.3f}({4:0.2f})'.format(rospy.get_time(), 
-                                                                                                              np.mean(rgb_cb_rate),
-                                                                                                              np.var(rgb_cb_rate),
-                                                                                                              np.mean(rgb_write_rate),
-                                                                                                              np.var(rgb_write_rate)))
+    # print('[create_dataset]: finished: {0}. RGB callback rate: {1:0.3f}({2:0.2f}) and RGB write rate: {3:0.3f}({4:0.2f})'.format(rospy.get_time(), 
+    #                                                                                                           np.mean(rgb_cb_rate),
+    #                                                                                                           np.var(rgb_cb_rate),
+    #                                                                                                           np.mean(rgb_write_rate),
+    #                                                                                                           np.var(rgb_write_rate)))
 
 def write_info(image_type, index):
   """For each image (lowest rate) save information regarding the position, control or scan readings."""
