@@ -1,5 +1,4 @@
 model_name: quadrotor
-# starting_height: 1
 takeoff: /takeoff
 land: /land
 emergency: /emergency
@@ -7,5 +6,7 @@ flattrim: /flattrim
 control: /cmd_vel
 rgb_image: /kinect/kinect/rgb/image_raw
 depth_image: /kinect/kinect/depth/image_raw
+rgb_image_right: /kinect_right/kinect_right/rgb/image_raw
+rgb_image_left: /kinect_left/kinect_left/rgb/image_raw
 scan: /scan
 gt_info: /ground_truth/state

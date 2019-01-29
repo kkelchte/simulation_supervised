@@ -62,6 +62,7 @@ waypoints=[] # list all waypoints in tuples
 current_waypoint_index=0
 goto_yaw_amplifier=2
 waypoint_reached=0.5 # distance to next waypoint to say drone has reached waypoint
+max_deviation=10*np.pi/180
 
 # Publisher fields
 action_pub = None
@@ -106,43 +107,40 @@ def gt_callback(data):
         data.pose.pose.orientation.z,
         data.pose.pose.orientation.w)
   _, _, yaw_drone = tf.transformations.euler_from_quaternion(quaternion)
+  
   dy=(waypoints[current_waypoint_index][1]-data.pose.pose.position.y)
   dx=(waypoints[current_waypoint_index][0]-data.pose.pose.position.x)
   
-  # if np.sqrt(dx**2+dy**2) < waypoint_reached:
-  #   # update to next waypoint:
-  #   current_waypoint_index+=1
-  #   current_waypoint_index=current_waypoint_index%len(waypoints)
-  #   print("[behavior_arbitration]: reached waypoint: {0}, next waypoint: {1}.".format(waypoints[current_waypoint_index-1],
-  #                                                                                     waypoints[current_waypoint_index]))
+  # print("[behavior_arbitration]: dx {0} dy {1} distance {2} <? min distance {3}".format(dx, dy, np.sqrt(dx**2+dy**2), waypoint_reached))
 
-  #   return
-  # else:
-  # adjust for quadrants...
-  print("\n\n\ndx {0}, dy {1}".format(dx, dy))
-  yaw_goal=np.arctan(dy/dx)
-  print("yaw_goal {0}".format(yaw_goal))
-  if np.sign(dx)==-1 and np.sign(dy) ==-1:
-    yaw_goal+=3.14
-    print("adjusted yaw_goal to 3th quadrant: {0}".format(yaw_goal))
-  
-  if np.sign(dx)==-1 and np.sign(dy) ==1:
-    yaw_goal-=3.14
-    print("adjusted yaw_goal to 2th quadrant: {0}".format(yaw_goal))
-
-  angle_difference=yaw_goal-yaw_drone
-  print("angle_difference: {0} = {1} - {2}".format(angle_difference, yaw_goal, yaw_drone))
-
-  while np.abs(angle_difference) > 2*3.14:
-    angle_difference-=np.sign(angle_difference)*3.14
-  print("angle_difference adjusted: {0}".format(angle_difference))
-
-  adjust_yaw_goto = goto_yaw_amplifier*np.sin(yaw_goal-yaw_drone)
-  print("yaw goto : {0}".format(adjust_yaw_goto))
-  if yaw_goal-yaw_drone > 1.57:
-    adjust_yaw_goto = goto_yaw_amplifier*np.sign(angle_difference)
-    print("yaw goto adjusted: {0}".format(adjust_yaw_goto))
-
+  if np.sqrt(dx**2+dy**2) < waypoint_reached:
+    # update to next waypoint:
+    current_waypoint_index+=1
+    current_waypoint_index=current_waypoint_index%len(waypoints)
+    print("[behavior_arbitration]: reached waypoint: {0}, next waypoint: {1}.".format(waypoints[current_waypoint_index-1],
+                                                                                      waypoints[current_waypoint_index]))
+    adjust_yaw_goto=0
+    return
+  else:
+    # adjust for quadrants...
+    # print("\n\n\ndx {0}, dy {1}".format(dx, dy))
+    yaw_goal=np.arctan(dy/dx)
+    # print("yaw_goal {0}".format(yaw_goal))
+    if np.sign(dx)==-1 and np.sign(dy) ==+1:
+      yaw_goal+=np.pi
+      # print("adjusted yaw_goal to 2th quadrant: {0} > 0".format(yaw_goal))
+    elif np.sign(dx)==-1 and np.sign(dy) ==-1:
+      yaw_goal-=np.pi
+      # print("adjusted yaw_goal to 3th quadrant: {0} < 0".format(yaw_goal))
+    if np.abs(yaw_goal-yaw_drone) > max_deviation:
+      adjust_yaw_goto=np.sign(yaw_goal-yaw_drone)
+      # if difference between alpha and beta is bigger than pi:
+      # swap direction because the other way is shorter.
+      if np.abs(yaw_goal-yaw_drone) > np.pi:
+        # print("Change yaw turn {0} to {1} because large difference {2}".format(adjust_yaw_goto,-1*adjust_yaw_goto,np.abs(yaw_goal-yaw_drone)))
+        adjust_yaw_goto=-1*adjust_yaw_goto
+    else:
+      adjust_yaw_goto=0
     # print("[behavior_arbitration]: goto_update time: {0:0.2f}, drone yaw: {1}, goal yaw: {2}, adjust_yaw: {3}.".format(time.time()-stime,
     #                                                                                                               yaw_drone,
     #                                                                                                               yaw_goal,
@@ -158,6 +156,8 @@ def get_control():
     control.linear.x = speed
   else:
     control.linear.x = turn_speed
+
+  # print("[behavior_arbitration] adjust_yaw_goto {2} + adjust_yaw_collision_avoidance {3} = control [speed {0}; yaw {1}], current_waypoint: {4}".format(control.linear.x, control.angular.z, adjust_yaw_goto, adjust_yaw_collision_avoidance, waypoints[current_waypoint_index]))
   return control
 
 def ready_callback(data):
@@ -168,6 +168,8 @@ def ready_callback(data):
     print('[BA] activated.')
     ready = True
     finished = False
+    current_waypoint_index=0
+
 
 def finished_callback(data):
   """Put node in idle state 
@@ -182,7 +184,8 @@ def image_callback(data):
   """Use the frame rate of the images to update the states as well as send the correct control."""
   global current_state, counter
   if not ready or finished: return
-  action_pub.publish(get_control())
+  control=get_control()
+  action_pub.publish(control)
 
 def scan_callback(data):
   """Callback of lidar scan.
@@ -292,15 +295,16 @@ if __name__=="__main__":
     print("[behavior_arbitration]: found following waypoints:{0}.".format(waypoints))
     if rospy.has_param('goto_weight'):
       goto_weight=rospy.get_param('goto_weight')
-      avoidance_weight=1-goto_weight 
+      avoidance_weight=1-goto_weight
+      print("[behavior_arbitration] goto_weight {0} and avoidance_weight {1}".format(goto_weight, avoidance_weight)) 
     else:
       goto_weight=0.5
       avoidance_weight=0.5
 
     #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
     #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
-    goto_weight=1
-    avoidance_weight=0.0
+    # goto_weight=1
+    # avoidance_weight=0.0
     #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
     #DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
 

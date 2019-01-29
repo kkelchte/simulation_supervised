@@ -1,0 +1,1042 @@
+<?xml version="1.0"?>
+<sdf version='1.4'>
+  <world name='default'>
+    <!-- DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG -->
+    <!-- DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG -->
+    <model name='cylinder_0.81'>
+      <static>1</static>
+      <pose>-30.8 -4 0.5 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.8'>
+      <static>1</static>
+      <pose>-20.8 -4 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_5-5'>
+      <static>1</static>
+      <pose>-5 -5 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_2.7'>
+      <static>1</static>
+      <pose>-2.7 -5.2 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.27'>
+      <static>1</static>
+      <pose>-0.27 -4.43 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.'>
+      <static>1</static>
+      <pose>-0. -0. 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.176127'>
+      <static>1</static>
+      <pose>-0.176127 8.52094 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.336142'>
+      <static>1</static>
+      <pose>-0.336142 15.8637 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.174103'>
+      <static>1</static>
+      <pose>-0.174103 23.6654 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.424533'>
+      <static>1</static>
+      <pose>-0.424533 30.5467 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.6'>
+      <static>1</static>
+      <pose>-0.6 33.65 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.75'>
+      <static>1</static>
+      <pose>-0.75 36.48 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_2.75'>
+      <static>1</static>
+      <pose>-2.75 36.95 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_9.19702'>
+      <static>1</static>
+      <pose>-9.19702 36.7426 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_5.5384'>
+      <static>1</static>
+      <pose>-15.5384 36.5405 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_3.0785'>
+      <static>1</static>
+      <pose>-23.0785 36.5471 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_5.4312'>
+      <static>1</static>
+      <pose>-45.4312 36.3484 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_0.8951'>
+      <static>1</static>
+      <pose>-50.8951 36.5703 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_3.38'>
+      <static>1</static>
+      <pose>-53.38 37.14 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_7.61'>
+      <static>1</static>
+      <pose>-57.61 35.32 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_7.5'>
+      <static>1</static>
+      <pose>-57.5 31.6 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_7.50'>
+      <static>1</static>
+      <pose>-57.5 20 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_7.54'>
+      <static>1</static>
+      <pose>-57.5 10 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_7.56'>
+      <static>1</static>
+      <pose>-57.5 5 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_7.99'>
+      <static>1</static>
+      <pose>-57.99 -0.75 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_6.62'>
+      <static>1</static>
+      <pose>-56.62 -3.69 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name='cylinder_4-3'>
+      <static>1</static>
+      <pose>-54 -3.3 0.5 0 0 0</pose>
+              <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <!-- DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG -->
+    <!-- DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG -->
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <include><uri>model://esat_corridor_v3</uri></include>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <gravity>0 0 -9.8</gravity>
+    </physics>
+    <scene>
+      <ambient>0.1 0.1 0.1 1</ambient>
+      <background>0.1 0.1 0.1 1</background>
+      <shadows>0</shadows>
+    </scene>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>-30 -35 51.15 0 0.788 1.57</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+    <light name='lightball' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>0 0 2 0 -0 0</pose>
+    </light>
+    <light name='lightball2' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>0 12 2 2 -0 0</pose>
+    </light>
+    <light name='lightball2b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>0.5 -0.1 0.9</direction>
+      <pose>0 24 1.5 2 -0 0</pose>
+    </light>
+    <light name='lightball2a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>0 36 2 0 -0 0</pose>
+    </light>
+    <light name='lightball3' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>0 0 0</direction>
+      <pose>-5 37 1.5 0 -0 0</pose>
+    </light>
+    <light name='lightball3a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>0.5 0.1 0.9</direction>
+      <pose>-15 37 1.5 0 -0 -0.</pose>
+    </light>
+    <light name='lightball3b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-23 37 1.5 0 -0 0</pose>
+    </light>
+    <light name='lightball3c' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>0.5 0.1 -0.9</direction>
+      <pose>-10 37 1.5 0 -0.5 0.8</pose>
+    </light>
+    <light name='lightball4' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-31 36 2 0 -0 0</pose>
+    </light>
+    <light name='lightball4a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-37 36 2 0 -0 0</pose>
+    </light>
+    <light name='lightball4b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.3</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-45 36 2 0 -0 0</pose>
+    </light>
+    <light name='lightball5' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-55 36 2 0 -0 0</pose>
+    </light>
+    <light name='lightball5a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-56 24 2 0 -0 0</pose>
+    </light>
+    <light name='lightball5b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-57 12 2 0 -0 0</pose>
+    </light>
+    <light name='lightball6a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-57 7 2 0 -0 0</pose>
+    </light>
+    <light name='lightball6b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-57 3 2 0 -0 0</pose>
+    </light>
+    <light name='lightball6c' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-57 0 2 0 -0 0</pose>
+    </light>
+    <light name='lightball6d' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-57 -2 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-53 -3.5 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-50 -3.5 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7c' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-47 -3.5 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7d' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-44 -3.5 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7e' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-40 -3.5 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7f' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-37 -3.5 2 0 -0 0</pose>
+    </light>
+    <light name='lightball7g' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-34 -3.6 2 0 -0 0</pose>
+    </light>
+    <light name='lightball8a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-30 -3.78 2 0 -0 0</pose>
+    </light>
+    <light name='lightball8b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-27 -3.92 2 0 -0 0</pose>
+    </light>
+    <light name='lightball8c' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-24 -4.06 2 0 -0 0</pose>
+    </light>
+    <light name='lightball8d' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-20 -4.2 2 0 -0 0</pose>
+    </light>
+    <light name='lightball9a' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-17 -4.34 2 0 -0 0</pose>
+    </light>
+    <light name='lightball9b' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-14 -4.48 2 0 -0 0</pose>
+    </light>
+    <light name='lightball9c' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-10 -4.62 2 0 -0 0</pose>
+    </light>
+    <light name='lightball9d' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-7 -4.76 2 0 -0 0</pose>
+    </light>
+    <light name='lightball9e' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-4 -4.9 2 0 -0 0</pose>
+    </light>
+    <light name='lightball9f' type='diffuse'>
+      <cast_shadows>1</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <!-- <specular>0.2 0.2 0.2 1</specular> -->
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.1</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <pose>-1 -5.1 2 0 -0 0</pose>
+    </light>
+  </world>
+</sdf>

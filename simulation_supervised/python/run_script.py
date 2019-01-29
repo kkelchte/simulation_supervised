@@ -166,6 +166,7 @@ parser.add_argument("--random_seed", type=int, help="If provided, the simulation
 #   Robot Settings
 # ==========================
 parser.add_argument("--robot",default='drone_sim', type=str, help="Specify the robot configuration file: turtle_sim(default), drone_sim, turtle_real, drone_real.")
+parser.add_argument("-r", "--recovery", action='store_true',help="Use drone with recovery camera's attached.")
 
 # ==========================
 #   Tensorflow Settings
@@ -299,7 +300,7 @@ def start_ros():
   print("{0}: start_ros pid {1}\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
   wait_for_ros_to_start()
   rospy.set_param('evaluate_every',FLAGS.evaluate_every if not FLAGS.evaluation else 1)  
-
+  rospy.set_param('recovery',FLAGS.recovery)  
 start_ros()
 
 ##########################################################################################################################
@@ -354,6 +355,8 @@ def start_python():
         sys.exit(2)
 
 start_python()
+
+print("[runscript] set recovery to {0}".format(rospy.get_param('recovery')))
 
 ##########################################################################################################################
 # STEP 4 Start gazebo environment

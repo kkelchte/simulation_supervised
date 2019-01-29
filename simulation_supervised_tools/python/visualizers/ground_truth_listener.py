@@ -56,7 +56,7 @@ data_location = None
 graphics=False
 
 # Create figure and axes
-fig,ax = plt.subplots(1)
+fig,ax = plt.subplots(1,figsize=(30,30))
 
 # fig=plt.figure(figsize=(30,30))
 # plt.title('Position Display')
@@ -71,9 +71,20 @@ minimum_distance_gazebo=0.7
 previous_position_gazebo=[] # x,y, yaw
 new_position_flag=False
 
-# Create a Rectangle patch
+# Create a Rectangle patch as Nx2
 # current_pose = patches.Rectangle((50,100),40,30,linewidth=1,edgecolor='r',facecolor='None')
-origin_arrow_map = np.asarray([[5,0],[0,-2],[0,-1],[-2.,-1],[-2.,1],[0,1],[0,2]])
+# origin_arrow_map = np.asarray([[5,0],[0,-2],[0,-1],[-2.,-1],[-2.,1],[0,1],[0,2]])
+# origin_arrow_map = np.asarray([[ 0. ,  0. ], [ 2. ,  0. ], [ 2. ,  0.5], [ 3. ,  0. ], [ 2. , -0.5], [ 2. ,  0. ]])
+origin_arrow_map = np.asarray([[ 0. ,  0. ], [ 7. ,  0. ], [ 7. ,  1.5], [ 9. ,  0. ], [ 7. , -1.5], [ 7. ,  0. ]])
+# Use recovery icon in case recovery is on...
+if rospy.has_param('recovery'):
+  if rospy.get_param('recovery'):
+    a=30*np.pi/180
+    origin_arrow_left=np.transpose(np.matmul(np.asarray([[np.cos(a), -np.sin(a)],[np.sin(a), np.cos(a)]]), np.transpose(origin_arrow_map)))
+    origin_arrow_right=np.transpose(np.matmul(np.asarray([[np.cos(a), np.sin(a)],[-np.sin(a), np.cos(a)]]), np.transpose(origin_arrow_map)))
+    origin_arrow_map=np.concatenate([origin_arrow_map, origin_arrow_left, origin_arrow_right], axis=0)
+    print("ground_truth_listener: using recovery arrow. {0}".format(origin_arrow_map.shape))
+
 transformed_arrow = origin_arrow_map[:]
 
 # rotation_gazebo_map = np.asarray([[-1,0,1],[0,1,0],[0,0,-1]])
