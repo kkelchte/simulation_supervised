@@ -156,6 +156,7 @@ parser.add_argument("-n", "--number_of_runs", default=-1, type=int, help="NUMBER
 parser.add_argument("-g", "--graphics", action='store_true', help="Add extra nodes for visualization e.g.: Gazebo GUI, control display, depth prediction, ...")
 parser.add_argument("-e", "--evaluation", action='store_true',help="This script can launch 2 modes of experiments: training (default) or evaluation.")
 parser.add_argument("--evaluate_every", default=10, type=int, help="Evaluate every N runs when training.")
+parser.add_argument("--final_evaluation_runs", default=5, type=int, help="Evaluate N times after training is finished..")
 parser.add_argument("-ds", "--create_dataset", action='store_true',help="In case of True, sensor data is saved.")
 parser.add_argument("--owr", action='store_true',help="Delete dataset if it is already there.")
 
@@ -459,7 +460,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
   # clean up gazebo ros folder every now and then
   if run_number%50 == 0 : shutil.rmtree("{0}/.gazebo/log".format(os.environ['HOME']),ignore_errors=True)
   
-  evaluate=(((run_number%FLAGS.evaluate_every) == 0 and run_number != 0 and FLAGS.evaluate_every != -1) or run_number==FLAGS.number_of_runs-1) or FLAGS.evaluation
+  evaluate=((run_number%FLAGS.evaluate_every) == 0 and run_number != 0 and FLAGS.evaluate_every != -1) or FLAGS.evaluation
   
   # if evaluate:
   #   rospy.set_param('max_duration', 120)
@@ -503,7 +504,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     rospy.set_param('starting_height', starting_height)
     
     print("Changed pose with return values: {0}".format(retvals))
-    time.sleep(1) #CHANGED
+    time.sleep(5) # HAS to be 5 otherwise '/overtake' and '/ready' overlap resulting in empty images in gt_listener
     unpause_physics_client(EmptyRequest())
 
   else:
@@ -636,7 +637,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     # increment also in case of crash as drone has zero turning speed:
     run_number+=1
     if message == 'FINISHED': # make this the final run for evaluation
-      FLAGS.number_of_runs=run_number+5
+      FLAGS.number_of_runs=run_number+FLAGS.final_evaluation_runs
       FLAGS.evaluation=True
       # run_number = FLAGS.number_of_runs-1
   time.sleep(3) 

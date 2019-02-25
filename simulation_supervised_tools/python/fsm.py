@@ -163,6 +163,7 @@ def update_data_location():
     rospy.set_param('data_location',data_location)
   except:
     print("[fsm]: failed to create new data location from current location {0}".format(data_location))
+
 def go_cb(data):
   """Callback on /go to change from 0 or 2 to 1 state"""
   global current_state, shuttingdown, run_number, max_duration
@@ -180,7 +181,11 @@ def go_cb(data):
 
   if rospy.has_param('max_duration'): 
     max_duration=rospy.get_param('max_duration')
-    print("[fsm] set max duration to {0}".format(max_duration))
+  # if rospy.has_param('max_duration') and rospy.has_param('evaluate') and rospy.get_param('evaluate'): 
+  #   max_duration=rospy.get_param('max_duration')
+  #   print("[fsm] set max duration to {0}".format(max_duration))
+  # else: #only use max_duration during evaluation.
+  #   max_duration=-1
 
   if "NN" in [control_sequence['1'], supervision_sequence['1']] and start_nn_pub: start_nn_pub.publish(Empty())
   if "BA" in [control_sequence['1'], supervision_sequence['1']] and start_ba_pub: start_ba_pub.publish(Empty())
@@ -238,7 +243,6 @@ def shutdown(message):
     init()
 
   shuttingdown = False
-
 
 def time_check():
   """Keep track of the time. If the duration is longer than max_duration shutdown with succes."""

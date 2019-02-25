@@ -55,14 +55,6 @@ data_location = None
 
 graphics=False
 
-# Create figure and axes
-fig,ax = plt.subplots(1,figsize=(30,30))
-
-# fig=plt.figure(figsize=(30,30))
-# plt.title('Position Display')
-ax.set_title('Position Display')
-
-
 
 current_position=[0,0,0] # x, y, yaw
 # current_position=[1322,1069,0] # x, y, yaw
@@ -75,10 +67,12 @@ new_position_flag=False
 # current_pose = patches.Rectangle((50,100),40,30,linewidth=1,edgecolor='r',facecolor='None')
 # origin_arrow_map = np.asarray([[5,0],[0,-2],[0,-1],[-2.,-1],[-2.,1],[0,1],[0,2]])
 # origin_arrow_map = np.asarray([[ 0. ,  0. ], [ 2. ,  0. ], [ 2. ,  0.5], [ 3. ,  0. ], [ 2. , -0.5], [ 2. ,  0. ]])
-origin_arrow_map = np.asarray([[ 0. ,  0. ], [ 7. ,  0. ], [ 7. ,  1.5], [ 9. ,  0. ], [ 7. , -1.5], [ 7. ,  0. ]])
+origin_arrow_map = np.asarray([[0.,0.],[7.,0.],[7.,1.5],[9.,0.],[7.,-1.5],[7.,0.]])
 # Use recovery icon in case recovery is on...
 if rospy.has_param('recovery'):
-  if rospy.get_param('recovery'):
+  evaluate=False
+  if rospy.has_param('evaluate'): evaluate=rospy.get_param('evaluate')
+  if rospy.get_param('recovery') and not evaluate:
     a=30*np.pi/180
     origin_arrow_left=np.transpose(np.matmul(np.asarray([[np.cos(a), -np.sin(a)],[np.sin(a), np.cos(a)]]), np.transpose(origin_arrow_map)))
     origin_arrow_right=np.transpose(np.matmul(np.asarray([[np.cos(a), np.sin(a)],[-np.sin(a), np.cos(a)]]), np.transpose(origin_arrow_map)))
@@ -90,21 +84,23 @@ transformed_arrow = origin_arrow_map[:]
 # rotation_gazebo_map = np.asarray([[-1,0,1],[0,1,0],[0,0,-1]])
 rotation_gazebo_map = np.asarray([[-1,0],[0,1]])
 
-# implot=plt.imshow(current_image,animated=True)
-current_image = np.zeros((1069,1322))
-implot=ax.imshow(current_image,animated=True)
-
+# colors fro plotting
 current_color=[0,0,0]
 color_transition='rb' #One of ['rb','rg','bg','br','gb','gr']
 index_translation={'r':0, 'b':1, 'g':2}
+
+# Create figure and axes
+fig,ax = plt.subplots(1,figsize=(30,30))
+ax.set_title('Position Display')
+current_image = np.zeros((1069,1322))
+implot=ax.imshow(current_image,animated=True)
+
   
 
 def update_color():
   """Update color according to following fields:
   current_color
-
   color_transition
-  
   """
   global current_color, color_transition
   current_color[index_translation[color_transition[0]]]-=1/20.
@@ -157,15 +153,19 @@ def ready_cb(data):
   if not ready: 
     # reset color variables
     color_transition=np.random.choice(['rb','rg','bg','br','gb','gr'])
-    current_color=[0,0,0]
-    current_color[index_translation[color_transition[0]]]=1
+    current_color=[1,1,1]
+    current_color[index_translation[color_transition[1]]]=0
 
     ready = True
     finished = False
-    run_file = 'gt_{0:05d}_{1}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f and f.endswith('.png') ]), img_type)
+    evaluation_tag=''
+    if rospy.has_param('evaluate'):
+      evaluation_tag='evaluate' if rospy.get_param('evaluate') else 'train'
+    
+    run_file = 'gt_{0:05d}_{1}{2}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f and f.endswith('.png') ]), img_type, evaluation_tag)
+
     positions = []
 
-    
 def finished_cb(data):
   global ready, finished, fig
   if not finished:
@@ -176,10 +176,18 @@ def finished_cb(data):
     # if not graphics:
     fig.savefig(log_folder+'/'+run_file)
 
+    time.sleep(0.1)
+    clear_fig()
     # draw_positions(log_folder+'/'+run_file)
     # if data_location: draw_positions(data_location+'/runs.png')
-    
 
+def clear_fig():
+  """Clear figure and restart collection of positions
+  """
+  global fig, ax, implot
+  plt.cla()
+  ax.set_title('Position Display')
+  implot=ax.imshow(current_image,animated=True)
 
 def gt_callback(data):
   global positions, current_position, transformed_arrow,previous_position_gazebo, new_position_flag
@@ -252,13 +260,12 @@ if __name__=="__main__":
   if rospy.has_param('background') and rospy.get_param('background') != '':
     if len(rospy.get_param('background')) != 0:
       img_file=rospy.get_param('background')
-  
   try:
     current_image=mpimg.imread(img_file)
   except Exception as e:
     print('[gt_listener]: failed to load background image: '+img_file+'. '+str(e))
   else:
-    implot=plt.imshow(current_image,animated=True)
+    implot=ax.imshow(current_image,animated=True)
     print("[gt_listener]: image shape: {}".format(current_image.shape))
     # print("[gt_listener]: bg shape: {}".format(current_image.shape))
 

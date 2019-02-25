@@ -62,7 +62,7 @@ waypoints=[] # list all waypoints in tuples
 current_waypoint_index=0
 goto_yaw_amplifier=2
 waypoint_reached=0.5 # distance to next waypoint to say drone has reached waypoint
-max_deviation=10*np.pi/180
+max_deviation=5*np.pi/180 #10
 
 # Publisher fields
 action_pub = None
@@ -163,7 +163,7 @@ def get_control():
 def ready_callback(data):
   """Start node 
   """
-  global ready, finished
+  global ready, finished, current_waypoint_index
   if not ready or finished:
     print('[BA] activated.')
     ready = True
