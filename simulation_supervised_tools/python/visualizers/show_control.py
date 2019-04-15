@@ -51,12 +51,14 @@ superviser = ''
 state = ''
 
 # plotting fields
-fig=plt.figure(figsize=(15,10))
+fig=plt.figure(figsize=(10,15))
 plt.title('Control Display')
 font = cv2.FONT_HERSHEY_PLAIN
 current_view = np.zeros((100,150))
 
 implot=plt.imshow(current_view,animated=True)
+ctr=1
+ctr_arrow=plt.arrow(current_view.shape[0]/2,current_view.shape[1]/2,current_view.shape[0]/2+10*ctr,current_view.shape[1]/2, animated=True)
 
 def build_image():
   """Make interface build on current view of robot.
@@ -64,6 +66,9 @@ def build_image():
   view=current_view
   xs=int(view.shape[1]/2)
   ys=int(view.shape[0]/2)  
+  
+  # plt.arrow()
+
   # # draw center bar
   # cv2.line(view, (xs, ys-5), (xs,ys+20),(0,0,0), 3)
   # if cmd_ctr: # draw applied control  
@@ -74,6 +79,7 @@ def build_image():
   
   # if sup_ctr: # draw supervised control  
   #   cv2.line(view, (xs, ys+15), (int(xs-150*sup_ctr.angular.z),ys+15),(0,250,0), 9)
+  
   return current_view
 
 def animate(*args):

@@ -100,6 +100,6 @@
 
   <!-- Visualizations -->
   <!-- Show control -->
-  <!-- <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/> -->
+  <node name="show_control" pkg="simulation_supervised_tools" type="show_control.py" output="screen"/>
 
 </launch>
