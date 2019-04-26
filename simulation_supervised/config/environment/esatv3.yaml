@@ -1,6 +1,6 @@
 delay_evaluation: 3
 # max_duration: 20
-max_duration: 250 # corresponds to one tour
+max_duration: 260 # corresponds to one tour
 # max_duration: 5
 min_depth: 0.5 
 starting_height: 1

@@ -341,17 +341,20 @@ def start_python():
   # Wait for creation of tensorflow log file to know the python node is running
   start_time = time.time()
 
+  wait_time=10
   if os.path.isfile(FLAGS.log_folder+'/nn_ready'):
     prev_stat_nn_ready=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
     while prev_stat_nn_ready == subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready')):
-      if time.time()-start_time > 5*60:
-        print("{0}: Waited for 5minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder))
+      if time.time()-start_time > wait_time*60:
+        print("{0}: Waited for {3}minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder, wait_time))
+        kill_combo()
+        sys.exit(2)
       time.sleep(1)
   else:
     while(not os.path.isfile(FLAGS.log_folder+'/nn_ready')):
       time.sleep(1)
-      if time.time()-start_time > 5*60:
-        print("{0}: Waited for 5minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder))
+      if time.time()-start_time > wait_time*60:
+        print("{0}: Waited for {3}minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder, wait_time))
         kill_combo()
         sys.exit(2)
 
