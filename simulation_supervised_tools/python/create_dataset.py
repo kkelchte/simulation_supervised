@@ -49,6 +49,7 @@ bridge = CvBridge()
 
 data_location = None
 index=0
+index_dict={'left':0,'right':0} #Extra indices for recovery cameras
 last_supervised_control=[0,0,0,0,0,0]
 last_control=[0,0,0,0,0,0]
 last_scan=[]
@@ -94,9 +95,11 @@ def compressed_image_callback(msg):
     # if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
     rgb_write_ts=time.time()
 
-def process_rgb(msg, index):
+def process_rgb(msg, index, saving_location=None):
   """If ready-state: go from serial to rgb image and save it."""
   if (not ready) or finished: return False
+  if not saving_location: 
+    saving_location=data_location
   try:
     # Convert your ROS Image message to OpenCV2
     rgb_image = bridge.imgmsg_to_cv2(msg, "bgr8")
@@ -106,18 +109,25 @@ def process_rgb(msg, index):
     # Save your OpenCV2 image as a jpeg 
     if index > skip_first: 
       # print('[create_dataset.py]: {2}: write RGB image {1} to {0}'.format(data_location, index, rospy.get_time()))
-      cv2.imwrite(data_location+"/RGB/{:010d}.jpg".format(index), rgb_image)
+      cv2.imwrite(saving_location+"/RGB/{:010d}.jpg".format(index), rgb_image)
     return True
 
-def image_callback(msg):
+def image_callback(msg, camera_type='straight'):
   """If saving the image worked out, write the log information and increment index."""
-  global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate
+  global index, rgb_cb_rate, rgb_cb_ts, rgb_write_ts, rgb_write_rate, index_dict
   # print "[create_dataset]: {2} : received image. index: {0} skip_first: {1}".format(index, skip_first, rospy.get_time())
   # if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
   rgb_cb_ts = time.time()
-  if process_rgb(msg, index):
-    if index > skip_first: write_info('RGB', index)
-    index+=1
+  if camera_type != 'straight':
+    if process_rgb(msg, index, saving_location=data_location+'_'+camera_type):
+      if index_dict[camera_type] > skip_first: 
+        write_info('RGB', index_dict[camera_type], saving_location=data_location+'_'+camera_type, direction=camera_type)
+      index_dict[camera_type]+=1
+  else:
+    if process_rgb(msg, index):
+      if index > skip_first if not recovery else 3*skip_first: 
+        write_info('RGB', index)
+      index+=1
     # if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
     rgb_write_ts=time.time()
 
@@ -212,11 +222,31 @@ def gt_callback(data):
     last_odom = [x,y,z,r,p,yw]
   T_pg = copy.deepcopy(T_cg) 
 
+# def image_callback_left_30(msg, sloc):
+#   global index_left_30  
+#   if process_rgb(msg, sloc, index_left_30):
+#     write_info('RGB', sloc, index_left_30)
+#     index_left_30+=1
+# def image_callback_left_60(msg, sloc):
+#   global index_left_60  
+#   if process_rgb(msg, sloc, index_left_60):
+#     write_info('RGB', sloc, index_left_60)
+#     index_left_60+=1
+# def image_callback_right_30(msg, sloc):
+#   global index_right_30  
+#   if process_rgb(msg, sloc, index_right_30):
+#     write_info('RGB', sloc, index_right_30)
+#     index_right_30+=1
+# def image_callback_right_60(msg, sloc):
+#   global index_right_60  
+#   if process_rgb(msg, sloc, index_right_60):
+#     write_info('RGB', sloc, index_right_60)
+#     index_right_60+=1
   
 
 def ready_callback(msg):
   """ callback function that makes create_ds start saving images and toggles ready"""
-  global ready, finished, data_location, index, last_supervised_control, last_control, last_scan, last_gt, last_position, last_odom, T_pg  
+  global ready, finished, data_location, index, last_supervised_control, last_control, last_scan, last_gt, last_position, last_odom, T_pg, index_dict  
   
   if not ready and finished:  
     print("[create_dataset]: Start saving images.")
@@ -240,6 +270,11 @@ def ready_callback(msg):
       last_position=[]
       last_odom=[]
       T_pg=[] # transformation of previous pose in global coordinates
+      if recovery:
+        for direction in ['left','right']:      
+          if not os.path.exists(data_location+'_'+direction+'/RGB'): os.makedirs(data_location+'_'+direction+'/RGB')
+          if not os.path.exists(data_location+'_'+direction+'/Depth'): os.makedirs(data_location+'_'+direction+'/Depth')
+          index_dict={'left':0,'right':0} #Extra indices for recovery cameras
 
 
     print('[create_dataset]: ready: {0}: {1}'.format(rospy.get_time(), data_location))
@@ -256,27 +291,37 @@ def finished_callback(msg):
     #                                                                                                           np.mean(rgb_write_rate),
     #                                                                                                           np.var(rgb_write_rate)))
 
-def write_info(image_type, index):
+def write_info(image_type, index, saving_location=None, direction='straight'):
   """For each image (lowest rate) save information regarding the position, control or scan readings."""
   if (not ready) or finished: return
+  if not saving_location:
+    saving_location=data_location
   # first copy all info in order to have the update closest to saving previous frame.
   supervised_control = last_supervised_control[:] # copy
   control=last_control[:] #copy
+  # adjust control according to direction
+  if direction != 'straight':
+    if direction=='left':
+      control[5] = control[5]-0.9 
+    elif direction=='right':
+      control[5] = control[5]+0.9 
+    else:
+      print("[create_dataset.py]: direction {} is unknown.".format(direction))
   odom=last_odom[:]
   position=last_position[:]
   scan=last_scan[:]
   # open and append information
-  with open(data_location+'/supervised_info.txt','a') as supervised_controlfile:
+  with open(saving_location+'/supervised_info.txt','a') as supervised_controlfile:
     supervised_controlfile.write("{0:010d} {1[0]} {1[1]} {1[2]} {1[3]} {1[4]} {1[5]}\n".format(index, supervised_control))
-  with open(data_location+'/control_info.txt','a') as controlfile:
+  with open(saving_location+'/control_info.txt','a') as controlfile:
     controlfile.write("{0:010d} {1[0]} {1[1]} {1[2]} {1[3]} {1[4]} {1[5]}\n".format(index, control))
-  with open(data_location+'/position_info.txt','a') as positionfile:
+  with open(saving_location+'/position_info.txt','a') as positionfile:
     positionfile.write("{0:010d} {1}\n".format(index, str(position)))
-  with open(data_location+'/odom_info.txt','a') as odomfile:
+  with open(saving_location+'/odom_info.txt','a') as odomfile:
     odomfile.write("{0:010d} {1}\n".format(index, str(odom)))
-  with open(data_location+'/images.txt','a') as imagesfile:
-    imagesfile.write("{3}s:{4}ns {0}/{1}/{2:010d}.jpg\n".format(data_location, image_type, index, rospy.get_rostime().secs, rospy.get_rostime().nsecs))
-  with open(data_location+'/scan.txt','a') as scanfile:
+  with open(saving_location+'/images.txt','a') as imagesfile:
+    imagesfile.write("{3}s:{4}ns {0}/{1}/{2:010d}.jpg\n".format(saving_location, image_type, index, rospy.get_rostime().secs, rospy.get_rostime().nsecs))
+  with open(saving_location+'/scan.txt','a') as scanfile:
     scanfile.write("{0:010d} {1}\n".format(index, str(scan)))
 
 
@@ -328,20 +373,21 @@ if __name__=="__main__":
     else:
       rospy.Subscriber(rospy.get_param('depth_image'), Image, depth_callback)
 
-  # if rospy.has_param('recovery'):
-  #   recovery = rospy.get_param('recovery')
-  # if recovery:
+
+  if rospy.has_param('recovery'):
+    recovery = rospy.get_param('recovery')
+  if recovery:
+    for direction in ['left','right']:
+      rospy.Subscriber(rospy.get_param('rgb_image_'+direction), Image, image_callback, callback_args=direction, queue_size = 20)
+      if not os.path.exists(data_location+'_'+direction+'/RGB'): os.makedirs(data_location+'_'+direction+'/RGB')
+      if not os.path.exists(data_location+'_'+direction+'/Depth'): os.makedirs(data_location+'_'+direction+'/Depth')
+    
   #   callbacks={'left':{'30':image_callback_left_30,'60':image_callback_left_60},'right':{'30':image_callback_right_30,'60':image_callback_right_60}}
   #   callbacks_depth={'left':{'30':depth_callback_left_30,'60':depth_callback_left_60},'right':{'30':depth_callback_right_30,'60':depth_callback_right_60}}
   #   for d in ['left','right']:
   #     for c in ['30','60']:
   #       rospy.Subscriber(re.sub(r"kinect","kinect_"+d+"_"+c,rospy.get_param('rgb_image')), Image, callbacks[d][c],(data_location+'_'+d+'_'+c))
   #       rospy.Subscriber(re.sub(r"kinect","kinect_"+d+"_"+c,rospy.get_param('depth_image')), Image, callbacks_depth[d][c],(data_location+'_'+d+'_'+c))
-  #       # create necessary directories
-  #       if not os.path.exists(data_location+'_'+d+'_'+c+'/RGB'):
-  #           os.makedirs(data_location+'_'+d+'_'+c+'/RGB')
-  #       if not os.path.exists(data_location+'_'+d+'_'+c+'/Depth'):
-  #           os.makedirs(data_location+'_'+d+'_'+c+'/Depth')
 
   # spin() simply keeps python from exiting until this node is stopped	
   rospy.spin()
@@ -349,26 +395,6 @@ if __name__=="__main__":
 
 #### MORE CALLBACKS FOR DIFFERENT SENSORS:
 
-# def image_callback_left_30(msg, sloc):
-#   global index_left_30  
-#   if process_rgb(msg, sloc, index_left_30):
-#     write_info('RGB', sloc, index_left_30)
-#     index_left_30+=1
-# def image_callback_left_60(msg, sloc):
-#   global index_left_60  
-#   if process_rgb(msg, sloc, index_left_60):
-#     write_info('RGB', sloc, index_left_60)
-#     index_left_60+=1
-# def image_callback_right_30(msg, sloc):
-#   global index_right_30  
-#   if process_rgb(msg, sloc, index_right_30):
-#     write_info('RGB', sloc, index_right_30)
-#     index_right_30+=1
-# def image_callback_right_60(msg, sloc):
-#   global index_right_60  
-#   if process_rgb(msg, sloc, index_right_60):
-#     write_info('RGB', sloc, index_right_60)
-#     index_right_60+=1
 
 
 # def depth_callback_left_30(msg, sloc):

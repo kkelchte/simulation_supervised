@@ -186,13 +186,13 @@ parser.add_argument("-w","--world",dest='worlds', action='append', nargs=1, help
 # parser.add_argument("-p","--paramfile",default='eva_params.yaml',type=str, help="Add more parameters to the command loading the DNN in tensorflow ex: eva_params.yaml or params.yaml.")
 parser.add_argument("--fsm",default='nn_drone_fsm',type=str, help="Define the fsm loaded from /simsup/config/fsm: nn_turtle_fsm, console_fsm, console_nn_db_turtle_fsm, ...")
 
-parser.add_argument("--x_pos",default=0,type=float, help="Specify x position.")
+parser.add_argument("--x_pos",default=999,type=float, help="Specify x position.")
 parser.add_argument("--x_var",default=0,type=float, help="Specify variation in x position.")
-parser.add_argument("--y_pos",default=0,type=float, help="Specify y position.")
+parser.add_argument("--y_pos",default=999,type=float, help="Specify y position.")
 parser.add_argument("--y_var",default=0,type=float, help="Specify variation in y position.")
-parser.add_argument("--z_pos",default=0,type=float, help="Specify z position.")
+parser.add_argument("--z_pos",default=999,type=float, help="Specify z position.")
 parser.add_argument("--z_var",default=0,type=float, help="Specify variation z position.")
-parser.add_argument("--yaw_or",default=1.57,type=float, help="Specify yaw orientation.")
+parser.add_argument("--yaw_or",default=999,type=float, help="Specify yaw orientation.")
 # parser.add_argument("--yaw_var",default=2*3.14,type=float, help="Specify variation in yaw orientation.")
 parser.add_argument("--yaw_var",default=0,type=float, help="Specify variation in yaw orientation.")
 
@@ -249,9 +249,19 @@ except:
 if FLAGS.owr and os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
   shutil.rmtree("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag))
 
-# Create main log folder
+# Create main log folder if necessary
 if not os.path.isdir("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag)):
   os.makedirs("{0}{1}".format(FLAGS.summary_dir, FLAGS.log_tag))
+else:
+  # Load last position to start from if lastposition is file log folder already existed
+  if os.path.isfile("{0}{1}/last_position.txt".format(FLAGS.summary_dir, FLAGS.log_tag)):
+    try:
+      with open("{0}{1}/last_position.txt".format(FLAGS.summary_dir, FLAGS.log_tag),'r') as f:
+        last_position=f.readlines()
+        FLAGS.x_pos,FLAGS.y_pos,FLAGS.z_pos,FLAGS.yaw_or= [ float(x) for x in last_position[-1].strip().split(',')]
+        print("[run_script] obtained last position as {0} {1} {2} {3}".format(FLAGS.x_pos,FLAGS.y_pos,FLAGS.z_pos,FLAGS.yaw_or))
+    except:
+      print("[run_script] failed to obtain last position from {0}{1}/last_position.txt".format(FLAGS.summary_dir, FLAGS.log_tag))
 
 # in case of data_creation, make data_location in ~/pilot_data
 if FLAGS.create_dataset: 
@@ -409,7 +419,7 @@ def sample_new_position(starting_positions=[]):
   returns positions: x, y, z and orientation yaw in quaternion (1 ~ +90)
   """
   # default with arguments
-  x, y, z, yaw = FLAGS.x_pos, FLAGS.y_pos, FLAGS.z_pos, FLAGS.yaw_or
+  x, y, z, yaw = 0,0,0,0
   if len(starting_positions) != 0:
     pos = starting_positions[np.random.choice(range(len(starting_positions)))]
     if len(pos) == 2:
@@ -420,10 +430,19 @@ def sample_new_position(starting_positions=[]):
       x, y, z, yaw = pos
     else:
       print("[run_script] failed to parse starting_position {0}".format(pos))
+  
+  # overwrite sampled starting positions if they were manually set
+  if FLAGS.x_pos != 999: x=FLAGS.x_pos
+  if FLAGS.y_pos != 999: y=FLAGS.y_pos
+  if FLAGS.z_pos != 999: z=FLAGS.z_pos
+  if FLAGS.yaw_or != 999: yaw=FLAGS.yaw_or
+  
+  # add some variation
   x += np.random.uniform(-FLAGS.x_var,FLAGS.x_var)
   y += np.random.uniform(-FLAGS.y_var,FLAGS.y_var)
   z += np.random.uniform(-FLAGS.z_var,FLAGS.z_var)
   yaw += np.random.uniform(-FLAGS.yaw_var,FLAGS.yaw_var)
+
   return x, y, z, yaw 
 
 # ensure location for logging the xterm outputs exists.
@@ -642,6 +661,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     if message == 'FINISHED': # make this the final run for evaluation
       FLAGS.number_of_runs=run_number+FLAGS.final_evaluation_runs
       FLAGS.evaluation=True
+
       # run_number = FLAGS.number_of_runs-1
   time.sleep(3) 
   # extra second needed to save image in gt_listener

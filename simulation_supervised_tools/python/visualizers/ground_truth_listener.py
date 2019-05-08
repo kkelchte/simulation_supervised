@@ -29,7 +29,7 @@ turtle=False
 size = (200,200,3)
 img = np.ones(size)
 img_type = "unknown"
-positions = []
+last_position = []
 ready = False
 finished = True
 transformations={'unknown':(2,1,-2,1),
@@ -132,24 +132,8 @@ def transform(x,y):
     a,b,c,d,e,f=transformations[img_type]
     return (a*x+b*y+c, d*x+e*y+f)
 
-def draw_positions(file_name):
-  # f=open('/home/klaas/gt.txt', 'w')
-  # for pos in positions:
-  #   f.write('{0}\n'.format(str(pos)))
-  # f.close()
-  print(len(positions))
-  fig = plt.figure(figsize=(10, 10))
-  imgplot = plt.imshow(img)
-  x = [p[0] for p in positions]
-  y = [p[1] for p in positions]
-  plt.plot(x,y, 'v',ms=1)
-  plt.axis('off')
-  # plt.show()
-  print("[gt_listener]: print run to {}".format(file_name))
-  plt.savefig(file_name, bbox_inches='tight')
-  
 def ready_cb(data):
-  global ready, finished, run_file, positions, img, color_transition, current_color
+  global ready, finished, run_file, last_position, img, color_transition, current_color
   if not ready: 
     # reset color variables
     color_transition=np.random.choice(['rb','rg','bg','br','gb','gr'])
@@ -164,25 +148,27 @@ def ready_cb(data):
     
     run_file = 'gt_{0:05d}_{1}{2}.png'.format(len([f for f in os.listdir(log_folder) if 'gt' in f and f.endswith('.png') ]), img_type, evaluation_tag)
 
-    positions = []
+    last_position = []
 
 def finished_cb(data):
   global ready, finished, fig
   if not finished:
     ready = False
     finished = True
+    
+    #write last pose to reuse if necessary
+    with open(log_folder+'/../last_position.txt','w') as f: 
+      f.write("{0[0]}, {0[1]}, {0[2]}, {0[3]}\n".format(last_position))
+    
     time.sleep(0.5)
-
     # if not graphics:
     fig.savefig(log_folder+'/'+run_file)
 
     time.sleep(0.1)
     clear_fig()
-    # draw_positions(log_folder+'/'+run_file)
-    # if data_location: draw_positions(data_location+'/runs.png')
 
 def clear_fig():
-  """Clear figure and restart collection of positions
+  """Clear figure and restart collection of position
   """
   global fig, ax, implot
   plt.cla()
@@ -190,15 +176,15 @@ def clear_fig():
   implot=ax.imshow(current_image,animated=True)
 
 def gt_callback(data):
-  global positions, current_position, transformed_arrow,previous_position_gazebo, new_position_flag
+  global last_position, current_position, transformed_arrow,previous_position_gazebo, new_position_flag
   if not ready: return 
   
-  # draw traingle only if distance is far enough
-  (x,y)=transform(data.pose.pose.position.x,data.pose.pose.position.y)
+  x,y=transform(data.pose.pose.position.x,data.pose.pose.position.y)
   
   if len(previous_position_gazebo)==0: 
     previous_position_gazebo=[data.pose.pose.position.x,data.pose.pose.position.y]
 
+  # draw traingle only if distance is far enough
   if np.sqrt((data.pose.pose.position.x-previous_position_gazebo[0])**2+(data.pose.pose.position.y-previous_position_gazebo[1])**2) > minimum_distance_gazebo:
     previous_position_gazebo=[data.pose.pose.position.x,data.pose.pose.position.y]
 
@@ -222,7 +208,11 @@ def gt_callback(data):
     transformed_arrow=transformed_arrow[:,:2]
     new_position_flag=True
 
-    positions.append((x,y, yaw))
+    last_position=[data.pose.pose.position.x,
+                  data.pose.pose.position.y,
+                  data.pose.pose.position.z,
+                  yaw]
+
 
     # if not graphics:
     animate()
@@ -237,6 +227,24 @@ def gt_callback(data):
 
   # # else: positions.append(transform(-data.pose.pose.position.y, data.pose.pose.position.x))
   # if len(positions) > 10**4: positions.pop(0) #avoid memory leakage
+
+def draw_positions(file_name):
+  # DEPRECATED
+  # f=open('/home/klaas/gt.txt', 'w')
+  # for pos in positions:
+  #   f.write('{0}\n'.format(str(pos)))
+  # f.close()
+  print(len(positions))
+  fig = plt.figure(figsize=(10, 10))
+  imgplot = plt.imshow(img)
+  x = [p[0] for p in positions]
+  y = [p[1] for p in positions]
+  plt.plot(x,y, 'v',ms=1)
+  plt.axis('off')
+  # plt.show()
+  print("[gt_listener]: print run to {}".format(file_name))
+  plt.savefig(file_name, bbox_inches='tight')
+  
 
 
 def cleanup():
