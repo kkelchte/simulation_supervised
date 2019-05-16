@@ -68,6 +68,15 @@ gazebo_popen = None
 crash_number = 0
 run_number = 0
 
+def myprint(message):
+  """
+  Output is not captured on computing cluster,
+  therefore write it away to logfolder/output as well
+  """
+  print(message)  
+  with open(FLAGS.summary_dir+FLAGS.log_tag+'/output','a') as f:
+    f.write(message+'\n')
+
 # Predefined functions.
 def load_param_file(location):
   """Load yaml as dict and change to proper string arguments.
@@ -77,7 +86,7 @@ def load_param_file(location):
     try:
       yaml_dict=yaml.load(stream)
     except yaml.YAMLError as exc:
-      print(exc)
+      myprint(exc)
   yaml_str=""
   for k in yaml_dict.keys():
     if isinstance(yaml_dict[k],bool):
@@ -90,7 +99,7 @@ def wait_for_gazebo():
   """gazebo popen is not enough to get gzserver to stop so wait longer..."""
   p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
   p_grep = subprocess.Popen(["grep","gz"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
-  print("{0}: wait for gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+  myprint("{0}: wait for gazebo".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
   out = p_grep.communicate()[0]
   while "gzserver" in out:
     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
@@ -103,7 +112,7 @@ def wait_for_create_dataset():
   """gazebo popen is not enough to get gzserver to stop so wait longer..."""
   p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
   p_grep = subprocess.Popen(["grep","create_dataset"],stdin=p_ps.stdout, stdout=subprocess.PIPE)
-  print("{0}: wait for create_dataset".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+  myprint("{0}: wait for create_dataset".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
   out = p_grep.communicate()[0]
   while "create_dataset" in out:
     p_ps = subprocess.Popen(["ps", "-ef"], stdout=subprocess.PIPE)
@@ -116,13 +125,13 @@ def wait_for_ros_to_start():
   time.sleep(1)
   p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
   while p_ps == 1:
-    print("{0}: wait for ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+    myprint("{0}: wait for ros".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
     time.sleep(1)
     p_ps = subprocess.call(["rosparam", "list"], stdout=subprocess.PIPE)
 
 def kill_popen(process_name, process_popen):
   """Check status, terminate popen and wait for it to stop."""
-  print("{0}: terminate {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), process_name))
+  myprint("{0}: terminate {1}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), process_name))
   if process_popen.poll() == None:
     process_popen.terminate()
     process_popen.wait()
@@ -135,6 +144,9 @@ def kill_combo():
   if python_popen: kill_popen('python', python_popen)
   if ros_popen: kill_popen('ros', ros_popen)
   time.sleep(5)
+
+
+
 
 ##########################################################################################################################
 # STEP 1 Load Parameters
@@ -236,7 +248,7 @@ if FLAGS.random_seed:
 
 # check if robot configuration exists is there:
 if not os.path.isfile(simulation_supervised_dir+'/config/robot/'+FLAGS.robot+'.yaml'):
-  print("Could not find robot configuration for {}".format(w[0]))
+  myprint("Could not find robot configuration for {}".format(w[0]))
   sys.exit(4)
 
 # try to extract condor host
@@ -259,9 +271,9 @@ else:
       with open("{0}{1}/last_position.txt".format(FLAGS.summary_dir, FLAGS.log_tag),'r') as f:
         last_position=f.readlines()
         FLAGS.x_pos,FLAGS.y_pos,FLAGS.z_pos,FLAGS.yaw_or= [ float(x) for x in last_position[-1].strip().split(',')]
-        print("[run_script] obtained last position as {0} {1} {2} {3}".format(FLAGS.x_pos,FLAGS.y_pos,FLAGS.z_pos,FLAGS.yaw_or))
+        myprint("[run_script] obtained last position as {0} {1} {2} {3}".format(FLAGS.x_pos,FLAGS.y_pos,FLAGS.z_pos,FLAGS.yaw_or))
     except:
-      print("[run_script] failed to obtain last position from {0}{1}/last_position.txt".format(FLAGS.summary_dir, FLAGS.log_tag))
+      myprint("[run_script] failed to obtain last position from {0}{1}/last_position.txt".format(FLAGS.summary_dir, FLAGS.log_tag))
 
 # in case of data_creation, make data_location in ~/pilot_data
 if FLAGS.create_dataset: 
@@ -279,11 +291,11 @@ if FLAGS.create_dataset:
       # in case there is already data recorded, parse the number of runs and continue from there
       last_run=sorted([d for d in os.listdir(FLAGS.data_location) if os.path.isdir("{0}/{1}".format(FLAGS.data_location,d))])[-1]
       run_number=int(last_run.split('_')[0]) +1 #assuming number occurs at first 5 digits xxxxx_name_of_data
-      print("Found data from previous run so adjusted run_number to {}".format(run_number))
+      myprint("Found data from previous run so adjusted run_number to {}".format(run_number))
 
 # display and save all settings
-print("\nSettings:")
-for f in sorted(FLAGS.__dict__): print("{0}: {1}".format( f, FLAGS.__dict__[f]))
+myprint("\nSettings:")
+for f in sorted(FLAGS.__dict__): myprint("{0}: {1}".format( f, FLAGS.__dict__[f]))
 
 with open("{0}{1}/run_conf".format(FLAGS.summary_dir, FLAGS.log_tag),'w') as c:
   c.write("Settings of Run_simulation_scripts:\n\n")
@@ -308,7 +320,7 @@ def start_ros():
   args = shlex.split("xterm -iconic -l -lf {0} -hold -e {1}".format(xterm_log_file,command))
   ros_popen = subprocess.Popen(args)
   pid_ros = ros_popen.pid
-  print("{0}: start_ros pid {1}\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
+  myprint("{0}: start_ros pid {1}\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_ros))
   wait_for_ros_to_start()
   rospy.set_param('evaluate_every',FLAGS.evaluate_every if not FLAGS.evaluation else 1)  
   rospy.set_param('recovery',FLAGS.recovery)  
@@ -340,14 +352,14 @@ def start_python():
                                                                                 FLAGS.code_root,
                                                                                 FLAGS.python_project,
                                                                                 params)
-  print("Tensorflow command:\n {}".format(command))
+  myprint("Tensorflow command:\n {}".format(command))
   xterm_log_file='{0}/xterm_python_{1}.txt'.format(python_xterm_log_dir,time.strftime("%Y-%m-%d_%I%M"))
   if os.path.isfile(xterm_log_file): os.remove(xterm_log_file)
   args = shlex.split("xterm -l -lf {0} -hold -e {1}".format(xterm_log_file, command))
   # Execute command
   python_popen = subprocess.Popen(args)
   pid_python = python_popen.pid
-  print("{0}: start_python pid {1} \n\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_python))
+  myprint("{0}: start_python pid {1} \n\n".format(time.strftime("%Y-%m-%d_%I:%M:%S"),pid_python))
   # Wait for creation of tensorflow log file to know the python node is running
   start_time = time.time()
 
@@ -356,7 +368,7 @@ def start_python():
     prev_stat_nn_ready=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
     while prev_stat_nn_ready == subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready')):
       if time.time()-start_time > wait_time*60:
-        print("{0}: Waited for {3}minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder, wait_time))
+        myprint("{0}: Waited for {3}minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder, wait_time))
         kill_combo()
         sys.exit(2)
       time.sleep(1)
@@ -364,13 +376,13 @@ def start_python():
     while(not os.path.isfile(FLAGS.log_folder+'/nn_ready')):
       time.sleep(1)
       if time.time()-start_time > wait_time*60:
-        print("{0}: Waited for {3}minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder, wait_time))
+        myprint("{0}: Waited for {3}minutes on nn_ready in {2} to start, seems like tensorflow has crashed on {1} so exit with error code 2.".format(time.strftime("%Y-%m-%d_%I:%M"), FLAGS.condor_host, FLAGS.log_folder, wait_time))
         kill_combo()
         sys.exit(2)
 
 start_python()
 
-print("[runscript] set recovery to {0}".format(rospy.get_param('recovery')))
+myprint("[runscript] set recovery to {0}".format(rospy.get_param('recovery')))
 
 ##########################################################################################################################
 # STEP 4 Start gazebo environment
@@ -404,7 +416,7 @@ def create_environment(run_number, world_name):
     return_val=subprocess.call(shlex.split(generator_command))
     if return_val != 0:
       kill_combo()
-      print("Failed to create env {0}, return value: {1}".format(world_name, return_val))
+      myprint("Failed to create env {0}, return value: {1}".format(world_name, return_val))
       sys.exit(2)
     world_file=FLAGS.log_folder+'/'+world_name+'.world'
     world_config=FLAGS.log_folder+'/'+world_name+'.yaml'  
@@ -429,7 +441,7 @@ def sample_new_position(starting_positions=[]):
     elif len(pos) == 4:
       x, y, z, yaw = pos
     else:
-      print("[run_script] failed to parse starting_position {0}".format(pos))
+      myprint("[run_script] failed to parse starting_position {0}".format(pos))
   
   # overwrite sampled starting positions if they were manually set
   if FLAGS.x_pos != 999: x=FLAGS.x_pos
@@ -475,7 +487,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
   if os.path.isfile(FLAGS.log_folder+'/nn_ready'):
     prev_stat_nn_log=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
   else: # we have last communication with our log folder so exit with code 2
-    print("{2}: lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
+    myprint("{2}: lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
     kill_combo()
     sys.exit(3)
 
@@ -512,7 +524,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     pose.position.x, pose.position.y, starting_height, yaw = sample_new_position(starting_positions)
     # pose.position.x, pose.position.y, starting_height, yaw=0,0,1,0
     
-    print("[run_script]: x: {0}, y: {1}, z: {2}, yaw:{3}".format(pose.position.x, pose.position.y, starting_height, yaw))
+    myprint("[run_script]: x: {0}, y: {1}, z: {2}, yaw:{3}".format(pose.position.x, pose.position.y, starting_height, yaw))
     # some yaw to quaternion re-orientation code:
     pose.orientation.z=np.sin(yaw)
     pose.orientation.w=np.cos(yaw)
@@ -525,7 +537,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     retvals = model_state_gazebo_service(state_request)
     rospy.set_param('starting_height', starting_height)
     
-    print("Changed pose with return values: {0}".format(retvals))
+    myprint("Changed pose with return values: {0}".format(retvals))
     time.sleep(5) # HAS to be 5 otherwise '/overtake' and '/ready' overlap resulting in empty images in gt_listener
     unpause_physics_client(EmptyRequest())
 
@@ -548,7 +560,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       new_environment_arguments+=" data_location:={0}".format(data_location)
       if 'world_file' in new_environment_arguments:
         world_file=[a for a in new_environment_arguments.split(' ') if 'world_file' in a][0].split(':=')[1]
-        print("[runscript] world_file ",world_file)
+        myprint("[runscript] world_file ",world_file)
         shutil.copyfile(world_file, data_location+'/'+os.path.basename(world_file))
 
     x,y,z,yaw=sample_new_position(starting_positions)
@@ -564,7 +576,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
             'random_seed:='+str(FLAGS.random_seed) if FLAGS.random_seed else '')
     # 4.2.2c Launch command
     # Execute command
-    print "gazebo_command: ",command
+    myprint( "gazebo_command: {0}".format(command))
     xterm_log_file='{0}/xterm_gazebo_{1}.txt'.format(gazebo_xterm_log_dir,time.strftime("%Y-%m-%d_%I-%M-%S"))
     args = shlex.split("xterm -iconic -l -lf {0} -hold -e {1}".format(xterm_log_file,command))
     gazebo_popen = subprocess.Popen(args)
@@ -583,7 +595,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
 
   prev_stat_fsm_log=subprocess.check_output(shlex.split("stat -c %Y "+fsm_file))
   time.sleep(0.1)
-  print("\n{0}: started run {1} of the {2} in {4} {3} {5}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
+  myprint("\n{0}: started run {1} of the {2} in {4} {3} {5}".format(time.strftime("%Y-%m-%d_%I:%M:%S"),
                                                           run_number+1, 
                                                           FLAGS.number_of_runs,
                                                           world_name,
@@ -597,7 +609,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     # Check on job suspension: 
     # if between last update and now has been more than 30 seconds (should be less than 0.1s)
     if time.time() - start_time - time_spend > 30:
-      print("{0}: Job got suspended.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+      myprint("{0}: Job got suspended.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       time.sleep(30) #wait for big tick to update
       start_time=time.time()
     else:
@@ -618,14 +630,14 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       with open(xterm_log_file, 'r') as f:
         for l in f.readlines():
           if 'process has died' in l:
-            print("[run_script] {0}: found gz crash in {1}: {2}.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), os.path.basename(xterm_log_file),l[:50]))
+            myprint("[run_script] {0}: found gz crash in {1}: {2}.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), os.path.basename(xterm_log_file),l[:50]))
             crashed=True
             crash_number+=1
       if crashed:
         if crash_number < 10: #after 20 crashes its maybe time to restart everything
           kill_popen('gazebo', gazebo_popen)
         else:
-          print("{0}: crashed for 10the time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+          myprint("{0}: crashed for 10the time so restart everything.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
           kill_combo()
           start_ros()
           start_python()
@@ -641,21 +653,21 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     if os.path.isfile(FLAGS.log_folder+'/nn_ready'):
       current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
       start_time=time.time()
-      print("{0}: waiting for nn_ready.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+      myprint("{0}: waiting for nn_ready.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
       while current_stat == prev_stat_nn_log:
         current_stat=subprocess.check_output(shlex.split("stat -c %Y "+FLAGS.log_folder+'/nn_ready'))
         time.sleep(1)
         if time.time()-start_time > 8*60:
-          print("{0}: waited for 8minutes on nn_ready to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
+          myprint("{0}: waited for 8minutes on nn_ready to finish training so something went wrong on {1} exit with code 2.".format(time.strftime("%Y-%m-%d_%I:%M:%S"), FLAGS.condor_host))
           kill_combo()
           sys.exit(2)
     else:
-      print("{2}: we have lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
+      myprint("{2}: we have lost communication with our log folder {0} on host {1} so exit with code 3.".format(FLAGS.log_folder, FLAGS.condor_host, time.strftime("%Y-%m-%d_%I:%M:%S")))
       kill_combo()
       sys.exit(3)
   if not crashed:
     message = open(fsm_file,'r').readlines()[-1].strip()
-    print("{0}: ended run {1} with {3}{2}{4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, message, bcolors.OKGREEN if 'success' in message else bcolors.FAIL, bcolors.ENDC))
+    myprint("{0}: ended run {1} with {3}{2}{4}".format(time.strftime("%Y-%m-%d_%I:%M:%S"), run_number+1, message, bcolors.OKGREEN if 'success' in message else bcolors.FAIL, bcolors.ENDC))
     # increment also in case of crash as drone has zero turning speed:
     run_number+=1
     if message == 'FINISHED': # make this the final run for evaluation
@@ -668,5 +680,5 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
 
 # after all required runs are finished
 kill_combo()
-print("\n{0}: done.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
+myprint("\n{0}: done.".format(time.strftime("%Y-%m-%d_%I:%M:%S")))
 
