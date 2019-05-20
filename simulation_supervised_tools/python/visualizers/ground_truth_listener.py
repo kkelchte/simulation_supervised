@@ -157,8 +157,9 @@ def finished_cb(data):
     finished = True
     
     #write last pose to reuse if necessary
-    with open(log_folder+'/../last_position.txt','w') as f: 
-      f.write("{0[0]}, {0[1]}, {0[2]}, {0[3]}\n".format(last_position))
+    if len(last_position) != 0:
+      with open(log_folder+'/../last_position.txt','w') as f: 
+        f.write("{0[0]}, {0[1]}, {0[2]}, {0[3]}\n".format(last_position))
     
     time.sleep(0.5)
     # if not graphics:
