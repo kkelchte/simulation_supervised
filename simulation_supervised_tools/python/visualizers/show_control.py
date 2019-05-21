@@ -263,6 +263,8 @@ if __name__=="__main__":
       print("[show_scan_prediction]: showing graphics.")
       anim=animation.FuncAnimation(fig,animate)
       plt.show()
+    else:
+      sys.exit(0)
   rospy.on_shutdown(cleanup)
 
   rospy.spin()
