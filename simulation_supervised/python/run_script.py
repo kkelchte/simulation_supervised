@@ -560,7 +560,7 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
       new_environment_arguments+=" data_location:={0}".format(data_location)
       if 'world_file' in new_environment_arguments:
         world_file=[a for a in new_environment_arguments.split(' ') if 'world_file' in a][0].split(':=')[1]
-        myprint("[runscript] world_file ",world_file)
+        myprint("[runscript] world_file {0}".format(world_file))
         shutil.copyfile(world_file, data_location+'/'+os.path.basename(world_file))
 
     x,y,z,yaw=sample_new_position(starting_positions)

@@ -108,9 +108,10 @@ def gt_callback(data):
         data.pose.pose.orientation.w)
   _, _, yaw_drone = tf.transformations.euler_from_quaternion(quaternion)
   
-  dy=(waypoints[current_waypoint_index][1]-data.pose.pose.position.y)
-  dx=(waypoints[current_waypoint_index][0]-data.pose.pose.position.x)
-  
+
+  dy=(waypoints[current_waypoint_index][1]-data.pose.pose.position.y) if len(waypoints) != 0 else 1000
+  dx=(waypoints[current_waypoint_index][0]-data.pose.pose.position.x) if len(waypoints) != 0 else 1000
+
   # print("[behavior_arbitration]: dx {0} dy {1} distance {2} <? min distance {3}".format(dx, dy, np.sqrt(dx**2+dy**2), waypoint_reached))
 
   if np.sqrt(dx**2+dy**2) < waypoint_reached:
