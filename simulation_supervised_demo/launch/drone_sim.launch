@@ -81,6 +81,9 @@
     <arg name="speed" value="$(arg speed)"/>
   </include>
    -->
+  <!-- KeyBoard node -->
+  <node name="teleop_twist_keyboard" pkg="simulation_supervised_tools" type="teleop_twist_keyboard.py" output="screen"/>
+
   
   <node name="behavior_arbitration" pkg="simulation_supervised_control" type="behavior_arbitration.py" output="screen"/>
   

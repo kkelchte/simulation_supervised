@@ -59,6 +59,7 @@ last_odom=[]
 T_pg=[] # transformation of previous pose in global coordinates
 ready=False
 finished=True
+recovery=False
 
 # keep track of how fast images arrive (first thing at callback)
 # and how fast they are written away

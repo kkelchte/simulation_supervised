@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='us-ascii'?>
 <sdf version="1.6">
   <world name="default">
-    <!-- <light name="sun" type="directional">
+    <light name="sun" type="directional">
       <cast_shadows>1</cast_shadows>
       <pose frame="">0 0 10 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -13,7 +13,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-    </light> -->
+    </light>
     <model name="ground_plane">
       <static>1</static>
       <link name="link">
@@ -88,6 +88,32 @@
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
+    <model name="wall_back_0_0_0_0">
+      <static>1</static>
+      <pose>0.0 -1.5 1.5 0.0 0.0 0.0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/White</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="wall_right_0_0_0_0">
       <static>1</static>
       <pose>1.5 0.0 1.5 0.0 0.0 1.57</pose>
@@ -102,10 +128,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -129,10 +154,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -156,10 +180,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -172,6 +195,24 @@
     <light name="lightball_0_0_0_0_0" type="point">
       <cast_shadows>0</cast_shadows>
       <pose>-0.25 -0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_1_0_0_0_0" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_0_0_0_0" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_0_0_0_0" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 0.25 2.99 0.0 0.0 0.0</pose>
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
@@ -215,10 +256,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -242,10 +282,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -269,10 +308,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -288,6 +326,69 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_0_1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_0_1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_0_1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="person_standing_0_1_0_1">
+    <pose>-1.0499999999999998 3.45275443332 0.0 0.0 0.0 0.0</pose>
+    <static>1</static>
+    <link name="link">
+      <inertial>
+        <pose>0 -0.1 0.95 0 0 0</pose>
+        <mass>80.0</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="bottom">
+        <pose>0 -0.1 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.35 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="person">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
     <model name="wall_bottom_0_1_0_1">
       <static>1</static>
       <pose>0.0 3.0 0.0 0.0 0.0 0.0</pose>
@@ -315,7 +416,7 @@
       </link>
     </model>
     <model name="doorway_0_1_0_1">
-    <pose frame="">0.0 3.95611042989 0.0 0.0 0.0 0.0</pose>
+    <pose frame="">0.0 1.864238205075 0.0 0.0 0.0 0.0</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -421,10 +522,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -448,10 +548,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -475,10 +574,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -494,8 +592,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_0_2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_0_2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_0_2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_0_2_0_2">
-    <pose>0.4704150852435 7.05 0.0 0.0 0.0 1.57</pose>
+    <pose>-1.0499999999999998 6.5092485543015 0.0 0.0 0.0 0.0</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -565,6 +681,32 @@
         </visual>
       </link>
     </model>
+    <model name="panel_0_2_0_2">
+      <static>1</static>
+      <pose>0.0 7.5 0.66 0.0 0.0 1.57</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="wall_front_1_2_0_3">
       <static>1</static>
       <pose>4.5 6.0 1.5 0.0 0.0 -1.57</pose>
@@ -579,10 +721,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -606,10 +747,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -633,10 +773,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -649,6 +788,24 @@
     <light name="lightball_0_1_2_0_3" type="point">
       <cast_shadows>0</cast_shadows>
       <pose>2.75 5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_1_1_2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_1_2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>2.75 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_1_2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 6.25 2.99 0.0 0.0 0.0</pose>
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
@@ -678,6 +835,32 @@
         </visual>
       </link>
     </model>
+    <model name="panel_1_2_0_3">
+      <static>1</static>
+      <pose>4.5 6.0 0.66 0.0 0.0 0.0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="wall_right_1_3_0_1">
       <static>1</static>
       <pose>4.5 9.0 1.5 0.0 0.0 1.57</pose>
@@ -692,10 +875,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -719,10 +901,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -746,10 +927,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -765,51 +945,24 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="person_standing_1_3_0_1">
-    <pose>4.05 8.722532179407 0.0 0.0 0.0 0.0</pose>
-    <static>1</static>
-    <link name="link">
-      <inertial>
-        <pose>0 -0.1 0.95 0 0 0</pose>
-        <mass>80.0</mass>
-        <inertia>
-          <ixx>24.88</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>25.73</iyy>
-          <iyz>0</iyz>
-          <izz>2.48</izz>
-        </inertia>
-      </inertial>
-
-      <collision name="bottom">
-        <pose>0 -0.1 0.01 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.5 0.35 0.02</size>
-          </box>
-        </geometry>
-      </collision>
-
-      <collision name="person">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </collision>
-
-      <visual name="visual">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+    <light name="lightball_1_1_3_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_1_3_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>2.75 9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_1_3_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="wall_bottom_1_3_0_1">
       <static>1</static>
       <pose>3.0 9.0 0.0 0.0 0.0 0.0</pose>
@@ -836,6 +989,99 @@
         </visual>
       </link>
     </model>
+    <model name="doorway_1_3_0_1">
+    <pose frame="">3.0 9.8417165474445 0.0 0.0 0.0 0.0</pose>
+    <link name="link_0">
+      <visual name="visual">
+        <pose frame="">0 0 1.5 0 1.57 1.57</pose>
+        <geometry>
+          <polyline>
+            <height>0.4</height>
+            <point>-1.5 -1.5</point>
+            <point>1.5 -1.5</point>
+            <point>1.5 -1</point>
+            <point>-0.500162 -1.00041</point>
+            <point>-0.499759 1</point>
+            <point>1.5 1</point>
+            <point>1.5 1.5</point>
+            <point>-1.5 1.5</point>
+            <point>-1.5 -1.5</point>
+          </polyline>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name="collision">
+        <pose frame="">0 0 1.5 0 1.57 1.57</pose>
+        <geometry>
+          <polyline>
+            <height>0.4</height>
+            <point>-1.5 -1.5</point>
+            <point>1.5 -1.5</point>
+            <point>1.5 -1</point>
+            <point>-0.500162 -1.00041</point>
+            <point>-0.499759 1</point>
+            <point>1.5 1</point>
+            <point>1.5 1.5</point>
+            <point>-1.5 1.5</point>
+            <point>-1.5 -1.5</point>
+          </polyline>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <static>1</static>
+  </model>
     <model name="wall_front_1_4_0_2">
       <static>1</static>
       <pose>3.0 13.5 1.5 0.0 0.0 0.0</pose>
@@ -850,10 +1096,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -877,10 +1122,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -904,10 +1148,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -923,8 +1166,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_1_4_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 11.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_1_4_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>2.75 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_1_4_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_1_4_0_2">
-    <pose>1.9500000000000002 12.375775751031 0.0 0.0 0.0 0.0</pose>
+    <pose>1.9500000000000002 12.2730344589345 0.0 0.0 0.0 0.0</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -1008,10 +1269,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1035,10 +1295,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1062,10 +1321,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1081,8 +1339,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_2_4_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>6.25 11.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_2_4_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>5.75 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_2_4_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>6.25 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_2_4_0_1">
-    <pose>5.672711763672 13.05 0.0 0.0 0.0 -1.57</pose>
+    <pose>5.756912062098 13.05 0.0 0.0 0.0 -1.57</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -1152,34 +1428,8 @@
         </visual>
       </link>
     </model>
-    <model name="panel_2_4_0_1">
-      <static>1</static>
-      <pose>6.0 10.5 0.66 0.0 0.0 -1.57</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
     <model name="doorway_2_4_0_1">
-    <pose frame="">5.7626534684715 12.0 0.0 0.0 0.0 -1.57</pose>
+    <pose frame="">5.684304501081 12.0 0.0 0.0 0.0 -1.57</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -1285,10 +1535,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1312,10 +1561,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1339,10 +1587,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1358,8 +1605,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_3_4_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>9.25 11.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_3_4_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>8.75 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_3_4_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>9.25 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_3_4_0_1">
-    <pose>9.229336486821 13.05 0.0 0.0 0.0 -1.57</pose>
+    <pose>8.364263661786 13.05 0.0 0.0 0.0 -1.57</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -1429,8 +1694,34 @@
         </visual>
       </link>
     </model>
+    <model name="panel_3_4_0_1">
+      <static>1</static>
+      <pose>9.0 10.5 0.66 0.0 0.0 -1.57</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="doorway_3_4_0_1">
-    <pose frame="">9.833669557761 12.0 0.0 0.0 0.0 -1.57</pose>
+    <pose frame="">8.0383834577835 12.0 0.0 0.0 0.0 -1.57</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -1536,10 +1827,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1563,10 +1853,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1590,10 +1879,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1609,6 +1897,69 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_4_4_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>12.25 11.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_4_4_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>11.75 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_4_4_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>12.25 12.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="person_standing_4_4_0_2">
+    <pose>11.545186294113 13.05 0.0 0.0 0.0 -1.57</pose>
+    <static>1</static>
+    <link name="link">
+      <inertial>
+        <pose>0 -0.1 0.95 0 0 0</pose>
+        <mass>80.0</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="bottom">
+        <pose>0 -0.1 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.35 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="person">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
     <model name="wall_bottom_4_4_0_2">
       <static>1</static>
       <pose>12.0 12.0 0.0 0.0 0.0 -1.57</pose>
@@ -1649,10 +2000,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1676,10 +2026,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1703,10 +2052,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1719,6 +2067,24 @@
     <light name="lightball_0_4_3_0_3" type="point">
       <cast_shadows>0</cast_shadows>
       <pose>11.75 8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_1_4_3_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>12.25 8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_4_3_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>11.75 9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_4_3_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>12.25 9.25 2.99 0.0 0.0 0.0</pose>
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
@@ -1748,32 +2114,6 @@
         </visual>
       </link>
     </model>
-    <model name="panel_4_3_0_3">
-      <static>1</static>
-      <pose>10.5 9.0 0.66 0.0 0.0 3.14</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
     <model name="wall_front_5_3_0_2">
       <static>1</static>
       <pose>16.5 9.0 1.5 0.0 0.0 -1.57</pose>
@@ -1788,10 +2128,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1815,10 +2154,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1842,10 +2180,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1861,6 +2198,69 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_5_3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>15.25 8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_5_3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>14.75 9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_5_3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>15.25 9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="person_standing_5_3_0_2">
+    <pose>14.893962473322 10.05 0.0 0.0 0.0 -1.57</pose>
+    <static>1</static>
+    <link name="link">
+      <inertial>
+        <pose>0 -0.1 0.95 0 0 0</pose>
+        <mass>80.0</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="bottom">
+        <pose>0 -0.1 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.35 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="person">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
     <model name="wall_bottom_5_3_0_2">
       <static>1</static>
       <pose>15.0 9.0 0.0 0.0 0.0 -1.57</pose>
@@ -1901,10 +2301,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1928,10 +2327,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1955,10 +2353,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -1974,51 +2371,69 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_5_2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>15.25 5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_5_2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>14.75 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_5_2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>15.25 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_5_2_0_3">
-      <pose>13.95 6.484852893942 0.0 0.0 0.0 3.14</pose>
-      <static>1</static>
-      <link name="link">
-        <inertial>
-          <pose>0 -0.1 0.95 0 0 0</pose>
-          <mass>80.0</mass>
-          <inertia>
-            <ixx>24.88</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>25.73</iyy>
-            <iyz>0</iyz>
-            <izz>2.48</izz>
-          </inertia>
-        </inertial>
+    <pose>14.7876461159415 4.95 0.0 0.0 0.0 4.71</pose>
+    <static>1</static>
+    <link name="link">
+      <inertial>
+        <pose>0 -0.1 0.95 0 0 0</pose>
+        <mass>80.0</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
 
-        <collision name="bottom">
-          <pose>0 -0.1 0.01 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 0.02</size>
-            </box>
-          </geometry>
-        </collision>
+      <collision name="bottom">
+        <pose>0 -0.1 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.35 0.02</size>
+          </box>
+        </geometry>
+      </collision>
 
-        <collision name="person">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>model://person_standing/meshes/standing.dae</uri>
-            </mesh>
-          </geometry>
-        </collision>
+      <collision name="person">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
 
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh>
-              <uri>model://person_standing/meshes/standing.dae</uri>
-            </mesh>
-          </geometry>
-        </visual>
-      </link>
-    </model>
+      <visual name="visual">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
     <model name="wall_bottom_5_2_0_3">
       <static>1</static>
       <pose>15.0 6.0 0.0 0.0 0.0 3.14</pose>
@@ -2045,6 +2460,32 @@
         </visual>
       </link>
     </model>
+    <model name="panel_5_2_0_3">
+      <static>1</static>
+      <pose>13.5 6.0 0.66 0.0 0.0 3.14</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="wall_front_6_2_0_2">
       <static>1</static>
       <pose>19.5 6.0 1.5 0.0 0.0 -1.57</pose>
@@ -2059,10 +2500,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2086,10 +2526,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2113,10 +2552,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2132,8 +2570,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_6_2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_6_2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>17.75 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_6_2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_6_2_0_2">
-    <pose>19.05 5.3256204365325 0.0 0.0 0.0 0.0</pose>
+    <pose>19.05 5.546812026786 0.0 0.0 0.0 0.0</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -2203,32 +2659,6 @@
         </visual>
       </link>
     </model>
-    <model name="panel_6_2_0_2">
-      <static>1</static>
-      <pose>18.0 7.5 0.66 0.0 0.0 -1.57</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
     <model name="wall_right_6_1_0_1">
       <static>1</static>
       <pose>16.5 3.0 1.5 0.0 0.0 4.71</pose>
@@ -2243,10 +2673,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2270,10 +2699,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2297,10 +2725,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2313,6 +2740,24 @@
     <light name="lightball_0_6_1_0_1" type="point">
       <cast_shadows>0</cast_shadows>
       <pose>17.75 2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_1_6_1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_6_1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>17.75 3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_6_1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 3.25 2.99 0.0 0.0 0.0</pose>
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
@@ -2343,7 +2788,7 @@
       </link>
     </model>
     <model name="doorway_6_1_0_1">
-    <pose frame="">18.0 4.16392300923 0.0 0.0 0.0 3.14</pose>
+    <pose frame="">18.0 3.2948480611695 0.0 0.0 0.0 3.14</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -2449,10 +2894,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2476,10 +2920,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2503,10 +2946,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2522,8 +2964,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_6_0_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 -0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_6_0_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>17.75 0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_6_0_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_6_0_0_3">
-    <pose>18.2293349764215 -1.0499999999999998 0.0 0.0 0.0 4.71</pose>
+    <pose>17.7284563406025 -1.0499999999999998 0.0 0.0 0.0 4.71</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -2607,10 +3067,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2634,10 +3093,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2661,10 +3119,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2680,51 +3137,24 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="person_standing_7_0_0_2">
-    <pose>22.05 -0.749971333716 0.0 0.0 0.0 0.0</pose>
-    <static>1</static>
-    <link name="link">
-      <inertial>
-        <pose>0 -0.1 0.95 0 0 0</pose>
-        <mass>80.0</mass>
-        <inertia>
-          <ixx>24.88</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>25.73</iyy>
-          <iyz>0</iyz>
-          <izz>2.48</izz>
-        </inertia>
-      </inertial>
-
-      <collision name="bottom">
-        <pose>0 -0.1 0.01 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.5 0.35 0.02</size>
-          </box>
-        </geometry>
-      </collision>
-
-      <collision name="person">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </collision>
-
-      <visual name="visual">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+    <light name="lightball_1_7_0_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>21.25 -0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_7_0_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>20.75 0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_7_0_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>21.25 0.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="wall_bottom_7_0_0_2">
       <static>1</static>
       <pose>21.0 0.0 0.0 0.0 0.0 -1.57</pose>
@@ -2765,10 +3195,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2792,10 +3221,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2819,10 +3247,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2838,51 +3265,24 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="person_standing_7_-1_0_2">
-    <pose>21.155367529962 -4.05 0.0 0.0 0.0 4.71</pose>
-    <static>1</static>
-    <link name="link">
-      <inertial>
-        <pose>0 -0.1 0.95 0 0 0</pose>
-        <mass>80.0</mass>
-        <inertia>
-          <ixx>24.88</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>25.73</iyy>
-          <iyz>0</iyz>
-          <izz>2.48</izz>
-        </inertia>
-      </inertial>
-
-      <collision name="bottom">
-        <pose>0 -0.1 0.01 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.5 0.35 0.02</size>
-          </box>
-        </geometry>
-      </collision>
-
-      <collision name="person">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </collision>
-
-      <visual name="visual">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+    <light name="lightball_1_7_-1_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>21.25 -3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_7_-1_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>20.75 -2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_7_-1_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>21.25 -2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="wall_bottom_7_-1_0_2">
       <static>1</static>
       <pose>21.0 -3.0 0.0 0.0 0.0 3.14</pose>
@@ -2923,10 +3323,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2950,10 +3349,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2977,10 +3375,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -2996,8 +3393,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_6_-1_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 -3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_6_-1_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>17.75 -2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_6_-1_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 -2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_6_-1_0_3">
-    <pose>16.95 -2.9731208949966 0.0 0.0 0.0 3.14</pose>
+    <pose>16.95 -2.599727747178 0.0 0.0 0.0 3.14</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -3081,10 +3496,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3108,10 +3522,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3135,10 +3548,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3151,6 +3563,24 @@
     <light name="lightball_0_6_-2_0_2" type="point">
       <cast_shadows>0</cast_shadows>
       <pose>17.75 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_1_6_-2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_6_-2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>17.75 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_6_-2_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>18.25 -5.75 2.99 0.0 0.0 0.0</pose>
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
@@ -3194,10 +3624,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3221,10 +3650,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3248,10 +3676,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3267,8 +3694,26 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_5_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>15.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_5_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>14.75 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_5_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>15.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="person_standing_5_-2_0_1">
-    <pose>14.5848563762805 -7.05 0.0 0.0 0.0 1.57</pose>
+    <pose>14.5240064771385 -7.05 0.0 0.0 0.0 1.57</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -3338,99 +3783,6 @@
         </visual>
       </link>
     </model>
-    <model name="doorway_5_-2_0_1">
-    <pose frame="">14.92997105605125 -6.0 0.0 0.0 0.0 1.57</pose>
-    <link name="link_0">
-      <visual name="visual">
-        <pose frame="">0 0 1.5 0 1.57 1.57</pose>
-        <geometry>
-          <polyline>
-            <height>0.4</height>
-            <point>-1.5 -1.5</point>
-            <point>1.5 -1.5</point>
-            <point>1.5 -1</point>
-            <point>-0.500162 -1.00041</point>
-            <point>-0.499759 1</point>
-            <point>1.5 1</point>
-            <point>1.5 1.5</point>
-            <point>-1.5 1.5</point>
-            <point>-1.5 -1.5</point>
-          </polyline>
-        </geometry>
-        <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <collision name="collision">
-        <pose frame="">0 0 1.5 0 1.57 1.57</pose>
-        <geometry>
-          <polyline>
-            <height>0.4</height>
-            <point>-1.5 -1.5</point>
-            <point>1.5 -1.5</point>
-            <point>1.5 -1</point>
-            <point>-0.500162 -1.00041</point>
-            <point>-0.499759 1</point>
-            <point>1.5 1</point>
-            <point>1.5 1.5</point>
-            <point>-1.5 1.5</point>
-            <point>-1.5 -1.5</point>
-          </polyline>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <static>1</static>
-  </model>
     <model name="wall_right_4_-2_0_1">
       <static>1</static>
       <pose>12.0 -4.5 1.5 0.0 0.0 3.14</pose>
@@ -3445,10 +3797,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3472,10 +3823,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3499,10 +3849,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3518,32 +3867,24 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="panel_4_-2_0_1">
-      <static>1</static>
-      <pose>12.0 -7.5 0.66 0.0 0.0 1.57</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
+    <light name="lightball_1_4_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>12.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_4_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>11.75 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_4_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>12.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="wall_bottom_4_-2_0_1">
       <static>1</static>
       <pose>12.0 -6.0 0.0 0.0 0.0 1.57</pose>
@@ -3571,7 +3912,7 @@
       </link>
     </model>
     <model name="doorway_4_-2_0_1">
-    <pose frame="">11.7489447621075 -6.0 0.0 0.0 0.0 1.57</pose>
+    <pose frame="">12.4152665803935 -6.0 0.0 0.0 0.0 1.57</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -3677,10 +4018,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3704,10 +4044,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3731,10 +4070,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3750,32 +4088,69 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="panel_3_-2_0_1">
-      <static>1</static>
-      <pose>9.0 -7.5 0.66 0.0 0.0 1.57</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
+    <light name="lightball_1_3_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>9.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_3_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>8.75 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_3_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>9.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="person_standing_3_-2_0_1">
+    <pose>8.89919737570065 -7.05 0.0 0.0 0.0 1.57</pose>
+    <static>1</static>
+    <link name="link">
+      <inertial>
+        <pose>0 -0.1 0.95 0 0 0</pose>
+        <mass>80.0</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="bottom">
+        <pose>0 -0.1 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.35 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="person">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
     <model name="wall_bottom_3_-2_0_1">
       <static>1</static>
       <pose>9.0 -6.0 0.0 0.0 0.0 1.57</pose>
@@ -3802,8 +4177,34 @@
         </visual>
       </link>
     </model>
+    <model name="panel_3_-2_0_1">
+      <static>1</static>
+      <pose>9.0 -4.5 0.66 0.0 0.0 1.57</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="doorway_3_-2_0_1">
-    <pose frame="">9.973917909786 -6.0 0.0 0.0 0.0 1.57</pose>
+    <pose frame="">9.3045015122445 -6.0 0.0 0.0 0.0 1.57</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -3909,10 +4310,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3936,10 +4336,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3963,10 +4362,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -3982,9 +4380,27 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_2_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>6.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_2_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>5.75 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_2_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>6.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="panel_2_-2_0_1">
       <static>1</static>
-      <pose>6.0 -7.5 0.66 0.0 0.0 1.57</pose>
+      <pose>6.0 -4.5 0.66 0.0 0.0 1.57</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
@@ -3996,7 +4412,7 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/DarkGrey</name>
+              <name>Gazebo/Grey</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -4035,7 +4451,7 @@
       </link>
     </model>
     <model name="doorway_2_-2_0_1">
-    <pose frame="">6.720056154042 -6.0 0.0 0.0 0.0 1.57</pose>
+    <pose frame="">6.1043129359458 -6.0 0.0 0.0 0.0 1.57</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>
@@ -4141,10 +4557,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4168,10 +4583,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4195,10 +4609,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4214,6 +4627,69 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
+    <light name="lightball_1_1_-2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_1_-2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>2.75 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_1_-2_0_3" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="person_standing_1_-2_0_3">
+    <pose>3.7448305584045 -4.95 0.0 0.0 0.0 1.57</pose>
+    <static>1</static>
+    <link name="link">
+      <inertial>
+        <pose>0 -0.1 0.95 0 0 0</pose>
+        <mass>80.0</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="bottom">
+        <pose>0 -0.1 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.35 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="person">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <pose>0 0 0.02 0.04 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_standing/meshes/standing.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
     <model name="wall_bottom_1_-2_0_3">
       <static>1</static>
       <pose>3.0 -6.0 0.0 0.0 0.0 1.57</pose>
@@ -4254,10 +4730,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4281,10 +4756,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4308,10 +4782,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4327,51 +4800,24 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="person_standing_1_-3_0_2">
-    <pose>4.05 -9.661664278461 0.0 0.0 0.0 3.14</pose>
-    <static>1</static>
-    <link name="link">
-      <inertial>
-        <pose>0 -0.1 0.95 0 0 0</pose>
-        <mass>80.0</mass>
-        <inertia>
-          <ixx>24.88</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>25.73</iyy>
-          <iyz>0</iyz>
-          <izz>2.48</izz>
-        </inertia>
-      </inertial>
-
-      <collision name="bottom">
-        <pose>0 -0.1 0.01 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.5 0.35 0.02</size>
-          </box>
-        </geometry>
-      </collision>
-
-      <collision name="person">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </collision>
-
-      <visual name="visual">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+    <light name="lightball_1_1_-3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 -9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_1_-3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>2.75 -8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_1_-3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>3.25 -8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="wall_bottom_1_-3_0_2">
       <static>1</static>
       <pose>3.0 -9.0 0.0 0.0 0.0 3.14</pose>
@@ -4412,10 +4858,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4439,10 +4884,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4466,10 +4910,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4485,51 +4928,24 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="person_standing_0_-3_0_2">
-    <pose>-0.5624281055010001 -10.05 0.0 0.0 0.0 1.57</pose>
-    <static>1</static>
-    <link name="link">
-      <inertial>
-        <pose>0 -0.1 0.95 0 0 0</pose>
-        <mass>80.0</mass>
-        <inertia>
-          <ixx>24.88</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>25.73</iyy>
-          <iyz>0</iyz>
-          <izz>2.48</izz>
-        </inertia>
-      </inertial>
-
-      <collision name="bottom">
-        <pose>0 -0.1 0.01 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.5 0.35 0.02</size>
-          </box>
-        </geometry>
-      </collision>
-
-      <collision name="person">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </collision>
-
-      <visual name="visual">
-        <pose>0 0 0.02 0.04 0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>model://person_standing/meshes/standing.dae</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+    <light name="lightball_1_0_-3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -9.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_0_-3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 -8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_0_-3_0_2" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -8.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
     <model name="wall_bottom_0_-3_0_2">
       <static>1</static>
       <pose>0.0 -9.0 0.0 0.0 0.0 1.57</pose>
@@ -4570,10 +4986,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4597,10 +5012,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4624,10 +5038,9 @@
         <visual name="visual">
           <material>
             <script>
-              <name>Gazebo/CeilingTiled</name>
+              <name>Gazebo/White</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
-            <ambient>1 1 1 1</ambient>
           </material>
           <geometry>
             <box>
@@ -4643,8 +5056,273 @@
       <diffuse>10 10 10 255</diffuse>
       <specular>10 10 10 255</specular>
     </light>
-    <model name="person_standing_0_-2_0_1">
-    <pose>-1.0499999999999998 -6.3494043296175 0.0 0.0 0.0 0.0</pose>
+    <light name="lightball_1_0_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -6.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_0_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_0_-2_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -5.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="panel_0_-2_0_1">
+      <static>1</static>
+      <pose>1.5 -6.0 0.66 0.0 0.0 0.0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_bottom_0_-2_0_1">
+      <static>1</static>
+      <pose>0.0 -6.0 0.0 0.0 0.0 0.0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 6 0.02</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Yellow</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>6 6 0.02</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="doorway_0_-2_0_1">
+    <pose frame="">0.0 -7.1375950809285005 0.0 0.0 0.0 0.0</pose>
+    <link name="link_0">
+      <visual name="visual">
+        <pose frame="">0 0 1.5 0 1.57 1.57</pose>
+        <geometry>
+          <polyline>
+            <height>0.4</height>
+            <point>-1.5 -1.5</point>
+            <point>1.5 -1.5</point>
+            <point>1.5 -1</point>
+            <point>-0.500162 -1.00041</point>
+            <point>-0.499759 1</point>
+            <point>1.5 1</point>
+            <point>1.5 1.5</point>
+            <point>-1.5 1.5</point>
+            <point>-1.5 -1.5</point>
+          </polyline>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name="collision">
+        <pose frame="">0 0 1.5 0 1.57 1.57</pose>
+        <geometry>
+          <polyline>
+            <height>0.4</height>
+            <point>-1.5 -1.5</point>
+            <point>1.5 -1.5</point>
+            <point>1.5 -1</point>
+            <point>-0.500162 -1.00041</point>
+            <point>-0.499759 1</point>
+            <point>1.5 1</point>
+            <point>1.5 1.5</point>
+            <point>-1.5 1.5</point>
+            <point>-1.5 -1.5</point>
+          </polyline>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <static>1</static>
+  </model>
+    <model name="wall_right_0_-1_0_1">
+      <static>1</static>
+      <pose>1.5 -3.0 1.5 0.0 0.0 1.57</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/White</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_left_0_-1_0_1">
+      <static>1</static>
+      <pose>-1.5 -3.0 1.5 0.0 0.0 1.57</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/White</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_top_0_-1_0_1">
+      <static>1</static>
+      <pose>0.0 -3.0 3.0 1.57 0.0 0.0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/White</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>3 0.02 3</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <light name="lightball_0_0_-1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 -3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_1_0_-1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -3.25 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_2_0_-1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>-0.25 -2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <light name="lightball_3_0_-1_0_1" type="point">
+      <cast_shadows>0</cast_shadows>
+      <pose>0.25 -2.75 2.99 0.0 0.0 0.0</pose>
+      <diffuse>10 10 10 255</diffuse>
+      <specular>10 10 10 255</specular>
+    </light>
+    <model name="person_standing_0_-1_0_1">
+    <pose>1.0499999999999998 -2.91080499727275 0.0 0.0 0.0 0.0</pose>
     <static>1</static>
     <link name="link">
       <inertial>
@@ -4688,264 +5366,6 @@
       </visual>
     </link>
   </model>
-    <model name="wall_bottom_0_-2_0_1">
-      <static>1</static>
-      <pose>0.0 -6.0 0.0 0.0 0.0 0.0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>6 6 0.02</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/Yellow</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>6 6 0.02</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-    <model name="panel_0_-2_0_1">
-      <static>1</static>
-      <pose>1.5 -6.0 0.66 0.0 0.0 0.0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-    <model name="doorway_0_-2_0_1">
-      <pose frame="">0.0 -4.8482298326535 0.0 0.0 0.0 0.0</pose>
-      <link name="link_0">
-        <visual name="visual">
-          <pose frame="">0 0 1.5 0 1.57 1.57</pose>
-          <geometry>
-            <polyline>
-              <height>0.4</height>
-              <point>-1.5 -1.5</point>
-              <point>1.5 -1.5</point>
-              <point>1.5 -1</point>
-              <point>-0.500162 -1.00041</point>
-              <point>-0.499759 1</point>
-              <point>1.5 1</point>
-              <point>1.5 1.5</point>
-              <point>-1.5 1.5</point>
-              <point>-1.5 -1.5</point>
-            </polyline>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-        <collision name="collision">
-          <pose frame="">0 0 1.5 0 1.57 1.57</pose>
-          <geometry>
-            <polyline>
-              <height>0.4</height>
-              <point>-1.5 -1.5</point>
-              <point>1.5 -1.5</point>
-              <point>1.5 -1</point>
-              <point>-0.500162 -1.00041</point>
-              <point>-0.499759 1</point>
-              <point>1.5 1</point>
-              <point>1.5 1.5</point>
-              <point>-1.5 1.5</point>
-              <point>-1.5 -1.5</point>
-            </polyline>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-              <torsional>
-                <coefficient>1</coefficient>
-                <patch_radius>0</patch_radius>
-                <surface_radius>0</surface_radius>
-                <use_patch_radius>1</use_patch_radius>
-                <ode>
-                  <slip>0</slip>
-                </ode>
-              </torsional>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1e+06</threshold>
-            </bounce>
-            <contact>
-              <collide_without_contact>0</collide_without_contact>
-              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-              <collide_bitmask>1</collide_bitmask>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-                <max_vel>0.01</max_vel>
-                <min_depth>0</min_depth>
-              </ode>
-              <bullet>
-                <split_impulse>1</split_impulse>
-                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e+13</kp>
-                <kd>1</kd>
-              </bullet>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-      <static>1</static>
-    </model>
-    <model name="wall_right_0_-1_0_1">
-      <static>1</static>
-      <pose>1.5 -3.0 1.5 0.0 0.0 1.57</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>3 0.02 3</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/CeilingTiled</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-            <ambient>1 1 1 1</ambient>
-          </material>
-          <geometry>
-            <box>
-              <size>3 0.02 3</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-    <model name="wall_left_0_-1_0_1">
-      <static>1</static>
-      <pose>-1.5 -3.0 1.5 0.0 0.0 1.57</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>3 0.02 3</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/CeilingTiled</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-            <ambient>1 1 1 1</ambient>
-          </material>
-          <geometry>
-            <box>
-              <size>3 0.02 3</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-    <model name="wall_top_0_-1_0_1">
-      <static>1</static>
-      <pose>0.0 -3.0 3.0 1.57 0.0 0.0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>3 0.02 3</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/CeilingTiled</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-            <ambient>1 1 1 1</ambient>
-          </material>
-          <geometry>
-            <box>
-              <size>3 0.02 3</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-    <light name="lightball_0_0_-1_0_1" type="point">
-      <cast_shadows>0</cast_shadows>
-      <pose>-0.25 -3.25 2.99 0.0 0.0 0.0</pose>
-      <diffuse>10 10 10 255</diffuse>
-      <specular>10 10 10 255</specular>
-    </light>
-    <model name="panel_0_-1_0_1">
-      <static>1</static>
-      <pose>1.5 -3.0 0.66 0.0 0.0 0.0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <material>
-            <script>
-              <name>Gazebo/DarkGrey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-          <geometry>
-            <box>
-              <size>0.2 1 0.6</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
     <model name="wall_bottom_0_-1_0_1">
       <static>1</static>
       <pose>0.0 -3.0 0.0 0.0 0.0 0.0</pose>
@@ -4972,8 +5392,34 @@
         </visual>
       </link>
     </model>
+    <model name="panel_0_-1_0_1">
+      <static>1</static>
+      <pose>-1.5 -3.0 0.66 0.0 0.0 0.0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+          <geometry>
+            <box>
+              <size>0.2 1 0.6</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name="doorway_0_-1_0_1">
-    <pose frame="">0.0 -3.913873110027 0.0 0.0 0.0 0.0</pose>
+    <pose frame="">0.0 -3.616336767933 0.0 0.0 0.0 0.0</pose>
     <link name="link_0">
       <visual name="visual">
         <pose frame="">0 0 1.5 0 1.57 1.57</pose>

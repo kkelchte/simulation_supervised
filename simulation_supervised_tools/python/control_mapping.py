@@ -20,6 +20,7 @@ import time
 # depth heuristic      | DH
 # neural network       | NN
 # drive back           | DB
+# keyboard             | KEY
 #
 # outputs: robot command, supervised command
 # 

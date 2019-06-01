@@ -83,17 +83,13 @@ root = tree.getroot()
 world = root.find('world')
 
 #############
-# 3. For each extension in conf load the elements in list
-# extensions=[]
-
-#############
 # 4. Build a corridor and add extensions:
 # returns all segments (models) to be added to the tree
 segments=[]
 
 # save output image in 'corridors'
 if not os.path.isdir(FLAGS.output_dir+'/corridors'): os.makedirs(FLAGS.output_dir+'/corridors')
-segments, goal = generate_corridor(length=FLAGS.corridor_length,
+segments, goal, waypoints = generate_corridor(length=FLAGS.corridor_length,
                             bends=FLAGS.corridor_bends,
                             width=FLAGS.corridor_width,
                             height=FLAGS.corridor_height,
@@ -116,7 +112,9 @@ env_conf= {'delay_evaluation': 5, #might have to be updated if many extensions i
         'goal_min_x': goal[0],
         'goal_max_x': goal[1],
         'goal_min_y': goal[2],
-        'goal_max_y': goal[3]}
+        'goal_max_y': goal[3],
+        'starting_positions': str([[waypoints[0][0],waypoints[0][1],1.57]]),
+        'waypoints': str(waypoints[1:])}
 
 yaml.dump(env_conf, open(FLAGS.output_dir+'/'+FLAGS.output_file+'.yaml', 'w'), default_flow_style=False)
 tree.write(FLAGS.output_dir+'/'+FLAGS.output_file+'.world', encoding="us-ascii", xml_declaration=True, method="xml")

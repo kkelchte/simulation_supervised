@@ -36,6 +36,8 @@ from gazebo_msgs.srv import SetModelStateRequest
 from gazebo_msgs.msg import ModelState
 
 
+import ast # to parse startingpositions as string to list
+
 
 import sys, os, os.path
 import subprocess, shlex
@@ -413,6 +415,7 @@ def create_environment(run_number, world_name):
     generator_file="{0}/python/generators/world_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1])
     generator_command="python "+generator_file+" --output_dir "+FLAGS.log_folder+" --output_file "+world_name
     for p in others: generator_command="{0} {1}".format(generator_command, p)
+    print("[runscript] Generate command: {0}".format(generator_command))
     return_val=subprocess.call(shlex.split(generator_command))
     if return_val != 0:
       kill_combo()
@@ -508,6 +511,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
 
   if rospy.has_param('/starting_positions'):
     starting_positions = rospy.get_param('starting_positions')
+    if isinstance(starting_positions,str):
+      starting_positions=ast.literal_eval(starting_positions)
   else:
     starting_positions = []
 

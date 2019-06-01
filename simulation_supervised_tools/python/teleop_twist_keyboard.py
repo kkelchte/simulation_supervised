@@ -18,9 +18,9 @@ f --> flat_trim
 e --> emergency
 g --> go
 o --> overtake
-x --> turn left TODO
-c --> straight TODO
-v --> turn right TODO
+x --> turn left
+c --> straight
+v --> turn right
 CTRL-C to quit
 """
 
@@ -43,18 +43,9 @@ keyPubs = {
 }
 
 moveBindings = {
-    'x':(0,0,0,0,0,1),
-    'c':(1,0,0,0,0,0),
-    'v':(0,0,0,0,0,-1)}
-
-# speedBindings={
-#     'q':(1.1,1.1),
-#     'z':(.9,.9),
-#     'w':(1.1,1),
-#     'x':(.9,1),
-#     'e':(1,1.1),
-#     'c':(1,.9),
-#         }
+    'x':(0.8,0,0,0,0,1),
+    'c':(0.8,0,0,0,0,0),
+    'v':(0.8,0,0,0,0,-1)}
 
 def getKey():
   tty.setraw(sys.stdin.fileno())
@@ -74,6 +65,8 @@ if __name__=="__main__":
   # add default publishers /go and /overtake
   keyPubs['go']=rospy.Publisher('/go', Empty, queue_size =1)
   keyPubs['overtake']=rospy.Publisher('/overtake', Empty, queue_size =1)
+
+  # if rospy.hasparam('speed')
   
   vel_pub = rospy.Publisher('key_vel', Twist, queue_size=1)
   for k in keyPubs.keys():
@@ -100,41 +93,10 @@ if __name__=="__main__":
         twist.angular.y=moveBindings[key][4]
         twist.angular.z=moveBindings[key][5]
         vel_pub.publish(twist)
-      # if key in moveBindings.keys():
-      #   x = moveBindings[key][0]
-      #   y = moveBindings[key][1]
-      #   z = moveBindings[key][2]
-      #   th = moveBindings[key][3]
-      # elif key in speedBindings.keys():
-      #   speed = speed * speedBindings[key][0]
-      #   turn = turn * speedBindings[key][1]
-
-      #   print(vels(speed,turn))
-      #   if (status == 14):
-      #     print(msg)
-      #   status = (status + 1) % 15
-      # else:
-      #   x = 0
-      #   y = 0
-      #   z = 0
-      #   th = 0
       if (key == '\x03'):
         break
-
-      # twist = Twist()
-      # twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
-      # twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
-      # pub.publish(twist)
-
   except Exception as e:
     print(e)
-
   finally:
-    # twist = Twist()
-    # twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
-    # twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-    # pub.publish(twist)
-
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-
 

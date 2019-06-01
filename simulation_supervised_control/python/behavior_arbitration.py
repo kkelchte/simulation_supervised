@@ -4,6 +4,8 @@ import time
 import sys, select, tty, os, os.path
 import numpy as np
 
+import ast # to parse waypoints as string to list
+
 # OpenCV2 for saving an image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
@@ -294,6 +296,9 @@ if __name__=="__main__":
   if rospy.has_param('waypoints') and rospy.has_param('gt_info'):
     waypoints=rospy.get_param('waypoints')
     print("[behavior_arbitration]: found following waypoints:{0}.".format(waypoints))
+    if isinstance(waypoints,str):
+      waypoints=ast.literal_eval(waypoints)
+    print 'waypoints: ',waypoints
     if rospy.has_param('goto_weight'):
       goto_weight=rospy.get_param('goto_weight')
       avoidance_weight=1-goto_weight
