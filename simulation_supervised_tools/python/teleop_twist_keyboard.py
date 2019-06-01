@@ -42,10 +42,13 @@ keyPubs = {
   'overtake':None
 }
 
+action_bound=0.5
+speed=0.6
+turnspeed=0.6
 moveBindings = {
-    'x':(0.8,0,0,0,0,1),
-    'c':(0.8,0,0,0,0,0),
-    'v':(0.8,0,0,0,0,-1)}
+    'x':(turnspeed,0,0,0,0,action_bound),
+    'c':(speed,0,0,0,0,0),
+    'v':(turnspeed,0,0,0,0,-action_bound)}
 
 def getKey():
   tty.setraw(sys.stdin.fileno())

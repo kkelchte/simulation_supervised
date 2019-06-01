@@ -19,7 +19,7 @@ gt_info: /odom
 # lowering till 4 means that there is only 0.1s to stabilize
 skip_frames: 10
 # avoid stabilization in the roll_pitch_yaw (default 0)
-/bebop/bebop_driver/PictureSettingsVideoStabilizationModeMode: 3
+# /bebop/bebop_driver/PictureSettingsVideoStabilizationModeMode: 3
 # 24 (0), 25 (1), 30 (2) FPS
 /bebop/bebop_driver/PictureSettingsVideoFramerateFramerate: 0
 # 1080x480(0), 720x720 (1)

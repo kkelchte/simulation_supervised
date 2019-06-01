@@ -199,7 +199,7 @@ if __name__=="__main__":
   sup_pub = rospy.Publisher('/supervised_vel', Twist, queue_size=1)
   cmd_pub = rospy.Publisher(rospy.get_param('control'), Twist, queue_size=1)
   
-  if rospy.has_param('gt_info') and rospy.get_param('model_name')=='quadrotor':
+  if rospy.has_param('gt_info') and rospy.has_param('model_name') and rospy.get_param('model_name')=='quadrotor':
     rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
   # initialize control subscribers
   con_sub = rospy.Subscriber('con_vel', Twist, con_cb)
