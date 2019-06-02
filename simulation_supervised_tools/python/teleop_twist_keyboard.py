@@ -42,7 +42,7 @@ keyPubs = {
   'overtake':None
 }
 
-action_bound=0.5
+action_bound=0.7
 speed=0.6
 turnspeed=0.6
 moveBindings = {

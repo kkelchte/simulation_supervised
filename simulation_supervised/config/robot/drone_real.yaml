@@ -21,9 +21,9 @@ skip_frames: 10
 # avoid stabilization in the roll_pitch_yaw (default 0)
 # /bebop/bebop_driver/PictureSettingsVideoStabilizationModeMode: 3
 # 24 (0), 25 (1), 30 (2) FPS
-/bebop/bebop_driver/PictureSettingsVideoFramerateFramerate: 0
+/bebop/bebop_driver/PictureSettingsVideoFramerateFramerate: 2
 # 1080x480(0), 720x720 (1)
-/bebop/bebop_driver/PictureSettingsVideoResolutionsType: 1
+/bebop/bebop_driver/PictureSettingsVideoResolutionsType: 0
 # off (0), on (1)
 /bebop/bebop_driver/SpeedSettingsHullProtectionPresent: 0
 /bebop/bebop_driver/SpeedSettingsOutdoorOutdoor: 0
