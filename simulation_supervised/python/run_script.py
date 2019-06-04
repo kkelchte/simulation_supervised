@@ -529,8 +529,6 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     pose.position.x, pose.position.y, starting_height, yaw = sample_new_position(starting_positions)
     # pose.position.x, pose.position.y, starting_height, yaw=0,0,1,0
     
-    print("----------------------{0}".format(yaw))
-
     myprint("[run_script]: x: {0}, y: {1}, z: {2}, yaw:{3}".format(pose.position.x, pose.position.y, starting_height, yaw))
     # some yaw to quaternion re-orientation code:
     pose.orientation.z=np.sin(yaw)
@@ -572,8 +570,6 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
 
     x,y,z,yaw=sample_new_position(starting_positions)
     # x,y,z,yaw=-54, -4, 1, -3.14
-
-    print("----------------------{0}".format(yaw))
 
     command="roslaunch simulation_supervised_demo {0}.launch fsm_config:={1} log_folder:={2} evaluate:={3} {4} graphics:={5} x:={6} y:={7} Yspawned:={9} starting_height:={8} {10}".format(FLAGS.robot,
             FLAGS.fsm,
