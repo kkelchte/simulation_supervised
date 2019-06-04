@@ -413,7 +413,7 @@ def create_environment(run_number, world_name):
       command="{0} world_config:={1}/config/environment/{2:05d}_{3}.yaml".format(command, simulation_supervised_dir,run_number%10, world_name)
   elif world_name in ['corridor'] and not FLAGS.reuse_default_world:
     generator_file="{0}/python/generators/world_generator.py".format(subprocess.check_output(shlex.split("rospack find simulation_supervised_tools"))[:-1])
-    generator_command="python "+generator_file+" --output_dir "+FLAGS.log_folder+" --output_file "+world_name
+    generator_command="python "+generator_file+" --output_dir "+FLAGS.log_folder+" --output_file "+world_name+"_"+str(run_number)
     for p in others: generator_command="{0} {1}".format(generator_command, p)
     print("[runscript] Generate command: {0}".format(generator_command))
     return_val=subprocess.call(shlex.split(generator_command))
@@ -421,8 +421,8 @@ def create_environment(run_number, world_name):
       kill_combo()
       myprint("Failed to create env {0}, return value: {1}".format(world_name, return_val))
       sys.exit(2)
-    world_file=FLAGS.log_folder+'/'+world_name+'.world'
-    world_config=FLAGS.log_folder+'/'+world_name+'.yaml'  
+    world_file=FLAGS.log_folder+'/'+world_name+"_"+str(run_number)+'.world'
+    world_config=FLAGS.log_folder+'/'+world_name+"_"+str(run_number)+'.yaml'  
 
   arguments='world_name:='+world_name
   for arg in ["world_file", "world_config", "background"]:
@@ -529,6 +529,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
     pose.position.x, pose.position.y, starting_height, yaw = sample_new_position(starting_positions)
     # pose.position.x, pose.position.y, starting_height, yaw=0,0,1,0
     
+    print("----------------------{0}".format(yaw))
+
     myprint("[run_script]: x: {0}, y: {1}, z: {2}, yaw:{3}".format(pose.position.x, pose.position.y, starting_height, yaw))
     # some yaw to quaternion re-orientation code:
     pose.orientation.z=np.sin(yaw)
@@ -570,6 +572,8 @@ while (run_number < FLAGS.number_of_runs) or FLAGS.number_of_runs==-1:
 
     x,y,z,yaw=sample_new_position(starting_positions)
     # x,y,z,yaw=-54, -4, 1, -3.14
+
+    print("----------------------{0}".format(yaw))
 
     command="roslaunch simulation_supervised_demo {0}.launch fsm_config:={1} log_folder:={2} evaluate:={3} {4} graphics:={5} x:={6} y:={7} Yspawned:={9} starting_height:={8} {10}".format(FLAGS.robot,
             FLAGS.fsm,

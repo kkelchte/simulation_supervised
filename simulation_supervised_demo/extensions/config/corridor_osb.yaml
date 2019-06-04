@@ -34,4 +34,4 @@ floor:
   type: 'floor'
   type_specific:
     name: 'floor'
-    texture: 'Gazebo/White'
+    texture: 'Gazebo/Black'
