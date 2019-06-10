@@ -16,6 +16,10 @@ import copy, time
 import tf
 import sys, select, tty, os, os.path, re
 
+from std_srvs.srv import Empty as Emptyservice
+from std_srvs.srv import EmptyRequest # for pausing and unpausing physics engine
+
+
 # Instantiate CvBridge
 bridge = CvBridge()
 
@@ -70,7 +74,12 @@ rgb_write_ts=0
 
 skip_first=4 # don't save the first images as the sensor is still starting up.
 
-  
+try:
+  pause_physics_client=rospy.ServiceProxy('/gazebo/pause_physics',Emptyservice)
+  unpause_physics_client=rospy.ServiceProxy('/gazebo/unpause_physics',Emptyservice)
+except:
+  pass
+
 def process_rgb_compressed(msg, index):
   """If ready-state: go from serial to rgb image and save it."""
   if (not ready) or finished: return False
@@ -119,18 +128,26 @@ def image_callback(msg, camera_type='straight'):
   # print "[create_dataset]: {2} : received image. index: {0} skip_first: {1}".format(index, skip_first, rospy.get_time())
   # if rgb_cb_ts != 0: rgb_cb_rate.append(time.time()-rgb_cb_ts)
   rgb_cb_ts = time.time()
+  # pause simulator
+  if camera_type=='straight' in globals(): 
+    pause_physics_client(EmptyRequest())
+  
+  # print("index straight: {0}, index_dict {2}: {1}".format(index, [index_dict[cam] for cam in sorted(index_dict.keys())], sorted(index_dict.keys())))
   if camera_type != 'straight':
-    if process_rgb(msg, index, saving_location=data_location+'_'+camera_type):
+    if process_rgb(msg, index_dict[camera_type], saving_location=data_location+'_'+camera_type):
       if index_dict[camera_type] > skip_first: 
         write_info('RGB', index_dict[camera_type], saving_location=data_location+'_'+camera_type, direction=camera_type)
       index_dict[camera_type]+=1
   else:
     if process_rgb(msg, index):
-      if index > skip_first if not recovery else 3*skip_first: 
+      if index > skip_first: 
         write_info('RGB', index)
       index+=1
     # if rgb_write_ts != 0: rgb_write_rate.append(time.time()-rgb_write_ts)
     rgb_write_ts=time.time()
+  # resume simulator
+  if camera_type=='straight' in globals(): 
+    unpause_physics_client(EmptyRequest())
 
 def process_depth(msg, index):
   """If ready-state: go from serial to depth image and save it."""
@@ -324,7 +341,7 @@ def write_info(image_type, index, saving_location=None, direction='straight'):
     imagesfile.write("{3}s:{4}ns {0}/{1}/{2:010d}.jpg\n".format(saving_location, image_type, index, rospy.get_rostime().secs, rospy.get_rostime().nsecs))
   with open(saving_location+'/scan.txt','a') as scanfile:
     scanfile.write("{0:010d} {1}\n".format(index, str(scan)))
-
+  # print("wrote: ctr: {0} for index {1} of cam {2}".format(control, index, direction))
 
 if __name__=="__main__":
   rospy.init_node('create_dataset', anonymous=True)
@@ -363,6 +380,8 @@ if __name__=="__main__":
   if rospy.has_param('control'): rospy.Subscriber(rospy.get_param('control'), Twist, control_callback)
   rospy.Subscriber('/supervised_vel', Twist, supervised_control_callback)
   if rospy.has_param('gt_info'): rospy.Subscriber(rospy.get_param('gt_info'), Odometry, gt_callback)
+
+
   if rospy.has_param('rgb_image'): 
     if 'compressed' in rospy.get_param('rgb_image'): 
       rospy.Subscriber(rospy.get_param('rgb_image'), CompressedImage, compressed_image_callback, queue_size = 20)  
@@ -382,6 +401,9 @@ if __name__=="__main__":
       rospy.Subscriber(rospy.get_param('rgb_image_'+direction), Image, image_callback, callback_args=direction, queue_size = 20)
       if not os.path.exists(data_location+'_'+direction+'/RGB'): os.makedirs(data_location+'_'+direction+'/RGB')
       if not os.path.exists(data_location+'_'+direction+'/Depth'): os.makedirs(data_location+'_'+direction+'/Depth')
+
+    
+
     
   #   callbacks={'left':{'30':image_callback_left_30,'60':image_callback_left_60},'right':{'30':image_callback_right_30,'60':image_callback_right_60}}
   #   callbacks_depth={'left':{'30':depth_callback_left_30,'60':depth_callback_left_60},'right':{'30':depth_callback_right_30,'60':depth_callback_right_60}}
